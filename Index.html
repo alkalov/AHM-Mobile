@@ -1,634 +1,477 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Anti-Hope Machine</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ══ TOKENS ══ */
 :root{
-  --bg:#08090b; --sur:#0f1013; --sur2:#1a1b1e;
-  --bor:#2a2d35; --bor2:#343840;
-  --g:#19b78f; --r:#e05a5a; --b:#5ab4f0;
-  --y:#e2a441; --p:#9469cc; --tl:#4bb0a1;
-  --or:#d97b47; --txt:#e3e2e6; --sub:#aab4b8;
-  --mut:#5a6878; --hbg:#0d0e11; --g2:#002116;
+  --bg:#080a0d;--sur:#0d1017;--s2:#141820;--bor:#1e2430;--b2:#2a3040;
+  --g:#00e5a0;--r:#ff4d6a;--b:#4da6ff;--y:#ffc043;--p:#b87aff;
+  --tl:#3dd9c0;--or:#ff8c42;--txt:#dde3ec;--sub:#8a97a8;--mut:#445060;
+  --g2:#001a0f;--sheet-bg:#0b0e14;
+  --nav-h:64px;--top-h:52px;
 }
-
-/* ══ RESET ══ */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;}
 input[type=number]{-moz-appearance:textfield;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--bor2);border-radius:2px;}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;overflow:hidden;}
 
-/* ══ LAYOUT ══ */
-html,body{height:100%;overflow:hidden;}
-body{
-  background:var(--bg);color:var(--txt);
-  font-family:'Space Grotesk',sans-serif;font-size:14px;
-  display:flex;flex-direction:column;
-}
-.shell{flex:1;display:flex;overflow:hidden;}
-
-/* Top bar */
+/* ── TOPBAR ── */
 .topbar{
-  height:46px;background:var(--sur);border-bottom:1px solid var(--bor);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 1.1rem;flex-shrink:0;gap:.8rem;
+height:var(–top-h);background:var(–sur);border-bottom:1px solid var(–bor);
+display:flex;align-items:center;justify-content:space-between;padding:0 1rem;
+flex-shrink:0;position:relative;z-index:50;
 }
-.topbar-brand{display:flex;flex-direction:column;gap:1px;}
-.topbar-brand h1{
-  font-family:'Space Grotesk';font-size:.9rem;font-weight:700;
-  color:#fff;letter-spacing:.22em;text-transform:uppercase;
-}
-.topbar-brand .tagline{
-  font-family:'JetBrains Mono';font-size:.55rem;color:var(--g);
-  letter-spacing:.18em;text-transform:uppercase;
-}
-.topbar-right{display:flex;align-items:center;gap:.7rem;}
-.topbar-motto{
-  font-family:'JetBrains Mono';font-size:.6rem;color:var(--mut);
-  letter-spacing:.05em;display:none;
-}
-@media(min-width:680px){.topbar-motto{display:block;}}
-.how-btn{
-  height:24px;padding:0 10px;
-  background:rgba(226,164,65,.1);border:1px solid rgba(226,164,65,.3);
-  color:var(--y);font-family:'Space Grotesk';font-size:.62rem;
-  font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
-}
-.how-btn:hover{background:rgba(226,164,65,.2);}
-.topbar-dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:blink 2s infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.brand{display:flex;flex-direction:column;}
+.brand-name{font-family:‘Syne’,sans-serif;font-size:.92rem;font-weight:800;color:#fff;letter-spacing:.08em;text-transform:uppercase;}
+.brand-tag{font-family:‘DM Mono’,monospace;font-size:.5rem;color:var(–g);letter-spacing:.22em;text-transform:uppercase;margin-top:1px;}
+.top-right{display:flex;align-items:center;gap:.6rem;}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(–g);animation:pulse 2.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,160,.4);}50%{opacity:.6;box-shadow:0 0 0 5px rgba(0,229,160,0);}}
+.how-btn{height:26px;padding:0 10px;background:rgba(255,192,67,.1);border:1px solid rgba(255,192,67,.3);color:var(–y);font-family:‘Syne’,sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;}
 
-/* ══ SIDE PANELS ══ */
-.left-panel,.right-panel{
-  width:248px;flex-shrink:0;background:var(--hbg);
-  display:flex;flex-direction:column;overflow-y:auto;
-}
-.left-panel{border-right:1px solid var(--bor);}
-.right-panel{border-left:1px solid var(--bor);}
+/* ── MAIN SCROLL AREA ── */
+.app{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(–nav-h) + 1rem);}
 
-/* Collapsible blocks */
-.collap{border-bottom:1px solid var(--bor);}
-.collap-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.52rem .9rem;cursor:pointer;user-select:none;background:var(--hbg);
-  transition:background .1s;
+/* ── BOTTOM NAV ── */
+.bnav{
+position:fixed;bottom:0;left:0;right:0;height:var(–nav-h);
+background:var(–sur);border-top:1px solid var(–bor);
+display:flex;align-items:stretch;z-index:100;
+padding-bottom:env(safe-area-inset-bottom);
 }
-.collap-head:hover{background:rgba(255,255,255,.02);}
-.collap-title{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.18em;}
-.collap-title.g{color:var(--g);} .collap-title.y{color:var(--y);}
-.collap-title.tl{color:var(--tl);} .collap-title.p{color:var(--p);}
-.collap-arrow{font-family:'JetBrains Mono';font-size:.62rem;color:var(--mut);}
-.collap-body{overflow:hidden;max-height:0;transition:max-height .28s ease;}
-.collap-body.open{max-height:9999px;}
-
-/* Input rows */
-.inp-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.3rem .9rem;background:rgba(255,255,255,.02);margin-bottom:1px;
+.bnav-btn{
+flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+gap:4px;background:none;border:none;cursor:pointer;position:relative;
+color:var(–mut);transition:color .15s;
 }
-.inp-row label{font-size:.65rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;}
-.inp-num{
-  background:#000;border:1px solid var(--bor2);color:var(--g);
-  font-family:'JetBrains Mono';font-size:.75rem;
-  text-align:center;width:68px;height:24px;outline:none;padding:0 4px;
-}
-.inp-num:focus{border-color:var(--g);}
+.bnav-btn.active{color:var(–g);}
+.bnav-btn.active::before{content:’’;position:absolute;top:0;left:20%;right:20%;height:2px;background:var(–g);border-radius:0 0 3px 3px;}
+.bnav-icon{font-size:1.1rem;line-height:1;}
+.bnav-lbl{font-family:‘DM Mono’,monospace;font-size:.48rem;letter-spacing:.12em;text-transform:uppercase;}
+.bnav-dot{position:absolute;top:8px;right:calc(50% - 14px);width:6px;height:6px;border-radius:50%;background:var(–g);display:none;}
+.bnav-dot.show{display:block;}
 
-/* Stat mini grid */
-.smini{display:grid;grid-template-columns:1fr 1fr;gap:.3rem .5rem;padding:.55rem .9rem;}
-.sm-lbl{font-size:.58rem;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;}
-.sm-val{font-family:'JetBrains Mono';font-size:.78rem;margin-top:1px;}
-
-/* Side buttons */
-.side-btns{display:flex;gap:.35rem;padding:.5rem .9rem .6rem;}
-.side-btn{
-  flex:1;height:26px;font-family:'Space Grotesk';font-size:.62rem;
-  font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border:1px solid;
-}
-.side-btn.tl{background:rgba(75,176,161,.1);border-color:rgba(75,176,161,.3);color:var(--tl);}
-.side-btn.tl:hover{background:rgba(75,176,161,.2);}
-.side-btn.muted{background:transparent;border-color:var(--bor2);color:var(--mut);}
-.side-btn.muted:hover{border-color:var(--sub);color:var(--sub);}
-
-/* Right panel cards */
-.rp-card{padding:.6rem .9rem;border-bottom:1px solid var(--bor);}
-.rp-lbl{font-size:.58rem;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
-.rp-val{font-family:'JetBrains Mono';font-size:1.05rem;}
-.rp-sub{font-family:'JetBrains Mono';font-size:.62rem;color:var(--mut);margin-top:2px;}
-.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:.3rem;}
-.dg{padding:.38rem .48rem;background:rgba(255,255,255,.025);}
-.dg-lbl{font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;}
-.dg-val{font-family:'JetBrains Mono';font-size:.76rem;margin-top:2px;}
-.grade-display{
-  font-family:'Space Grotesk';font-size:2.4rem;font-weight:700;
-  color:var(--g);line-height:1;
+/* ── SECTION HEADERS ── */
+.sec-hd{
+padding:.65rem 1rem .45rem;
+font-family:‘DM Mono’,monospace;font-size:.55rem;color:var(–mut);
+text-transform:uppercase;letter-spacing:.18em;
+border-bottom:1px solid var(–bor);background:var(–bg);
+position:sticky;top:0;z-index:10;
 }
 
-/* Disclaimer */
-.disclaimer{
-  padding:.65rem .9rem;margin-top:auto;
-  background:#1a1200;border-top:1px solid rgba(226,164,65,.2);
+/* ── STRATEGY TABS ── */
+.strat-tabs{display:flex;border-bottom:1px solid var(–bor);flex-shrink:0;}
+.strat-tab{flex:1;height:40px;background:transparent;border:none;font-family:‘Syne’,sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(–mut);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+.strat-tab.active{color:var(–g);border-bottom-color:var(–g);}
+
+/* ── DIST BAR ── */
+.dist-card{margin:.75rem .9rem;background:var(–s2);border:1px solid var(–bor);padding:.75rem;border-radius:4px;}
+.dist-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;}
+.dist-lbl{font-family:‘Syne’,sans-serif;font-size:.65rem;font-weight:700;color:var(–sub);text-transform:uppercase;letter-spacing:.1em;}
+.ev-badge{font-family:‘DM Mono’,monospace;font-size:.75rem;font-weight:500;}
+.dist-bar{height:8px;border-radius:4px;overflow:hidden;display:flex;background:var(–bor);}
+.dbg{background:var(–g);}.dbb{background:var(–b);}.dbr{background:var(–r);}
+.dist-lbls{display:flex;justify-content:space-between;margin-top:.4rem;}
+.dist-lbls span{font-family:‘DM Mono’,monospace;font-size:.62rem;}
+
+/* ── CTRL GROUPS ── */
+.ctrl-group{border-bottom:1px solid var(–bor);}
+.ctrl-group-hd{
+display:flex;align-items:center;justify-content:space-between;
+padding:.7rem 1rem;cursor:pointer;user-select:none;
+background:rgba(255,255,255,.018);
 }
-.disclaimer h3{font-size:.6rem;color:var(--y);text-transform:uppercase;letter-spacing:.14em;margin-bottom:.3rem;}
-.disclaimer p{font-size:.68rem;color:#c0a878;line-height:1.65;}
-
-/* ══ MAIN PANEL ══ */
-.main-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-
-/* Tab bar */
-.tab-bar{display:flex;border-bottom:1px solid var(--bor);flex-shrink:0;background:var(--hbg);}
-.tab-btn{
-  flex:1;height:38px;background:transparent;border:none;
-  font-family:'Space Grotesk';font-size:.72rem;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;color:var(--mut);
-  cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;
-}
-.tab-btn.active{color:var(--g);border-bottom-color:var(--g);}
-.tab-btn:hover:not(.active){color:var(--sub);}
-
-/* Tab panes */
-.tab-pane{display:none;flex-direction:column;flex:1;overflow-y:auto;overflow-x:hidden;}
-.tab-pane.active{display:flex;}
-
-/* Distribution bar */
-.dist-wrap{padding:.5rem .75rem;border-bottom:1px solid var(--bor);flex-shrink:0;}
-.dist-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;}
-.dist-label{font-size:.68rem;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
-.dist-ev{font-family:'JetBrains Mono';font-size:.72rem;}
-.dist-bar{height:12px;border-radius:6px;overflow:hidden;display:flex;background:var(--bor);}
-.db-g{background:var(--g);} .db-b{background:var(--b);} .db-r{background:var(--r);}
-.dist-lbls{display:flex;justify-content:space-between;margin-top:.3rem;}
-.dist-lbls span{font-family:'JetBrains Mono';font-size:.72rem;font-weight:500;}
-
-/* Control groups */
-.ctrl-groups{flex-shrink:0;}
-.ctrl-group{border-bottom:1px solid var(--bor);}
-.ctrl-group-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.52rem 1rem;cursor:pointer;user-select:none;
-  background:rgba(255,255,255,.02);transition:background .1s;
-}
-.ctrl-group-head:hover{background:rgba(255,255,255,.04);}
-.ctrl-group-title{
-  font-family:'Space Grotesk';font-size:.72rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.14em;color:var(--sub);
-}
-.ctrl-group-arrow{font-family:'JetBrains Mono';font-size:.62rem;color:var(--mut);}
+.ctrl-group-hd:active{background:rgba(255,255,255,.04);}
+.ctrl-group-title{font-family:‘Syne’,sans-serif;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(–sub);}
+.ctrl-group-arr{font-family:‘DM Mono’,monospace;font-size:.65rem;color:var(–mut);transition:transform .25s;}
+.ctrl-group-arr.open{transform:rotate(180deg);}
 .ctrl-group-body{overflow:hidden;max-height:0;transition:max-height .3s ease;}
 .ctrl-group-body.open{max-height:9999px;}
-.ctrl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;padding:.6rem;}
-@media(max-width:860px){.ctrl-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:520px){.ctrl-grid{grid-template-columns:1fr;}}
-.ctrl-span3{grid-column:1/-1;}
+.ctrls-list{padding:.5rem .9rem .7rem;}
 
-/* Control cards */
-.ctrl{background:var(--sur2);border-left:2px solid var(--bor2);padding:.55rem .7rem;}
-.ctrl.off{opacity:.28;pointer-events:none;}
-.ctrl.off .ctrl-head{pointer-events:auto;opacity:1;}
-.ctrl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.35rem;}
-.ctrl-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
+/* ── CTRL CARD ── */
+.ctrl-card{
+background:var(–s2);border-left:2px solid var(–b2);
+padding:.6rem .75rem;margin-bottom:.45rem;border-radius:0 4px 4px 0;
+}
+.ctrl-card.off{opacity:.3;pointer-events:none;}
+.ctrl-card.off .ctrl-top{pointer-events:auto;opacity:1;}
+.ctrl-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.38rem;}
+.ctrl-lbl{font-family:‘Syne’,sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:5px;}
+.ctrl-val{font-family:‘DM Mono’,monospace;font-size:.72rem;margin-bottom:.32rem;}
+.ibtn{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border:1px solid var(–b2);font-family:‘DM Mono’,monospace;font-size:.52rem;color:var(–mut);cursor:pointer;border-radius:2px;background:none;flex-shrink:0;}
+.ibtn:active{border-color:var(–tl);color:var(–tl);}
 
-/* Toggle switch */
-.tog-wrap{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;}
-.tog{
-  appearance:none;-webkit-appearance:none;
-  width:28px;height:15px;border-radius:100px;
-  background:var(--bor2);border:1px solid var(--bor2);
-  position:relative;cursor:pointer;outline:none;transition:all .2s;flex-shrink:0;
-}
-.tog:checked{background:var(--g);border-color:var(--g);}
-.tog::after{
-  content:'';position:absolute;width:9px;height:9px;
-  border-radius:50%;background:#e3e2e6;top:2px;left:2px;transition:transform .2s;
-}
-.tog:checked::after{transform:translateX(13px);background:var(--g2);}
-.tog-lbl{font-size:.6rem;color:var(--mut);}
-.ctrl-disp{font-family:'JetBrains Mono';font-size:.7rem;color:var(--mut);margin-bottom:.18rem;}
+/* ── TOGGLE ── */
+.tog-wrap{display:flex;align-items:center;gap:5px;cursor:pointer;}
+.tog{appearance:none;-webkit-appearance:none;width:32px;height:17px;border-radius:100px;background:var(–b2);border:1px solid var(–b2);position:relative;cursor:pointer;outline:none;transition:all .18s;flex-shrink:0;}
+.tog:checked{background:var(–g);border-color:var(–g);}
+.tog::after{content:’’;position:absolute;width:11px;height:11px;border-radius:50%;background:#dde3ec;top:2px;left:2px;transition:transform .18s;}
+.tog:checked::after{transform:translateX(15px);background:var(–g2);}
+.tog-lbl{font-family:‘DM Mono’,monospace;font-size:.58rem;color:var(–mut);}
 
-/* Range sliders — large thumb for mobile */
-input[type=range]{
-  -webkit-appearance:none;background:transparent;
-  width:100%;cursor:pointer;height:30px;display:block;
-}
-input[type=range]::-webkit-slider-runnable-track{background:var(--bor2);height:4px;border-radius:2px;}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;height:22px;width:22px;
-  border-radius:5px;border:1px solid rgba(0,0,0,.5);
-  cursor:pointer;margin-top:-9px;
-}
-input[type=range]::-moz-range-track{background:var(--bor2);height:4px;border-radius:2px;}
-input[type=range]::-moz-range-thumb{height:22px;width:22px;border-radius:5px;border:1px solid rgba(0,0,0,.5);cursor:pointer;}
-.rg::-webkit-slider-thumb{background:var(--g);}
-.rg::-moz-range-thumb{background:var(--g);}
-.rr_::-webkit-slider-thumb{background:var(--r);}
-.rr_::-moz-range-thumb{background:var(--r);}
-.rb::-webkit-slider-thumb{background:var(--b);}
-.ro::-webkit-slider-thumb{background:var(--or);}
-.ry::-webkit-slider-thumb{background:var(--y);}
-.rp_::-webkit-slider-thumb{background:var(--p);}
-.rtl::-webkit-slider-thumb{background:var(--tl);}
-.rmut::-webkit-slider-thumb{background:var(--mut);}
-.sl-pair{display:flex;gap:.4rem;}
+/* ── STEPPER ── */
+.stepper{display:flex;align-items:center;gap:.4rem;width:100%;}
+.stepper-track{flex:1;position:relative;}
+input[type=range]{-webkit-appearance:none;background:transparent;width:100%;cursor:pointer;height:36px;display:block;touch-action:pan-y;}
+input[type=range]::-webkit-slider-runnable-track{background:var(–b2);height:3px;border-radius:2px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:26px;width:26px;border-radius:6px;border:1px solid rgba(0,0,0,.4);cursor:pointer;margin-top:-11.5px;}
+input[type=range]::-moz-range-track{background:var(–b2);height:3px;border-radius:2px;}
+input[type=range]::-moz-range-thumb{height:26px;width:26px;border-radius:6px;border:none;cursor:pointer;}
+.rg::-webkit-slider-thumb,.rg::-moz-range-thumb{background:var(–g);}
+.rr_::-webkit-slider-thumb,.rr_::-moz-range-thumb{background:var(–r);}
+.rb::-webkit-slider-thumb,.rb::-moz-range-thumb{background:var(–b);}
+.ro::-webkit-slider-thumb,.ro::-moz-range-thumb{background:var(–or);}
+.ry::-webkit-slider-thumb,.ry::-moz-range-thumb{background:var(–y);}
+.rp::-webkit-slider-thumb,.rp::-moz-range-thumb{background:var(–p);}
+.rtl::-webkit-slider-thumb,.rtl::-moz-range-thumb{background:var(–tl);}
+.rm::-webkit-slider-thumb,.rm::-moz-range-thumb{background:var(–mut);}
+.dual-track{display:flex;gap:.5rem;}
+.dual-track input[type=range]{flex:1;}
+.ctrl-sel{width:100%;background:#000;border:1px solid var(–b2);color:var(–g);font-family:‘DM Mono’,monospace;font-size:.7rem;height:32px;padding:0 8px;outline:none;-webkit-appearance:none;border-radius:3px;}
+.sl-note{font-size:.64rem;color:var(–mut);line-height:1.55;margin-top:.3rem;}
 
-/* Select */
-.ctrl-select{
-  width:100%;background:#000;border:1px solid var(--bor2);color:var(--g);
-  font-family:'JetBrains Mono';font-size:.7rem;height:26px;padding:0 6px;outline:none;
-  -webkit-appearance:none;
-}
-
-/* ══ SIMULATE ROW ══ */
-.sim-row{
-  display:flex;gap:.5rem;padding:.55rem .7rem;
-  flex-shrink:0;border-bottom:1px solid var(--bor);
-}
+/* ── SIM ROW ── */
+.sim-row{padding:.75rem .9rem;border-bottom:1px solid var(–bor);display:flex;gap:.5rem;}
 .sim-btn{
-  flex:1;height:40px;background:var(--g);color:var(--g2);
-  font-family:'Space Grotesk';font-weight:700;font-size:.84rem;
-  letter-spacing:.24em;text-transform:uppercase;border:none;
-  cursor:pointer;border-bottom:3px solid #149171;transition:filter .15s;
+flex:1;height:48px;background:var(–g);color:var(–g2);
+font-family:‘Syne’,sans-serif;font-weight:800;font-size:.85rem;
+letter-spacing:.2em;text-transform:uppercase;border:none;cursor:pointer;
+border-radius:4px;border-bottom:3px solid #00b87d;
+transition:filter .1s;
 }
 .sim-btn:active{filter:brightness(1.15);}
-.export-btn{
-  height:40px;padding:0 14px;background:rgba(90,180,240,.1);
-  border:1px solid rgba(90,180,240,.3);color:var(--b);
-  font-family:'Space Grotesk';font-size:.65rem;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;cursor:pointer;white-space:nowrap;
-}
-.export-btn:hover{background:rgba(90,180,240,.2);}
+.exp-btn{height:48px;padding:0 14px;background:rgba(77,166,255,.1);border:1px solid rgba(77,166,255,.3);color:var(–b);font-family:‘Syne’,sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:4px;white-space:nowrap;}
 
-/* ══ CHART + INSIGHT SIDE BY SIDE ══ */
-.chart-zone{
-  display:flex;flex-shrink:0;
-  border-bottom:1px solid var(--bor);
-  gap:0;
-}
-.chart-half{
-  flex:1;padding:.5rem .7rem .4rem;
-  border-right:1px solid var(--bor);min-width:0;
-}
-.chart-half:last-child{border-right:none;}
-.chart-title{font-size:.58rem;color:var(--mut);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.3rem;}
-canvas{width:100%;height:88px;display:block;}
-.insight-box{
-  flex:1;display:none;padding:.4rem .6rem;
-  min-width:0;overflow-y:auto;max-height:108px;
-}
-.insight-box.show{display:block;}
-.insight-box.left,.insight-box.right{position:static;width:auto;backdrop-filter:none;background:transparent;}
-.ins-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.35rem .6rem;border-bottom:1px solid var(--bor);
-  font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
-}
-.ins-badge{font-family:'JetBrains Mono';font-size:.78rem;font-weight:700;padding:1px 9px;}
-.insight-box.vi .ins-head{background:rgba(25,183,143,.07);color:var(--g);}
-.insight-box.vi .ins-badge{background:rgba(25,183,143,.15);color:var(--g);}
-.insight-box.mg .ins-head{background:rgba(226,164,65,.07);color:var(--y);}
-.insight-box.mg .ins-badge{background:rgba(226,164,65,.15);color:var(--y);}
-.insight-box.ng .ins-head{background:rgba(224,90,90,.07);color:var(--r);}
-.insight-box.ng .ins-badge{background:rgba(224,90,90,.15);color:var(--r);}
-.ins-lines{padding:.38rem .6rem;}
-.ins-line{
-  font-size:.76rem;color:var(--sub);line-height:1.6;
-  padding:.2rem 0;border-bottom:1px solid rgba(255,255,255,.04);
-}
-.ins-line:last-child{border:none;}
-.ins-line strong{font-family:'JetBrains Mono';font-size:.76rem;color:var(--txt);}
+/* ── CHART ── */
+.chart-wrap{padding:.75rem .9rem .5rem;border-bottom:1px solid var(–bor);}
+.chart-title{font-family:‘DM Mono’,monospace;font-size:.52rem;color:var(–mut);text-transform:uppercase;letter-spacing:.14em;margin-bottom:.4rem;}
+canvas{width:100%;height:110px;display:block;}
 
-/* ══ TABLE ══ */
-.tbl-wrap{flex:0 0 auto;}
-table{width:100%;border-collapse:collapse;}
-thead{background:var(--sur);position:sticky;top:0;z-index:5;}
-thead th{
-  font-family:'JetBrains Mono';font-size:.58rem;letter-spacing:.06em;
-  color:var(--mut);text-transform:uppercase;
-  padding:.5rem .55rem;text-align:right;
-  border-bottom:1px solid var(--bor);white-space:nowrap;
+/* ── INSIGHT ── */
+.insight-wrap{margin:.75rem .9rem;border-radius:4px;overflow:hidden;display:none;}
+.insight-wrap.show{display:block;}
+.insight-hd{display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;font-family:‘Syne’,sans-serif;font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;}
+.insight-badge{font-family:‘DM Mono’,monospace;font-size:.72rem;padding:2px 10px;border-radius:2px;}
+.insight-wrap.vi .insight-hd{background:rgba(0,229,160,.1);color:var(–g);}
+.insight-wrap.vi .insight-badge{background:rgba(0,229,160,.18);color:var(–g);}
+.insight-wrap.mg .insight-hd{background:rgba(255,192,67,.1);color:var(–y);}
+.insight-wrap.mg .insight-badge{background:rgba(255,192,67,.18);color:var(–y);}
+.insight-wrap.ng .insight-hd{background:rgba(255,77,106,.1);color:var(–r);}
+.insight-wrap.ng .insight-badge{background:rgba(255,77,106,.18);color:var(–r);}
+.insight-lines{padding:.5rem .75rem;background:rgba(255,255,255,.025);}
+.insight-line{font-size:.73rem;color:var(–sub);line-height:1.6;padding:.2rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.insight-line:last-child{border:none;}
+.insight-line strong{font-family:‘DM Mono’,monospace;color:var(–txt);}
+
+/* ── RESULTS SHEET (slides up after sim) ── */
+.results-sheet{
+position:fixed;bottom:var(–nav-h);left:0;right:0;
+background:var(–sheet-bg);border-top:1px solid var(–bor);
+transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);
+z-index:80;max-height:70vh;display:flex;flex-direction:column;
 }
-th:nth-child(1),th:nth-child(2){text-align:center;}
-th:nth-child(4){text-align:left;}
-tbody tr{border-bottom:1px solid rgba(255,255,255,.03);}
-tbody tr:hover{background:rgba(255,255,255,.025);}
-tr.rl{background:rgba(224,90,90,.04);}
-tr.rb_{background:rgba(90,180,240,.03);}
-tr.rms-w{background:rgba(25,183,143,.08);}tr.rms-w td{color:var(--g)!important;}
-tr.rms-l{background:rgba(224,90,90,.08);}tr.rms-l td{color:var(--r)!important;}
-tr.blow{background:rgba(224,90,90,.12);}tr.blow td{color:var(--r)!important;}
-tr.good{background:rgba(25,183,143,.1);}tr.good td{color:var(--g)!important;}
-td{
-  padding:.4rem .55rem;text-align:right;
-  font-family:'JetBrains Mono';font-size:.7rem;white-space:nowrap;
-}
-td:nth-child(1),td:nth-child(2){text-align:center;color:var(--mut);font-size:.63rem;}
-td:nth-child(4){text-align:left;font-family:'Space Grotesk';font-size:.65rem;color:var(--mut);}
+.results-sheet.open{transform:translateY(0);}
+.sheet-handle{width:36px;height:4px;border-radius:2px;background:var(–b2);margin:.6rem auto .4rem;flex-shrink:0;cursor:pointer;}
+.sheet-title{font-family:‘DM Mono’,monospace;font-size:.54rem;color:var(–mut);text-transform:uppercase;letter-spacing:.16em;text-align:center;padding-bottom:.5rem;border-bottom:1px solid var(–bor);flex-shrink:0;}
+.sheet-close{position:absolute;top:.5rem;right:.75rem;background:none;border:1px solid var(–b2);color:var(–mut);font-family:‘DM Mono’,monospace;font-size:.58rem;padding:2px 8px;cursor:pointer;border-radius:2px;}
+.sheet-close:active{color:var(–r);border-color:var(–r);}
+.sheet-body{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
+
+/* ── SHEET CARDS ── */
+.sheet-cards{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;padding:.75rem .9rem;}
+.scard{background:var(–s2);padding:.55rem .65rem;border-radius:4px;}
+.scard.full{grid-column:1/-1;}
+.scard-l{font-family:‘DM Mono’,monospace;font-size:.52rem;color:var(–mut);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.scard-v{font-family:‘DM Mono’,monospace;font-size:1rem;font-weight:500;}
+.scard-s{font-family:‘DM Mono’,monospace;font-size:.58rem;color:var(–mut);margin-top:2px;}
+.scard-v.pos{color:var(–g);}.scard-v.neg{color:var(–r);}.scard-v.neu{color:var(–y);}
+.scard-v.cb{color:var(–b);}.scard-v.cy{color:var(–y);}.scard-v.ctla{color:var(–tl);}
+
+/* ── EDGE DIAGNOSTICS ── */
+.edge-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;padding:.75rem .9rem;}
+.ecell{background:var(–s2);padding:.52rem .6rem;border-radius:4px;}
+.ecell.full{grid-column:1/-1;}
+.ecell-l{font-family:‘DM Mono’,monospace;font-size:.5rem;color:var(–mut);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.ecell-v{font-family:‘DM Mono’,monospace;font-size:.82rem;font-weight:500;}
+.ecell-v.pos{color:var(–g);}.ecell-v.neg{color:var(–r);}.ecell-v.neu{color:var(–y);}
+
+/* ── TABLE ── */
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;min-width:560px;}
+thead{background:var(–sur);position:sticky;top:0;z-index:5;}
+thead th{font-family:‘DM Mono’,monospace;font-size:.52rem;letter-spacing:.05em;color:var(–mut);text-transform:uppercase;padding:.45rem .5rem;text-align:right;border-bottom:1px solid var(–bor);white-space:nowrap;}
+th:nth-child(1),th:nth-child(2){text-align:center;}th:nth-child(4){text-align:left;}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.025);}
+tbody tr:active{background:rgba(255,255,255,.03);}
+tr.rl{background:rgba(255,77,106,.04);}tr.rb_{background:rgba(77,166,255,.03);}
+tr.rms-w{background:rgba(0,229,160,.08);}tr.rms-w td{color:var(–g)!important;}
+tr.rms-l{background:rgba(255,77,106,.08);}tr.rms-l td{color:var(–r)!important;}
+tr.blow{background:rgba(255,77,106,.12);}tr.blow td{color:var(–r)!important;}
+tr.good{background:rgba(0,229,160,.1);}tr.good td{color:var(–g)!important;}
+td{padding:.38rem .5rem;text-align:right;font-family:‘DM Mono’,monospace;font-size:.68rem;white-space:nowrap;}
+td:nth-child(1),td:nth-child(2){text-align:center;color:var(–mut);font-size:.6rem;}
+td:nth-child(4){text-align:left;font-family:‘DM Sans’,sans-serif;font-size:.62rem;color:var(–mut);}
 .bw{position:relative;overflow:hidden;}
 .bf{position:absolute;left:0;top:0;bottom:0;pointer-events:none;}
-.bfp{background:rgba(25,183,143,.09);}
-.bfn{background:rgba(224,90,90,.11);}
-.bfz{background:rgba(90,180,240,.08);}
+.bfp{background:rgba(0,229,160,.09);}.bfn{background:rgba(255,77,106,.11);}.bfz{background:rgba(77,166,255,.08);}
 .bw span{position:relative;}
 
-/* ══ COLOUR UTILITIES ══ */
-.pos{color:var(--g);}.neg{color:var(--r);}.neu{color:var(--y);}
-.cg{color:var(--g);}.cr{color:var(--r);}.cb{color:var(--b);}
-.cy{color:var(--y);}.cp{color:var(--p);}.ctla{color:var(--tl);}.cor{color:var(--or);}
+/* ── SESSION TAB ── */
+.session-body{padding:.75rem .9rem;}
+.input-group{background:var(–s2);border-radius:4px;margin-bottom:.5rem;overflow:hidden;}
+.input-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;border-bottom:1px solid var(–bor);}
+.input-row:last-child{border:none;}
+.input-row label{font-family:‘DM Sans’,sans-serif;font-size:.68rem;color:var(–sub);}
+.num-input{background:#000;border:1px solid var(–b2);color:var(–g);font-family:‘DM Mono’,monospace;font-size:.78rem;text-align:center;width:76px;height:30px;outline:none;padding:0 4px;border-radius:3px;}
+.num-input:focus{border-color:var(–g);}
+.sess-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-bottom:.6rem;}
+.ss-cell{background:var(–s2);padding:.5rem .55rem;border-radius:4px;text-align:center;}
+.ss-lbl{font-family:‘DM Mono’,monospace;font-size:.48rem;color:var(–mut);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.ss-val{font-family:‘DM Mono’,monospace;font-size:.85rem;font-weight:500;}
+.sess-btns{display:flex;gap:.5rem;margin-bottom:.75rem;}
+.sess-btn{flex:1;height:44px;font-family:‘Syne’,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:4px;border:1px solid;}
+.sess-btn.log{background:rgba(61,217,192,.15);border-color:rgba(61,217,192,.4);color:var(–tl);}
+.sess-btn.clr{background:transparent;border-color:var(–b2);color:var(–mut);}
+.log-count{font-family:‘DM Mono’,monospace;font-size:.6rem;color:var(–mut);text-align:center;margin-bottom:.5rem;}
+.grade-card{background:var(–s2);border-radius:4px;padding:.75rem;display:flex;align-items:center;justify-content:space-between;}
+.grade-info .grade-title{font-family:‘DM Mono’,monospace;font-size:.52rem;color:var(–mut);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.3rem;}
+.grade-info .grade-status{font-size:.73rem;color:var(–sub);}
+.grade-big{font-family:‘Syne’,sans-serif;font-size:3rem;font-weight:800;color:var(–g);line-height:1;}
 
-/* ══ MODALS ══ */
-.modal-bg{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);
-  z-index:1000;align-items:flex-start;justify-content:center;
-  padding:2rem 1rem;overflow-y:auto;
-}
-.modal-bg.open{display:flex;}
-.modal-box{
-  background:var(--sur);border:1px solid var(--bor2);
-  max-width:580px;width:100%;padding:1.5rem;position:relative;
-}
-.modal-title{
-  font-size:.78rem;color:var(--g);text-transform:uppercase;
-  letter-spacing:.18em;margin-bottom:1rem;
-  padding-bottom:.5rem;border-bottom:1px solid var(--bor);
-}
-.modal-close{
-  position:absolute;top:.6rem;right:.6rem;background:none;
-  border:1px solid var(--bor2);color:var(--mut);font-size:.68rem;
-  padding:2px 8px;cursor:pointer;
-}
-.modal-close:hover{color:var(--r);border-color:var(--r);}
-.guide-step{margin-bottom:1rem;padding-left:.8rem;border-left:2px solid var(--g);}
-.guide-step h3{font-size:.72rem;color:var(--g);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem;}
-.guide-step p,.guide-step li{font-size:.78rem;color:var(--sub);line-height:1.65;margin-bottom:.25rem;}
-.guide-step ul{padding-left:1rem;}
-.gtag{background:rgba(25,183,143,.12);color:var(--g);font-family:'JetBrains Mono';font-size:.65rem;padding:1px 6px;}
-.info-box{
-  background:var(--sur);border:1px solid var(--g);
-  padding:1.2rem;max-width:420px;width:100%;
-  max-height:78vh;overflow-y:auto;position:relative;
-}
-.info-box h2{font-size:.7rem;color:var(--g);text-transform:uppercase;letter-spacing:.14em;margin-bottom:.55rem;}
-.info-box p,.info-box li{font-size:.78rem;color:var(--sub);line-height:1.65;margin-bottom:.35rem;}
+/* ── OVERALL STATS TAB ── */
+.overall-body{padding:.75rem .9rem;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem;}
+.stat-cell{background:var(–s2);padding:.55rem .65rem;border-radius:4px;}
+.stat-lbl{font-family:‘DM Mono’,monospace;font-size:.5rem;color:var(–mut);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.stat-val{font-family:‘DM Mono’,monospace;font-size:.88rem;font-weight:500;}
+.stat-input-group{background:var(–s2);border-radius:4px;margin-bottom:.5rem;overflow:hidden;}
+.stat-input-row{display:flex;align-items:center;justify-content:space-between;padding:.48rem .75rem;border-bottom:1px solid var(–bor);}
+.stat-input-row:last-child{border:none;}
+.stat-input-row label{font-family:‘DM Sans’,sans-serif;font-size:.67rem;color:var(–sub);}
+
+/* ── MODALS ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:flex-end;justify-content:center;padding:0;}
+.modal.open{display:flex;}
+.modal-box{background:var(–sur);border-top:1px solid var(–b2);max-width:600px;width:100%;padding:1.2rem 1rem 2rem;max-height:85vh;overflow-y:auto;border-radius:12px 12px 0 0;position:relative;}
+.modal-title{font-family:‘DM Mono’,monospace;font-size:.6rem;color:var(–g);text-transform:uppercase;letter-spacing:.2em;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(–bor);}
+.modal-x{position:absolute;top:.7rem;right:.9rem;background:none;border:1px solid var(–b2);color:var(–mut);font-size:.65rem;padding:3px 10px;cursor:pointer;border-radius:3px;font-family:‘DM Mono’,monospace;}
+.gs{margin-bottom:.85rem;padding-left:.8rem;border-left:2px solid var(–g);}
+.gs h3{font-family:‘Syne’,sans-serif;font-size:.68rem;font-weight:700;color:var(–g);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.25rem;}
+.gs p,.gs li{font-size:.76rem;color:var(–sub);line-height:1.65;margin-bottom:.2rem;}
+.gs ul{padding-left:1rem;}
+.gtag{background:rgba(0,229,160,.12);color:var(–g);font-family:‘DM Mono’,monospace;font-size:.62rem;padding:1px 6px;border-radius:2px;}
+.info-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:flex-end;justify-content:center;}
+.info-modal.open{display:flex;}
+.info-box{background:var(–sur);border-top:1px solid var(–g);padding:1.2rem 1rem 2rem;max-width:500px;width:100%;max-height:70vh;overflow-y:auto;position:relative;border-radius:12px 12px 0 0;}
+.info-box h2{font-family:‘Syne’,sans-serif;font-size:.7rem;color:var(–g);text-transform:uppercase;letter-spacing:.14em;margin-bottom:.5rem;}
+.info-box p,.info-box li{font-size:.76rem;color:var(–sub);line-height:1.65;margin-bottom:.3rem;}
 .info-box ul{padding-left:1rem;}
-.term{color:var(--tl);font-family:'JetBrains Mono';}
-.info-btn{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:14px;height:14px;border:1px solid var(--bor2);
-  font-family:'JetBrains Mono';font-size:.55rem;color:var(--mut);
-  cursor:pointer;flex-shrink:0;margin-left:4px;background:none;
-}
-.info-btn:hover{border-color:var(--tl);color:var(--tl);}
+.term{color:var(–tl);font-family:‘DM Mono’,monospace;}
 
-/* ══ MOBILE OVERRIDES ══ */
-@media(max-width:860px){
-  html,body{height:auto;overflow:auto;}
-  .shell{flex-direction:column;}
-  .left-panel,.right-panel{width:100%;border:none;border-bottom:1px solid var(--bor);}
-  .main-panel{overflow:visible;}
-  .tab-pane.active{overflow:visible;}
-  .tbl-wrap{min-height:300px;}
-}
+/* ── DISC ── */
+.disc{margin:.75rem .9rem;background:rgba(255,192,67,.06);border:1px solid rgba(255,192,67,.2);border-radius:4px;padding:.65rem .8rem;}
+.disc h3{font-family:‘DM Mono’,monospace;font-size:.55rem;color:var(–y);text-transform:uppercase;letter-spacing:.14em;margin-bottom:.28rem;}
+.disc p{font-size:.67rem;color:#c0a878;line-height:1.65;}
+
+/* ── UTIL ── */
+.pos{color:var(–g);}.neg{color:var(–r);}.neu{color:var(–y);}
+.cg_{color:var(–g);}.cr{color:var(–r);}.cb{color:var(–b);}.cy_{color:var(–y);}.ctla_{color:var(–tl);}
 </style>
+
 </head>
 <body>
+<div class="app">
 
-<!-- TOP BAR -->
+<!-- TOPBAR -->
+
 <div class="topbar">
-  <div class="topbar-brand">
-    <h1>Anti-Hope Machine</h1>
-    <span class="tagline">Strategy Simulator</span>
+  <div class="brand">
+    <div class="brand-name">Anti-Hope Machine</div>
+    <div class="brand-tag">Strategy Simulator</div>
   </div>
-  <div class="topbar-right">
-    <span class="topbar-motto">Enter your numbers · Run a sim · See the truth</span>
-    <button class="how-btn" onclick="openModal('guide')">? How to Use</button>
-    <span class="topbar-dot"></span>
+  <div class="top-right">
+    <button class="how-btn" onclick="openGuide()">? Guide</button>
+    <div class="pulse"></div>
   </div>
 </div>
 
-<div class="shell">
+<!-- SCREENS -->
 
-<!-- ══════════ LEFT PANEL ══════════ -->
-<aside class="left-panel">
+<div class="screen" id="screen-sim">
+  <!-- strategy tabs -->
+  <div class="strat-tabs">
+    <button class="strat-tab active" id="stb0" onclick="switchStrat(0)">Strategy A</button>
+    <button class="strat-tab" id="stb1" onclick="switchStrat(1)">Strategy B</button>
+    <button class="strat-tab" id="stb2" onclick="switchStrat(2)">Strategy C</button>
+  </div>
+  <div id="strat-pane-0"></div>
+  <div id="strat-pane-1" style="display:none;"></div>
+  <div id="strat-pane-2" style="display:none;"></div>
+</div>
 
-  <!-- Today's Session -->
-  <div class="collap">
-    <div class="collap-head" onclick="toggleCollap(this)">
-      <span class="collap-title tl">Today's Session</span>
-      <span class="collap-arrow">▲</span>
+<div class="screen" id="screen-edge" style="display:none;">
+  <div class="sec-hd">Edge Diagnostics</div>
+  <div class="edge-grid">
+    <div class="ecell full"><div class="ecell-l">Expected $/Day (Net)</div><div class="ecell-v pos" id="ed-main">—</div></div>
+    <div class="ecell"><div class="ecell-l">Exp $/Trade</div><div class="ecell-v" id="ed-ev">—</div></div>
+    <div class="ecell"><div class="ecell-l">Monthly Est</div><div class="ecell-v" id="ed-mo">—</div></div>
+    <div class="ecell"><div class="ecell-l">R:R Ratio</div><div class="ecell-v" id="ed-rr">—</div></div>
+    <div class="ecell"><div class="ecell-l">Min WR to BE</div><div class="ecell-v" id="ed-mwr">—</div></div>
+    <div class="ecell"><div class="ecell-l">Days/Share</div><div class="ecell-v" id="ed-ds">—</div></div>
+    <div class="ecell"><div class="ecell-l">Friction/Day</div><div class="ecell-v" id="ed-fric">—</div></div>
+    <div class="ecell"><div class="ecell-l">WR Buffer</div><div class="ecell-v" id="ed-wrbuf">—</div></div>
+    <div class="ecell"><div class="ecell-l">Swing Capture</div><div class="ecell-v" id="ed-swing">—</div></div>
+    <div class="ecell full"><div class="ecell-l">Status</div><div class="ecell-v" id="ed-st">—</div></div>
+  </div>
+  <div class="sec-hd" style="position:relative;top:auto;">Sim Results</div>
+  <div class="sheet-cards">
+    <div class="scard full"><div class="scard-l">Time to Goal</div><div class="scard-v cb" id="tp-cal">—</div><div class="scard-s" id="tp-sub">Run a simulation first</div></div>
+    <div class="scard full"><div class="scard-l">Capital at Goal</div><div class="scard-v cy" id="tp-cap">—</div><div class="scard-s" id="tp-rsub">—</div></div>
+    <div class="scard"><div class="scard-l">Win Rate</div><div class="scard-v cg_" id="ss-wr">—</div></div>
+    <div class="scard"><div class="scard-l">BE Rate</div><div class="scard-v cb" id="ss-be">—</div></div>
+    <div class="scard"><div class="scard-l">Loss Rate</div><div class="scard-v neg" id="ss-lr">—</div></div>
+    <div class="scard"><div class="scard-l">Total Return</div><div class="scard-v" id="ss-ret">—</div></div>
+    <div class="scard"><div class="scard-l">Ann Return</div><div class="scard-v" id="ss-ann">—</div></div>
+    <div class="scard"><div class="scard-l">Sharpe</div><div class="scard-v ctla" id="ss-sharpe">—</div></div>
+  </div>
+  <div class="disc"><h3>⚠ Disclaimer</h3><p><strong>Results are not guaranteed.</strong> Educational use only. Not financial advice.</p></div>
+</div>
+
+<div class="screen" id="screen-session" style="display:none;">
+  <div class="sec-hd">Today's Session</div>
+  <div class="session-body">
+    <div class="log-count" id="dCount">0 days logged</div>
+    <div class="input-group">
+      <div class="input-row"><label>Wins</label><input class="num-input" id="dWins" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
+      <div class="input-row"><label>Losses</label><input class="num-input" id="dLoss" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
+      <div class="input-row"><label>Breakevens</label><input class="num-input" id="dBE" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
+      <div class="input-row"><label>Avg Win ticks</label><input class="num-input" id="dTickW" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
+      <div class="input-row"><label>Avg Loss ticks</label><input class="num-input" id="dTickL" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
+      <div class="input-row"><label>Net P&amp;L $</label><input class="num-input" id="dPnl" type="number" step="0.01" placeholder="0.00" oninput="onDaily()" style="width:84px;"></div>
+      <div class="input-row"><label>Shares held</label><input class="num-input" id="dShares" type="number" min="1" placeholder="100" oninput="onDaily()"></div>
     </div>
-    <div class="collap-body open">
-      <div style="padding:.35rem .9rem .15rem;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:.58rem;color:var(--mut);font-family:'JetBrains Mono';" id="dCount">0 logged</span>
+    <div class="sess-stats">
+      <div class="ss-cell"><div class="ss-lbl">Win Rate</div><div class="ss-val cg_" id="dd-wr">—</div></div>
+      <div class="ss-cell"><div class="ss-lbl">Exp/Trade</div><div class="ss-val" id="dd-ev">—</div></div>
+      <div class="ss-cell"><div class="ss-lbl">Mo Pace</div><div class="ss-val" id="dd-mo">—</div></div>
+      <div class="ss-cell"><div class="ss-lbl">vs Baseline</div><div class="ss-val" id="dd-pb">—</div></div>
+      <div class="ss-cell"><div class="ss-lbl">On Goal</div><div class="ss-val" id="dd-og">—</div></div>
+      <div class="ss-cell"><div class="ss-lbl">Grade</div><div class="ss-val" id="dd-gr" style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;">—</div></div>
+    </div>
+    <div class="sess-btns">
+      <button class="sess-btn log" onclick="logDay()">+ LOG DAY</button>
+      <button class="sess-btn clr" onclick="clearLog()">CLEAR</button>
+    </div>
+    <div class="grade-card">
+      <div class="grade-info">
+        <div class="grade-title">Grade vs Your Baseline</div>
+        <div class="grade-status" id="sd-status">Log days to unlock</div>
       </div>
-      <div class="inp-row"><label>Wins</label><input class="inp-num" id="dWins" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
-      <div class="inp-row"><label>Losses</label><input class="inp-num" id="dLoss" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
-      <div class="inp-row"><label>Breakevens</label><input class="inp-num" id="dBE" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
-      <div class="inp-row"><label>Avg Win ticks</label><input class="inp-num" id="dTickW" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
-      <div class="inp-row"><label>Avg Loss ticks</label><input class="inp-num" id="dTickL" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
-      <div class="inp-row"><label>Net P&L $</label><input class="inp-num" id="dPnl" type="number" step="0.01" placeholder="0.00" oninput="onDaily()" style="width:74px;"></div>
-      <div class="inp-row"><label>Shares held</label><input class="inp-num" id="dShares" type="number" min="1" placeholder="100" oninput="onDaily()"></div>
-      <div class="smini">
-        <div><div class="sm-lbl">Win Rate</div><div class="sm-val cg" id="dd-wr">—</div></div>
-        <div><div class="sm-lbl">Exp $/Trade</div><div class="sm-val" id="dd-ev">—</div></div>
-        <div><div class="sm-lbl">Monthly Pace</div><div class="sm-val" id="dd-mo">—</div></div>
-        <div><div class="sm-lbl">vs Baseline</div><div class="sm-val" id="dd-pb">—</div></div>
-        <div><div class="sm-lbl">Grade</div><div class="sm-val" id="dd-gr" style="font-size:1rem;font-weight:700;">—</div></div>
-        <div><div class="sm-lbl">On Goal</div><div class="sm-val" id="dd-og">—</div></div>
-      </div>
-      <div class="side-btns">
-        <button class="side-btn tl" onclick="logDay()">+ LOG DAY</button>
-        <button class="side-btn muted" onclick="clearLog()">CLR</button>
-      </div>
+      <div class="grade-big" id="sd-grade">—</div>
     </div>
   </div>
+</div>
 
-  <!-- Overall Trading Stats -->
-  <div class="collap">
-    <div class="collap-head" onclick="toggleCollap(this)">
-      <span class="collap-title y">Overall Trading Stats</span>
-      <span class="collap-arrow">▲</span>
+<div class="screen" id="screen-overall" style="display:none;">
+  <div class="sec-hd">Overall Trading Stats</div>
+  <div class="overall-body">
+    <div class="stat-input-group">
+      <div class="stat-input-row"><label>Total Trades</label><input class="num-input" id="rTrades" type="number" placeholder="—" oninput="onReal()"></div>
+      <div class="stat-input-row"><label>Trading Days</label><input class="num-input" id="rDays" type="number" placeholder="—" oninput="onReal()"></div>
+      <div class="stat-input-row"><label>Win Rate %</label><input class="num-input" id="rWR" type="number" step="0.1" placeholder="—" oninput="onReal()"></div>
+      <div class="stat-input-row"><label>Breakeven %</label><input class="num-input" id="rBE" type="number" step="0.1" placeholder="—" oninput="onReal()"></div>
+      <div class="stat-input-row"><label>Avg Ticks Won</label><input class="num-input" id="rTickW" type="number" placeholder="—" oninput="onReal()"></div>
+      <div class="stat-input-row"><label>Avg Ticks Lost</label><input class="num-input" id="rTickL" type="number" placeholder="—" oninput="onReal()"></div>
+      <div class="stat-input-row"><label>Start Capital $</label><input class="num-input" id="rCapS" type="number" placeholder="—" oninput="onReal()" style="width:90px;"></div>
+      <div class="stat-input-row"><label>Curr Capital $</label><input class="num-input" id="rCapC" type="number" placeholder="—" oninput="onReal()" style="width:90px;"></div>
+      <div class="stat-input-row"><label>Sharpe (actual)</label><input class="num-input" id="rSharpe" type="number" step="0.01" min="-5" max="5" placeholder="0.0" oninput="onReal()" style="width:66px;"></div>
     </div>
-    <div class="collap-body open">
-      <div class="inp-row"><label>Total Trades</label><input class="inp-num" id="rTrades" type="number" placeholder="—" oninput="onReal()"></div>
-      <div class="inp-row"><label>Trading Days</label><input class="inp-num" id="rDays" type="number" placeholder="—" oninput="onReal()"></div>
-      <div class="inp-row"><label>Win Rate %</label><input class="inp-num" id="rWR" type="number" step="0.1" placeholder="—" oninput="onReal()"></div>
-      <div class="inp-row"><label>Breakeven %</label><input class="inp-num" id="rBE" type="number" step="0.1" placeholder="—" oninput="onReal()"></div>
-      <div class="inp-row"><label>Avg Ticks Won</label><input class="inp-num" id="rTickW" type="number" placeholder="—" oninput="onReal()"></div>
-      <div class="inp-row"><label>Avg Ticks Lost</label><input class="inp-num" id="rTickL" type="number" placeholder="—" oninput="onReal()"></div>
-      <div class="inp-row"><label>Start Capital $</label><input class="inp-num" id="rCapS" type="number" placeholder="—" oninput="onReal()" style="width:74px;"></div>
-      <div class="inp-row"><label>Curr Capital $</label><input class="inp-num" id="rCapC" type="number" placeholder="—" oninput="onReal()" style="width:74px;"></div>
-      <div class="inp-row"><label>Sharpe (actual)</label><input class="inp-num" id="rSharpe" type="number" step="0.01" min="-5" max="5" placeholder="0.0" oninput="onReal()" style="width:54px;"></div>
-      <div class="smini">
-        <div><div class="sm-lbl">Loss Rate</div><div class="sm-val cr" id="rLoss">—</div></div>
-        <div><div class="sm-lbl">Avg T/Day</div><div class="sm-val cy" id="rAvgT">—</div></div>
-        <div><div class="sm-lbl">R:R Ratio</div><div class="sm-val cg" id="rRR">—</div></div>
-        <div><div class="sm-lbl">YTD Return</div><div class="sm-val" id="rYTD">—</div></div>
-        <div><div class="sm-lbl">Total P&L</div><div class="sm-val" id="rPnlTotal">—</div></div>
-        <div><div class="sm-lbl">Sharpe</div><div class="sm-val ctla" id="rSharpeLabel">—</div></div>
-      </div>
-      <!-- Account overview inline -->
-      <div style="padding:.4rem .9rem .55rem;border-top:1px solid var(--bor);">
-        <div style="font-size:.6rem;color:var(--mut);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem;">Account Overview</div>
-        <div class="smini" style="padding:0;">
-          <div><div class="sm-lbl">YTD Return</div><div class="sm-val" id="b-ytd">—</div></div>
-          <div><div class="sm-lbl">Capital Change</div><div class="sm-val" id="b-cap">—</div></div>
-        </div>
-      </div>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="stat-lbl">Loss Rate</div><div class="stat-val cr" id="rLoss">—</div></div>
+      <div class="stat-cell"><div class="stat-lbl">Avg T/Day</div><div class="stat-val cy_" id="rAvgT">—</div></div>
+      <div class="stat-cell"><div class="stat-lbl">R:R Ratio</div><div class="stat-val cg_" id="rRR">—</div></div>
+      <div class="stat-cell"><div class="stat-lbl">YTD Return</div><div class="stat-val" id="rYTD">—</div></div>
+      <div class="stat-cell"><div class="stat-lbl">Total P&amp;L</div><div class="stat-val" id="rPnlTotal">—</div></div>
+      <div class="stat-cell"><div class="stat-lbl">Sharpe</div><div class="stat-val ctla_" id="rSharpeL">—</div></div>
     </div>
   </div>
+</div>
 
-</aside>
+<!-- RESULTS SHEET (table) -->
 
-<!-- ══════════ MAIN PANEL ══════════ -->
-<main class="main-panel">
-  <div class="tab-bar">
-    <button class="tab-btn active" id="tb0" onclick="switchTab(0)">Strategy A</button>
-    <button class="tab-btn" id="tb1" onclick="switchTab(1)">Strategy B</button>
-    <button class="tab-btn" id="tb2" onclick="switchTab(2)">Strategy C</button>
-  </div>
-  <div class="tab-pane active" id="tp0"></div>
-  <div class="tab-pane" id="tp1"></div>
-  <div class="tab-pane" id="tp2"></div>
-</main>
-
-<!-- ══════════ RIGHT PANEL ══════════ -->
-<aside class="right-panel">
-
-  <div class="collap">
-    <div class="collap-head" onclick="toggleCollap(this)">
-      <span class="collap-title g">Edge Diagnostics</span>
-      <span class="collap-arrow">▲</span>
-    </div>
-    <div class="collap-body open">
-      <div class="rp-card">
-        <div class="rp-lbl">Expected $ / Day (Net)</div>
-        <div class="rp-val pos" id="ed-day-main">—</div>
-      </div>
-      <div style="padding:.45rem .9rem;border-bottom:1px solid var(--bor);">
-        <div class="diag-grid">
-          <div class="dg"><div class="dg-lbl">Exp $ / Trade</div><div class="dg-val" id="ed-ev">—</div></div>
-          <div class="dg"><div class="dg-lbl">Monthly Est</div><div class="dg-val" id="ed-mo">—</div></div>
-          <div class="dg"><div class="dg-lbl">R:R Ratio</div><div class="dg-val" id="ed-rr">—</div></div>
-          <div class="dg"><div class="dg-lbl">Min WR BE</div><div class="dg-val" id="ed-mwr">—</div></div>
-          <div class="dg"><div class="dg-lbl">Days/Share</div><div class="dg-val" id="ed-ds">—</div></div>
-          <div class="dg"><div class="dg-lbl">Friction/Day</div><div class="dg-val" id="ed-fric">—</div></div>
-          <div class="dg"><div class="dg-lbl">WR Buffer</div><div class="dg-val" id="ed-wrbuf">—</div></div>
-          <div class="dg"><div class="dg-lbl">Status</div><div class="dg-val" id="ed-st">—</div></div>
-        </div>
-      </div>
+<div class="results-sheet" id="results-sheet">
+  <div class="sheet-handle" onclick="closeSheet()"></div>
+  <div class="sheet-title" id="sheet-title">Simulation Table — Strategy A</div>
+  <button class="sheet-close" onclick="closeSheet()">✕</button>
+  <div class="sheet-body">
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Day</th><th>Cal</th><th>Mo P&L</th><th>Label</th><th>Shares</th><th>Result</th><th>Tr</th><th>Ticks</th><th>Day%</th><th>P&L</th><th>Ret%</th><th>Surplus</th><th>+Sh</th><th>Cumul</th></tr></thead>
+        <tbody id="sheet-tbody"></tbody>
+      </table>
     </div>
   </div>
+</div>
 
-  <div class="collap">
-    <div class="collap-head" onclick="toggleCollap(this)">
-      <span class="collap-title y">Sim Results</span>
-      <span class="collap-arrow">▲</span>
-    </div>
-    <div class="collap-body open">
-      <div class="rp-card">
-        <div class="rp-lbl">Time to Goal</div>
-        <div class="rp-val cb" id="tp-cal">—</div>
-        <div class="rp-sub" id="tp-sub">—</div>
-      </div>
-      <div class="rp-card">
-        <div class="rp-lbl">Capital at Goal</div>
-        <div class="rp-val cy" id="tp-cap">—</div>
-        <div class="rp-sub" id="tp-ret-sub">—</div>
-      </div>
-      <div style="padding:.45rem .9rem;border-bottom:1px solid var(--bor);">
-        <div class="diag-grid">
-          <div class="dg"><div class="dg-lbl">Win Rate</div><div class="dg-val cg" id="ss-wr">—</div></div>
-          <div class="dg"><div class="dg-lbl">BE Rate</div><div class="dg-val cb" id="ss-be">—</div></div>
-          <div class="dg"><div class="dg-lbl">Loss Rate</div><div class="dg-val cr" id="ss-lr">—</div></div>
-          <div class="dg"><div class="dg-lbl">Total Return</div><div class="dg-val" id="ss-ret">—</div></div>
-          <div class="dg"><div class="dg-lbl">Ann Return</div><div class="dg-val" id="ss-ann">—</div></div>
-          <div class="dg"><div class="dg-lbl">Sharpe</div><div class="dg-val ctla" id="ss-sharpe">—</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- BOTTOM NAV -->
 
-  <div class="collap">
-    <div class="collap-head" onclick="toggleCollap(this)">
-      <span class="collap-title tl">Session Grade</span>
-      <span class="collap-arrow">▲</span>
-    </div>
-    <div class="collap-body open">
-      <div class="rp-card" style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div class="rp-lbl">Grade vs Your Baseline</div>
-          <div class="rp-sub" id="sd-status">Log days to unlock</div>
-        </div>
-        <div class="grade-display" id="sd-grade">—</div>
-      </div>
-    </div>
-  </div>
+<nav class="bnav">
+  <button class="bnav-btn active" id="bnav-sim" onclick="switchScreen('sim')">
+    <span class="bnav-icon">⚙</span>
+    <span class="bnav-lbl">Simulate</span>
+  </button>
+  <button class="bnav-btn" id="bnav-edge" onclick="switchScreen('edge')">
+    <span class="bnav-icon">◈</span>
+    <span class="bnav-lbl">Edge</span>
+    <span class="bnav-dot" id="edge-dot"></span>
+  </button>
+  <button class="bnav-btn" id="bnav-session" onclick="switchScreen('session')">
+    <span class="bnav-icon">📋</span>
+    <span class="bnav-lbl">Session</span>
+  </button>
+  <button class="bnav-btn" id="bnav-overall" onclick="switchScreen('overall')">
+    <span class="bnav-icon">📊</span>
+    <span class="bnav-lbl">Stats</span>
+  </button>
+</nav>
 
-  <div class="disclaimer">
-    <h3>⚠ Disclaimer</h3>
-    <p><strong>Results are not guaranteed.</strong> For educational use only. Not financial advice. Always trade with capital you can afford to lose.</p>
-  </div>
-
-</aside>
-</div><!-- shell -->
+</div><!-- /app -->
 
 <!-- GUIDE MODAL -->
-<div class="modal-bg" id="modal-guide" onclick="if(event.target===this)closeModal('guide')">
+
+<div class="modal" id="guide-modal" onclick="if(event.target===this)closeGuide()">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('guide')">✕ close</button>
+    <button class="modal-x" onclick="closeGuide()">✕</button>
     <div class="modal-title">How to Use the Anti-Hope Machine</div>
-    <div class="guide-step">
-      <h3>Step 1 — Enter Your Real Numbers (Left Panel)</h3>
-      <p>Fill in <span class="gtag">Overall Trading Stats</span> from your broker. These power the baseline for your daily session grades. Leave blank if you're just exploring.</p>
-    </div>
-    <div class="guide-step">
-      <h3>Step 2 — Set Your Strategy (Centre Panel)</h3>
-      <p>Two collapsible groups per tab:</p>
-      <ul>
-        <li><strong>Core Settings</strong> — the essentials: profit target, stop loss, win rate, trades per day, share goal.</li>
-        <li><strong>Realistic Conditions</strong> — costs and chaos: spread, slippage, commission, bad days, discipline. These are what separate paper performance from live reality.</li>
-      </ul>
-      <p>Each slider has a <span class="gtag">toggle switch</span>. Turn a variable off and it has zero effect on the simulation.</p>
-    </div>
-    <div class="guide-step">
-      <h3>Step 3 — Simulate</h3>
-      <p>Hit <span class="gtag">▶ SIMULATE</span>. The sim runs until you reach your share goal (or 5,000 days). You get an equity curve, a day-by-day table, and a verdict box overlaid on the chart: <strong>Viable</strong>, <strong>Marginal</strong>, or <strong>Failing</strong>.</p>
-    </div>
-    <div class="guide-step">
-      <h3>Step 4 — Compare Strategies</h3>
-      <p>Use the <span class="gtag">Strategy B</span> and <span class="gtag">Strategy C</span> tabs to test different setups side by side. The left and right panels always reflect the active tab.</p>
-    </div>
-    <div class="guide-step">
-      <h3>Step 5 — Log Your Sessions</h3>
-      <p>After each session, enter your results in <span class="gtag">Today's Session</span>. After a few days you'll unlock a grade (S to F) comparing today against your running average. Honest, not flattering.</p>
-    </div>
-    <div class="guide-step">
-      <h3>Step 6 — Export</h3>
-      <p>The <span class="gtag">⬇ XLSX</span> button exports all settings, edge diagnostics, simulation summary, and the full day table as a CSV that opens in Excel.</p>
-    </div>
-    <div class="guide-step">
-      <h3>Key Terms</h3>
-      <ul>
-        <li><strong>Tick</strong> — smallest price move. US stocks: $0.01 per share.</li>
-        <li><strong>R:R</strong> — Reward:Risk. 1.67:1 means you win 1.67 ticks for every tick risked.</li>
-        <li><strong>Edge</strong> — expected profit per trade after all costs. Positive = system works.</li>
-        <li><strong>Friction</strong> — total cost per trade: commission + slippage + spread.</li>
-        <li><strong>Breakeven trade</strong> — closed at entry. Zero P&L before costs.</li>
-      </ul>
-    </div>
+    <div class="gs"><h3>Step 1 — Real Numbers</h3><p>Go to <span class="gtag">Stats</span> tab. Fill in your broker data — powers session grades.</p></div>
+    <div class="gs"><h3>Step 2 — Set Your Strategy</h3><p>In <span class="gtag">Simulate</span>, configure Core Settings and Realistic Conditions. Toggle each card ON/OFF. Cards turned off have zero effect on the simulation.</p></div>
+    <div class="gs"><h3>Step 3 — Daily % Override</h3><p>Enable in Realistic Conditions to bypass tick math. Set min/max daily return %.</p></div>
+    <div class="gs"><h3>Step 4 — Simulate</h3><p>Hit <span class="gtag">SIMULATE</span>. Results appear in <span class="gtag">Edge</span> tab instantly. Tap <span class="gtag">VIEW TABLE</span> for day-by-day breakdown.</p></div>
+    <div class="gs"><h3>Step 5 — Compare Strategies</h3><p>Strategy B and C tabs run independently. Edge tab always reflects the active strategy.</p></div>
+    <div class="gs"><h3>Step 6 — Log Sessions</h3><p>Enter today's results in <span class="gtag">Session</span> tab. After a few days you'll get a grade (S–F).</p></div>
+    <div class="gs"><h3>Key Terms</h3><ul>
+      <li><strong>Tick</strong> — $0.01/share for US stocks.</li>
+      <li><strong>R:R</strong> — Reward:Risk. 1.67:1 = win 1.67 ticks per tick risked.</li>
+      <li><strong>Edge</strong> — expected profit per trade after all costs.</li>
+      <li><strong>Friction</strong> — commission + slippage + spread per trade.</li>
+      <li><strong>Pullback</strong> — price retraces after entry. If it exceeds your target, win becomes stop-out.</li>
+      <li><strong>Entry Offset</strong> — ticks lost entering late. Shrinks your effective target.</li>
+    </ul></div>
   </div>
 </div>
 
 <!-- INFO MODAL -->
-<div class="modal-bg" id="modal-info" onclick="if(event.target===this)closeModal('info')" style="align-items:center;">
+
+<div class="info-modal" id="info-modal" onclick="if(event.target===this)closeInfo()">
   <div class="info-box">
-    <button class="modal-close" onclick="closeModal('info')">✕</button>
+    <button class="modal-x" onclick="closeInfo()">✕</button>
     <h2 id="info-title">—</h2>
     <div id="info-body"></div>
   </div>
@@ -636,1044 +479,679 @@ td:nth-child(4){text-align:left;font-family:'Space Grotesk';font-size:.65rem;col
 
 <script>
 'use strict';
-// ═══════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════
+
+/* ─── HELPERS ─── */
 const $   = id => document.getElementById(id);
 const ri  = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const rf  = (a,b) => a + Math.random()*(b-a);
 const fmt = (n,d=2) => Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const sgn = n => (n>=0?'+$':'−$')+fmt(Math.abs(n));
 const pct = (n,d=1) => (n>=0?'+':'')+n.toFixed(d)+'%';
-const calStr = m => {
-  if(m>=12){const y=Math.floor(m/12),mo=Math.round(m%12);return y+'y'+(mo>0?' '+mo+'mo':'');}
+const cal = m => {
+  if(m>=12){const y=Math.floor(m/12),mo=Math.round(m%12);return y+'y'+(mo?' '+mo+'mo':'');}
   if(m>=1) return m.toFixed(1)+'mo';
   return ((m/12)*52).toFixed(1)+'wk';
 };
-function clampDist(wr,be){
-  const s=wr+be; return s>1?[wr/s,be/s]:[wr,be];
-}
+function clampD(wr,be){const s=wr+be;return s>1?[wr/s,be/s]:[wr,be];}
 
-// ═══════════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════════
-function openModal(id){ $(('modal-'+id))?.classList.add('open'); }
-function closeModal(id){ $('modal-'+id)?.classList.remove('open'); }
-
-// ═══════════════════════════════════════════
-// COLLAPSIBLES
-// ═══════════════════════════════════════════
-function toggleCollap(head){
-  const body = head.nextElementSibling;
-  const arrow = head.querySelector('.collap-arrow');
-  const open = body.classList.toggle('open');
-  if(arrow) arrow.textContent = open ? '▲' : '▼';
-}
-function toggleCtrlGroup(head){
-  const body = head.nextElementSibling;
-  const arrow = head.querySelector('.ctrl-group-arrow');
-  const open = body.classList.toggle('open');
-  if(arrow) arrow.textContent = open ? '▲' : '▼';
-}
-
-// ═══════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════
-let activeTab = 0;
-const simResults = [null, null, null];
-
-function switchTab(n){
-  activeTab = n;
-  [0,1,2].forEach(i=>{
-    $('tb'+i)?.classList.toggle('active', i===n);
-    $('tp'+i)?.classList.toggle('active', i===n);
+/* ─── SCREEN NAV ─── */
+const screens=['sim','edge','session','overall'];
+let activeScreen='sim';
+function switchScreen(name){
+  screens.forEach(s=>{
+    $('screen-'+s).style.display=s===name?'block':'none';
+    $('bnav-'+s).classList.toggle('active',s===name);
   });
-  updateEdgeDiag(n);
-  updateDistBar(n);
+  activeScreen=name;
+  if(name==='edge') updateEdge(activeStrat);
 }
 
-// ═══════════════════════════════════════════
-// TOGGLE
-// ═══════════════════════════════════════════
-function onTog(cb, ctrlId, tab){
-  const el = $(ctrlId);
-  if(!el) return;
-  if(cb.checked) el.classList.remove('off');
-  else           el.classList.add('off');
-  const lbl = $(cb.id+'-l');
-  if(lbl) lbl.textContent = cb.checked ? 'ON' : 'OFF';
+/* ─── STRAT TABS ─── */
+let activeStrat=0;
+const simResults=[null,null,null];
+function switchStrat(n){
+  activeStrat=n;
+  [0,1,2].forEach(i=>{
+    $('stb'+i).classList.toggle('active',i===n);
+    $('strat-pane-'+i).style.display=i===n?'block':'none';
+  });
+  updateDist(n);
+  updateEdge(n);
+}
+
+/* ─── MODALS ─── */
+function openGuide(){$('guide-modal').classList.add('open');}
+function closeGuide(){$('guide-modal').classList.remove('open');}
+function openInfo(key){const d=INFO[key];if(!d)return;$('info-title').textContent=d.t;$('info-body').innerHTML=d.b;$('info-modal').classList.add('open');}
+function closeInfo(){$('info-modal').classList.remove('open');}
+
+/* ─── SHEET ─── */
+function openSheet(){$('results-sheet').classList.add('open');}
+function closeSheet(){$('results-sheet').classList.remove('open');}
+
+/* ─── COLLAPSIBLES ─── */
+function toggleGrp(hd){
+  const body=hd.nextElementSibling;
+  const arr=hd.querySelector('.ctrl-group-arr');
+  const open=body.classList.toggle('open');
+  if(arr)arr.classList.toggle('open',open);
+}
+
+/* ─── TOGGLE ─── */
+function onTog(cb,ctrlId,tab){
+  const el=$(ctrlId);if(!el)return;
+  if(cb.checked)el.classList.remove('off');else el.classList.add('off');
+  const lbl=$(cb.id+'-l');if(lbl)lbl.textContent=cb.checked?'ON':'OFF';
   onSlider(tab);
 }
-const togOn = id => { const e=$(id); return !e || e.checked; };
+const isOn=id=>{const e=$(id);return!e||e.checked;};
 
-// ═══════════════════════════════════════════
-// CONFIG — single source of truth
-// ═══════════════════════════════════════════
-function getConfig(tab=0){
-  const s  = tab===0 ? '' : '_'+tab;
-  const gv = (id, fb=0) => { const e=document.getElementById(id+s); return e ? +e.value : fb; };
-  const gs = (id, fb='') => { const e=document.getElementById(id+s); return e ? e.value : fb; };
-  const tn = id => togOn(id+s);
-
-  const raw = {
-    minP:  gv('minP',15),  maxP:  gv('maxP',30),
-    minL:  gv('minL',5),   maxL:  gv('maxL',15),
-    minWR: gv('minWR',55)/100,  maxWR: gv('maxWR',65)/100,
-    minBE: gv('minBE',10)/100,  maxBE: gv('maxBE',20)/100,
-    minT:  gv('minT',2),   maxT:  gv('maxT',5),
-    rr:    gv('rrSlider',0)/10,
-    tickSz:gv('tickSize',1)/100,
-    minPr: gv('minPrice',43), maxPr: gv('maxPrice',47),
-    spread:gv('spread',1),    slip:  gv('slippage',1),
-    comm:  gv('commission',50)/100,
-    startSh: gv('startShares',100)||100,
-    target:  gv('shareTarget',500)||500,
-    buffer:  gv('buffer',1)||1,
-    cap:     gv('lossCap',30),
-    interval:gv('interval',5)||5,
-    cs:      gv('consistency',85)/100,
-    bfreq:   gv('blowFreq',3)/100,  bsize: gv('blowSize',2)/100,
-    gfreq:   gv('goodFreq',3)/100,  gsize: gv('goodSize',2)/100,
-    bias:    gv('bias',50)/100,
-    curve:   gs('biasCurve','linear'),
-    mode:    gs('simMode','rand'),
+/* ─── CONFIG ─── */
+function cfg(tab){
+  const s=tab===0?'':'_'+tab;
+  const n=(id,fb)=>{const e=document.getElementById(id+s);return e?(+e.value||0):fb;};
+  const str=(id,fb)=>{const e=document.getElementById(id+s);return e?e.value:fb;};
+  const on=id=>isOn(id+s);
+  const r={
+    minP:n('minP',15),maxP:n('maxP',30),minL:n('minL',5),maxL:n('maxL',15),
+    minWR:n('minWR',55)/100,maxWR:n('maxWR',65)/100,
+    minBE:n('minBE',10)/100,maxBE:n('maxBE',20)/100,
+    minT:n('minT',2),maxT:n('maxT',5),rr:n('rrSlider',0)/10,tick:n('tickSz',1)/100,
+    minPr:n('minPr',43),maxPr:n('maxPr',47),spread:n('spread',1),slip:n('slip',1),
+    comm:n('comm',50)/100,sh:n('sh',100)||100,goal:n('goal',500)||500,
+    buf:n('buf',1)||1,cap:n('cap',30),intv:n('intv',5)||5,disc:n('disc',85)/100,
+    bf:n('bf',3)/100,bs:n('bs',2)/100,gf:n('gf',3)/100,gs_:n('gs_',2)/100,
+    minPB:n('minPB',3),maxPB:n('maxPB',8),minEO:n('minEO',1),maxEO:n('maxEO',4),
+    minSw:n('minSw',15),maxSw:n('maxSw',40),minDp:n('minDp',-2),maxDp:n('maxDp',3),
+    bias:n('bias',50)/100,curve:str('curve','linear'),mode:str('mode','rand'),
   };
-
-  // Apply toggles — OFF = neutral value, no effect
-  const c = {
-    minP:  tn('tog-p')  ? raw.minP  : Math.round((raw.minP+raw.maxP)/2),
-    maxP:  tn('tog-p')  ? raw.maxP  : Math.round((raw.minP+raw.maxP)/2),
-    minL:  tn('tog-l')  ? raw.minL  : Math.round((raw.minL+raw.maxL)/2),
-    maxL:  tn('tog-l')  ? raw.maxL  : Math.round((raw.minL+raw.maxL)/2),
-    minWR: tn('tog-wr') ? raw.minWR : (raw.minWR+raw.maxWR)/2,
-    maxWR: tn('tog-wr') ? raw.maxWR : (raw.minWR+raw.maxWR)/2,
-    minBE: tn('tog-be') ? raw.minBE : 0,
-    maxBE: tn('tog-be') ? raw.maxBE : 0,
-    minT:  tn('tog-t')  ? raw.minT  : Math.round((raw.minT+raw.maxT)/2),
-    maxT:  tn('tog-t')  ? raw.maxT  : Math.round((raw.minT+raw.maxT)/2),
-    rr:    tn('tog-rr') ? raw.rr    : 0,
-    tickSz:tn('tog-tk') ? raw.tickSz: 0.01,
-    minPr: tn('tog-pr') ? raw.minPr : 45,
-    maxPr: tn('tog-pr') ? raw.maxPr : 45,
-    spread:tn('tog-sp') ? raw.spread: 0,
-    slip:  tn('tog-sl') ? raw.slip  : 0,
-    comm:  tn('tog-co') ? raw.comm  : 0,
-    startSh: raw.startSh, target: raw.target,
-    buffer:  tn('tog-buf') ? raw.buffer : 1,
-    cap:     tn('tog-cap') ? raw.cap    : 0,
-    interval: raw.interval,
-    cs:    tn('tog-cs') ? raw.cs    : 1,
-    bfreq: tn('tog-bd') ? raw.bfreq : 0, bsize: raw.bsize,
-    gfreq: tn('tog-gd') ? raw.gfreq : 0, gsize: raw.gsize,
-    bias:  tn('tog-bias')? raw.bias  : 0,
-    curve: raw.curve, mode: raw.mode,
+  const c={
+    minP:on('tog-p')?r.minP:Math.round((r.minP+r.maxP)/2),maxP:on('tog-p')?r.maxP:Math.round((r.minP+r.maxP)/2),
+    minL:on('tog-l')?r.minL:Math.round((r.minL+r.maxL)/2),maxL:on('tog-l')?r.maxL:Math.round((r.minL+r.maxL)/2),
+    minWR:on('tog-wr')?r.minWR:(r.minWR+r.maxWR)/2,maxWR:on('tog-wr')?r.maxWR:(r.minWR+r.maxWR)/2,
+    minBE:on('tog-be')?r.minBE:0,maxBE:on('tog-be')?r.maxBE:0,
+    minT:on('tog-t')?r.minT:Math.round((r.minT+r.maxT)/2),maxT:on('tog-t')?r.maxT:Math.round((r.minT+r.maxT)/2),
+    rr:on('tog-rr')?r.rr:0,tick:on('tog-tk')?r.tick:0.01,
+    minPr:on('tog-pr')?r.minPr:45,maxPr:on('tog-pr')?r.maxPr:45,
+    spread:on('tog-sp')?r.spread:0,slip:on('tog-sl')?r.slip:0,comm:on('tog-co')?r.comm:0,
+    sh:r.sh,goal:r.goal,buf:on('tog-buf')?r.buf:1,cap:on('tog-cap')?r.cap:0,intv:r.intv,
+    disc:on('tog-cs')?r.disc:1,bf:on('tog-bd')?r.bf:0,bs:r.bs,gf:on('tog-gd')?r.gf:0,gs_:r.gs_,
+    minPB:on('tog-pb')?r.minPB:0,maxPB:on('tog-pb')?r.maxPB:0,
+    minEO:on('tog-eo')?r.minEO:0,maxEO:on('tog-eo')?r.maxEO:0,
+    minSw:r.minSw,maxSw:r.maxSw,dpct:on('tog-dp'),
+    minDp:on('tog-dp')?r.minDp:0,maxDp:on('tog-dp')?r.maxDp:0,
+    bias:on('tog-bias')?r.bias:0,curve:r.curve,mode:r.mode,
   };
-
-  // Derived averages
-  const avgWR = (c.minWR+c.maxWR)/2, avgBE = (c.minBE+c.maxBE)/2;
-  const [wr,be] = clampDist(avgWR, avgBE);
-  const loss  = Math.max(0, 1-wr-be);
-  const avgP  = (c.minP+c.maxP)/2;
-  let   avgL  = (c.minL+c.maxL)/2;
-  if(c.rr > 0) avgL = avgP / c.rr;
-  const avgT  = (c.minT+c.maxT)/2;
-  const avgPr = (c.minPr+c.maxPr)/2;
-  const startAcct = c.startSh * avgPr;
-
-  // Friction per trade (dollar value)
-  const frPerTrade = c.comm + (c.slip+c.spread) * c.tickSz * c.startSh * (avgPr/45);
-  const frPerDay   = frPerTrade * avgT;
-
-  // EV (dollar value)
-  const evTicks    = wr*avgP - loss*avgL;
-  const evDollar   = evTicks * c.tickSz * c.startSh * (avgPr/45);
-  const evDayGross = evDollar * avgT;
-  const evDayNet   = evDayGross - frPerDay;
-
-  return {
-    ...c, wr, be, loss, avgP, avgL, avgT, avgPr, startAcct,
-    frPerTrade, frPerDay, evTicks, evDollar, evDayGross, evDayNet
-  };
+  const avgWR=(c.minWR+c.maxWR)/2,avgBE=(c.minBE+c.maxBE)/2;
+  const [wr,be]=clampD(avgWR,avgBE);
+  const loss=Math.max(0,1-wr-be);
+  const avgP=(c.minP+c.maxP)/2;
+  let avgL=(c.minL+c.maxL)/2;if(c.rr>0)avgL=avgP/c.rr;
+  const avgT=(c.minT+c.maxT)/2,avgPr=(c.minPr+c.maxPr)/2,acct0=c.sh*avgPr;
+  const frTr=c.comm+(c.slip+c.spread)*c.tick*c.sh,frDay=frTr*avgT;
+  const avgEO=(c.minEO+c.maxEO)/2,effTgt=Math.max(0,avgP-avgEO);
+  const pbRange=Math.max(c.maxPB-c.minPB,1);
+  const pbKill=c.maxPB>0?Math.max(0,Math.min(1,(c.maxPB-effTgt)/pbRange)):0;
+  const effWR=wr*(1-pbKill),effLoss=loss+wr*pbKill;
+  const evTick=effWR*effTgt-effLoss*avgL;
+  const evDol=evTick*c.tick*c.sh,evGross=evDol*avgT,evNet=c.dpct?(c.minDp+c.maxDp)/2/100*acct0:evGross-frDay;
+  const avgSw=(c.minSw+c.maxSw)/2,swUtil=avgSw>0?Math.min(100,(effTgt/avgSw)*100):0;
+  return{...c,wr,be,loss,avgP,avgL,avgT,avgPr,acct0,frTr,frDay,effTgt,pbKill,effWR,effLoss,evTick,evDol,evGross,evNet,avgSw,swUtil};
 }
 
-// ═══════════════════════════════════════════
-// SLIDER DISPLAY SYNC
-// ═══════════════════════════════════════════
-function onSlider(tab=0){
-  const s  = tab===0 ? '' : '_'+tab;
-  const gv = id => { const e=document.getElementById(id+s); return e ? e.value : ''; };
-  const sv = (id, val) => { const e=document.getElementById(id+s); if(e) e.textContent=val; };
-
-  sv('v-minP',  gv('minP')+'/'+gv('maxP')+'t');
-  sv('v-minL',  gv('minL')+'/'+gv('maxL')+'t');
-  sv('v-minWR', gv('minWR')+'/'+gv('maxWR')+'%');
-  sv('v-minBE', gv('minBE')+'/'+gv('maxBE')+'%');
-  sv('v-minT',  gv('minT')+'/'+gv('maxT'));
-  sv('v-startSh', gv('startShares'));
-  sv('v-target',  (+gv('shareTarget')||500).toLocaleString());
-  sv('v-interval', (+gv('interval')===1)?'Every day':'Every '+gv('interval')+' days');
-  sv('v-spread',  +gv('spread')===0?'Off':gv('spread')+' tick'+(+gv('spread')===1?'':'s'));
-  sv('v-slip',    +gv('slippage')===0?'Off':gv('slippage')+' tick'+(+gv('slippage')===1?'':'s'));
-  sv('v-comm',    '$'+(+gv('commission')/100).toFixed(2));
-  sv('v-cs',      gv('consistency')+'%');
-  sv('v-buf',     +gv('buffer')===1?'1 (buy now)':gv('buffer')+' shares');
-  sv('v-cap',     +gv('lossCap')===0?'Off':gv('lossCap')+'t');
-  sv('v-bd',      gv('blowFreq')+'%/'+gv('blowSize')+'%');
-  sv('v-gd',      gv('goodFreq')+'%/'+gv('goodSize')+'%');
-  sv('v-rr',      +gv('rrSlider')===0?'Off':(+gv('rrSlider')/10).toFixed(1)+':1');
-  sv('v-tick',    '$'+(+gv('tickSize')/100).toFixed(2));
-  sv('v-pr',      '$'+gv('minPrice')+'/$'+gv('maxPrice'));
-  sv('v-bias',    gv('bias')+'%');
-
-  updateDistBar(tab);
-  if(tab === activeTab) updateEdgeDiag(tab);
-  saveState();
+/* ─── SLIDER SYNC ─── */
+function onSlider(tab){
+  const s=tab===0?'':'_'+tab;
+  const g=id=>{const e=document.getElementById(id+s);return e?e.value:'0';};
+  const sv=(id,v)=>{const e=document.getElementById(id+s);if(e)e.textContent=v;};
+  sv('d-minP',g('minP')+'/'+g('maxP')+'t');sv('d-minL',g('minL')+'/'+g('maxL')+'t');
+  sv('d-minWR',g('minWR')+'/'+g('maxWR')+'%');sv('d-minBE',g('minBE')+'/'+g('maxBE')+'%');
+  sv('d-minT',g('minT')+'/'+g('maxT'));sv('d-sh',g('sh'));
+  sv('d-goal',(+g('goal')||500).toLocaleString());
+  const iv=+g('intv');sv('d-intv',iv===1?'Every day':'Every '+iv+' days');
+  const sp=+g('spread');sv('d-spread',sp===0?'Off':sp+' tick'+(sp===1?'':'s'));
+  const sl=+g('slip');sv('d-slip',sl===0?'Off':sl+' tick'+(sl===1?'':'s'));
+  sv('d-comm','$'+(+g('comm')/100).toFixed(2));sv('d-disc',g('disc')+'%');
+  const bf=+g('buf');sv('d-buf',bf===1?'1 (buy now)':bf+' shares');
+  const cp=+g('cap');sv('d-cap',cp===0?'Off':cp+'t');
+  sv('d-bd',g('bf')+'%/'+g('bs')+'%');sv('d-gd',g('gf')+'%/'+g('gs_')+'%');
+  sv('d-minPB',g('minPB')+'/'+g('maxPB')+'t');sv('d-minEO',g('minEO')+'/'+g('maxEO')+'t');
+  sv('d-minSw',g('minSw')+'/'+g('maxSw')+'t');
+  const rr=+g('rrSlider');sv('d-rr',rr===0?'Off':(rr/10).toFixed(1)+':1');
+  sv('d-tick','$'+(+g('tickSz')/100).toFixed(2));sv('d-pr','$'+g('minPr')+'/$'+g('maxPr'));
+  sv('d-bias',g('bias')+'%');
+  const dpOn=isOn('tog-dp'+s);
+  const dpMin=(+g('minDp')).toFixed(1),dpMax=(+g('maxDp')).toFixed(1);
+  sv('d-dp',dpOn?dpMin+'% to +'+dpMax+'%':'Off — toggle to enable');
+  updateDist(tab);
+  if(tab===activeStrat)updateEdge(tab);
+  save();
 }
 
-// ═══════════════════════════════════════════
-// DIST BAR
-// ═══════════════════════════════════════════
-function updateDistBar(tab=0){
-  const s = tab===0 ? '' : '_'+tab;
-  const c = getConfig(tab);
-  const wp=(c.wr*100).toFixed(1), bp=(c.be*100).toFixed(1), lp=(c.loss*100).toFixed(1);
-  const set = (id,v) => { const e=document.getElementById(id+s); if(e) e.textContent=v; };
-  const setW= (id,v) => { const e=document.getElementById(id+s); if(e) e.style.width=v+'%'; };
-  setW('dbg',wp); setW('dbb',bp); setW('dbr',lp);
-  set('db-gl','WIN '+wp+'%'); set('db-bl','BE '+bp+'%'); set('db-rl','LOSS '+lp+'%');
-  const ev = c.evDayNet;
-  const eq = document.getElementById('ev-q'+s);
-  if(eq){ eq.textContent='EV: '+(ev>=0?'+$':'−$')+fmt(Math.abs(ev))+'/day'; eq.style.color=ev>0?'var(--g)':ev<0?'var(--r)':'var(--y)'; }
+function updateDist(tab){
+  const s=tab===0?'':'_'+tab;
+  const c=cfg(tab);
+  const wp=(c.wr*100).toFixed(1),bp=(c.be*100).toFixed(1),lp=(c.loss*100).toFixed(1);
+  const se=(id,fn)=>{const e=document.getElementById(id+s);if(e)fn(e);};
+  se('dbg',e=>e.style.width=wp+'%');se('dbb',e=>e.style.width=bp+'%');se('dbr',e=>e.style.width=lp+'%');
+  se('db-gl',e=>e.textContent='WIN '+wp+'%');se('db-bl',e=>e.textContent='BE '+bp+'%');se('db-rl',e=>e.textContent='LOSS '+lp+'%');
+  const ev=c.evNet;
+  se('ev-q',e=>{e.textContent='EV '+(ev>=0?'+$':'−$')+fmt(Math.abs(ev))+'/day';e.style.color=ev>0?'var(--g)':ev<0?'var(--r)':'var(--y)';});
 }
 
-// ═══════════════════════════════════════════
-// EDGE DIAGNOSTICS
-// ═══════════════════════════════════════════
-function updateEdgeDiag(tab=0){
-  const c = getConfig(tab);
-  const minWR  = (c.avgL*(1-c.be))/(c.avgP+c.avgL);
-  const wrBuf  = (c.wr-minWR)*100;
-  const maxL   = c.loss>0 ? c.wr*c.avgP/c.loss : null;
-  const dts    = c.evDayNet>0 ? Math.ceil(c.avgPr/c.evDayNet) : null;
-  const actRR  = c.avgL>0 ? c.avgP/c.avgL : 0;
-  const monthly= c.evDayNet*21;
-  const evNet  = c.evDollar - c.frPerTrade;
-  const wrOk   = c.wr >= minWR;
-  const cls    = v => v>0?'pos':v<0?'neg':'neu';
-
-  const dv = (id, val, color) => {
-    const e=$(id); if(!e) return;
-    e.textContent=val;
-    if(color) e.className='dg-val '+(color==='ok'?'pos':color==='bad'?'neg':color==='warn'?'neu':'');
-  };
-
-  $('ed-day-main').textContent = (c.evDayNet>=0?'+$':'−$')+fmt(Math.abs(c.evDayNet));
-  $('ed-day-main').className   = 'rp-val '+cls(c.evDayNet);
-  dv('ed-ev',    evNet>=0?'+$'+fmt(evNet):'−$'+fmt(Math.abs(evNet)), evNet>0?'ok':evNet===0?'warn':'bad');
-  dv('ed-mo',    (monthly>=0?'+$':'−$')+fmt(Math.abs(monthly)),      monthly>0?'ok':monthly===0?'warn':'bad');
-  dv('ed-rr',    actRR.toFixed(2)+':1',                               actRR>=1.5?'ok':actRR>=1.0?'warn':'bad');
-  dv('ed-mwr',   (minWR*100).toFixed(1)+'%',                          wrOk?'ok':'bad');
-  dv('ed-ds',    dts?'~'+dts+'d':'∞',                                 dts&&dts<30?'ok':dts&&dts<100?'warn':'bad');
-  dv('ed-fric',  '$'+fmt(c.frPerDay),                                 'warn');
-  dv('ed-wrbuf', wrBuf>=0?'+'+wrBuf.toFixed(1)+'%':wrBuf.toFixed(1)+'%', wrBuf>=5?'ok':wrBuf>=0?'warn':'bad');
-  dv('ed-st',    c.evDayNet>0&&wrOk?'PROFITABLE':c.evDayNet>0?'MARGINAL':'NEGATIVE', c.evDayNet>0&&wrOk?'ok':c.evDayNet>0?'warn':'bad');
-
-  // Sim stats header update
-  const sv = (id,v,cl) => { const e=$(id); if(e){e.textContent=v; if(cl)e.className='dg-val '+cl;} };
-  sv('ss-wr', (c.wr*100).toFixed(1)+'%',  'cg');
-  sv('ss-be', (c.be*100).toFixed(1)+'%',  'cb');
-  sv('ss-lr', (c.loss*100).toFixed(1)+'%','cr');
+/* ─── EDGE DIAGNOSTICS ─── */
+function updateEdge(tab){
+  const c=cfg(tab);
+  const minWR=(c.avgL*(1-c.be))/(c.avgP+c.avgL);
+  const wrBuf=(c.wr-minWR)*100;
+  const actRR=c.avgL>0?c.avgP/c.avgL:0;
+  const mo=c.evNet*21;
+  const evNet=c.evDol-c.frTr;
+  const dts=c.evNet>0?Math.ceil(c.avgPr/c.evNet):null;
+  const wrOk=c.wr>=minWR;
+  const dv=(id,v,cl)=>{const e=$(id);if(!e)return;e.textContent=v;if(cl)e.className='ecell-v '+(cl==='ok'?'pos':cl==='bad'?'neg':cl==='warn'?'neu':'');};
+  $('ed-main').textContent=(c.evNet>=0?'+$':'−$')+fmt(Math.abs(c.evNet));
+  $('ed-main').className='ecell-v '+(c.evNet>0?'pos':c.evNet<0?'neg':'neu');
+  dv('ed-ev',evNet>=0?'+$'+fmt(evNet):'−$'+fmt(Math.abs(evNet)),evNet>0?'ok':evNet===0?'warn':'bad');
+  dv('ed-mo',(mo>=0?'+$':'−$')+fmt(Math.abs(mo)),mo>0?'ok':mo===0?'warn':'bad');
+  dv('ed-rr',actRR.toFixed(2)+':1',actRR>=1.5?'ok':actRR>=1.0?'warn':'bad');
+  dv('ed-mwr',(minWR*100).toFixed(1)+'%',wrOk?'ok':'bad');
+  dv('ed-ds',dts?'~'+dts+'d':'∞',dts&&dts<30?'ok':dts&&dts<100?'warn':'bad');
+  dv('ed-fric','$'+fmt(c.frDay),'warn');
+  dv('ed-wrbuf',wrBuf>=0?'+'+wrBuf.toFixed(1)+'%':wrBuf.toFixed(1)+'%',wrBuf>=5?'ok':wrBuf>=0?'warn':'bad');
+  dv('ed-swing',c.swUtil.toFixed(0)+'% of swing',c.swUtil>=60?'ok':c.swUtil>=35?'warn':'bad');
+  dv('ed-st',wrOk&&c.evNet>0?'PROFITABLE':c.evNet>0?'MARGINAL':'NEGATIVE',wrOk&&c.evNet>0?'ok':c.evNet>0?'warn':'bad');
+  // dot indicator on nav
+  const dot=$('edge-dot');if(dot)dot.classList.toggle('show',c.evNet>0);
 }
 
-// ═══════════════════════════════════════════
-// REAL STATS
-// ═══════════════════════════════════════════
+/* ─── REAL STATS ─── */
 function onReal(){
-  const trades = +$('rTrades').value||0;
-  const days   = +$('rDays').value||1;
-  const wr     = +$('rWR').value||0;
-  const be     = +$('rBE').value||0;
-  const tw     = +$('rTickW').value||1;
-  const tl     = +$('rTickL').value||1;
-  const capS   = +$('rCapS').value||1;
-  const capC   = +$('rCapC').value||capS;
-  const sharpe = +$('rSharpe').value;
-  const loss   = Math.max(0, 100-wr-be);
-  const ytd    = ((capC-capS)/capS)*100;
-  const totalPnl = capC-capS;
-
-  $('rLoss').textContent    = loss.toFixed(1)+'%';
-  $('rAvgT').textContent    = (trades/days).toFixed(1)+'/d';
-  $('rRR').textContent      = (tw/tl).toFixed(2)+':1';
-  $('rYTD').textContent     = pct(ytd);
-  $('rYTD').className       = 'sm-val '+(ytd>=0?'pos':'neg');
-  $('rPnlTotal').textContent= sgn(totalPnl);
-  $('rPnlTotal').style.color= totalPnl>=0?'var(--g)':'var(--r)';
-  const sl = $('rSharpeLabel');
-  if(sl){
-    if(!sharpe){sl.textContent='—';}
-    else{
-      sl.textContent = sharpe>=2?sharpe.toFixed(2)+' ★':sharpe>=1?sharpe.toFixed(2)+' ✓':sharpe>=.5?sharpe.toFixed(2)+' ~':sharpe.toFixed(2)+' ✗';
-      sl.style.color = sharpe>=1?'var(--g)':sharpe>=.5?'var(--y)':'var(--r)';
-    }
-  }
-  $('b-ytd').textContent = pct(ytd); $('b-ytd').className = 'sm-val '+(ytd>=0?'pos':'neg');
-  $('b-cap').textContent = sgn(totalPnl); $('b-cap').style.color = totalPnl>=0?'var(--g)':'var(--r)';
-  saveState();
+  const tr=+$('rTrades').value||0,dy=+$('rDays').value||1;
+  const wr=+$('rWR').value||0,be=+$('rBE').value||0;
+  const tw=+$('rTickW').value||1,tl=+$('rTickL').value||1;
+  const cs=+$('rCapS').value||1,cc=+$('rCapC').value||cs;
+  const sp=+$('rSharpe').value;
+  const loss=Math.max(0,100-wr-be);
+  const ytd=((cc-cs)/cs)*100,tp=cc-cs;
+  $('rLoss').textContent=loss.toFixed(1)+'%';
+  $('rAvgT').textContent=(tr/dy).toFixed(1)+'/d';
+  $('rRR').textContent=(tw/tl).toFixed(2)+':1';
+  $('rYTD').textContent=pct(ytd);$('rYTD').className='stat-val '+(ytd>=0?'pos':'neg');
+  $('rPnlTotal').textContent=sgn(tp);$('rPnlTotal').style.color=tp>=0?'var(--g)':'var(--r)';
+  const sl=$('rSharpeL');
+  if(sl){sl.textContent=!sp?'—':sp>=2?sp.toFixed(2)+' ★':sp>=1?sp.toFixed(2)+' ✓':sp>=.5?sp.toFixed(2)+' ~':sp.toFixed(2)+' ✗';sl.style.color=sp>=1?'var(--g)':sp>=.5?'var(--y)':'var(--r)';}
+  save();
 }
 
-// ═══════════════════════════════════════════
-// DAILY SESSION
-// ═══════════════════════════════════════════
-let dailyLog = [];
-
+/* ─── SESSION ─── */
+let log=[];
 function onDaily(){
-  const w = Math.max(0,+$('dWins').value||0);
-  const l = Math.max(0,+$('dLoss').value||0);
-  const b = Math.max(0,+$('dBE').value||0);
-  const total = w+l+b;
-  if(!total) return;
-  const wr=w/total, be=b/total, lr=l/total;
-  const tw  = +$('dTickW').value||0;
-  const tl  = +$('dTickL').value||0;
-  const pnl = +$('dPnl').value||0;
-  const sh  = Math.max(1, +$('dShares').value||100);
-  const c   = getConfig(activeTab);
-  const evT = (wr*tw - lr*tl)*c.tickSz*sh*(c.avgPr/45);
-  const evMo= evT*total*21;
-
-  $('dd-wr').textContent = (wr*100).toFixed(1)+'%';
-  $('dd-wr').className   = 'sm-val '+(wr>=.5?'cg':'cr');
-  $('dd-ev').textContent = (evT>=0?'+$':'−$')+fmt(Math.abs(evT));
-  $('dd-ev').style.color = evT>0?'var(--g)':'var(--r)';
-  $('dd-mo').textContent = (evMo>=0?'+$':'−$')+fmt(Math.abs(evMo));
-  $('dd-mo').style.color = evMo>0?'var(--g)':'var(--r)';
-
-  const bl = dailyLog.length>0 ? getBaseline() : null;
+  const w=+$('dWins').value||0,l=+$('dLoss').value||0,b=+$('dBE').value||0;
+  const tot=w+l+b;if(!tot)return;
+  const wr=w/tot,be=b/tot,lr=l/tot;
+  const tw=+$('dTickW').value||0,tl=+$('dTickL').value||0;
+  const pnl=+$('dPnl').value||0,sh=Math.max(1,+$('dShares').value||100);
+  const c=cfg(activeStrat);
+  const evT=(wr*tw-lr*tl)*c.tick*sh;
+  const evMo=evT*tot*21;
+  $('dd-wr').textContent=(wr*100).toFixed(1)+'%';$('dd-wr').className='ss-val '+(wr>=.5?'cg_':'cr');
+  $('dd-ev').textContent=(evT>=0?'+$':'−$')+fmt(Math.abs(evT));$('dd-ev').style.color=evT>0?'var(--g)':'var(--r)';
+  $('dd-mo').textContent=(evMo>=0?'+$':'−$')+fmt(Math.abs(evMo));$('dd-mo').style.color=evMo>0?'var(--g)':'var(--r)';
+  const bl=log.length?baseline():null;
   if(bl){
-    const pd = pnl-bl.avgPnl;
-    $('dd-pb').textContent = (pd>=0?'+$':'−$')+fmt(Math.abs(pd));
-    $('dd-pb').style.color = pd>=0?'var(--g)':'var(--r)';
-    let sc = 0;
-    sc += ((wr-bl.wr)/Math.max(bl.wr,.01))*30;
-    sc += ((pnl-bl.avgPnl)/Math.max(Math.abs(bl.avgPnl),1))*30;
-    sc += (tw>0&&tl>0 ? tw/tl>=1.5?20:tw/tl>=1.0?10:0 : 0);
-    sc += (evT>0?10:0);
-    const grades=[['S',25],['A',12],['B',3],['C',-5],['D',-15],['F',-999]];
-    const [g] = grades.find(([,t])=>sc>=t)||['F'];
-    const gcol = g==='S'||g==='A'?'var(--g)':g==='B'||g==='C'?'var(--y)':'var(--r)';
-    $('dd-gr').textContent = g; $('dd-gr').style.color = gcol;
-    $('sd-grade').textContent = g; $('sd-grade').style.color = gcol;
-    const wrOk=wr>=c.wr*.85, beOk=be>=c.be*.75, rrOk=(tw>0&&tl>0?tw/tl:c.avgP/c.avgL)>=.8;
-    const n = [wrOk,beOk,rrOk].filter(Boolean).length;
-    $('dd-og').textContent = n===3?'✓ On Goal':n===2?'~ Mostly':'✗ Off Goal';
-    $('dd-og').style.color = n===3?'var(--g)':n===2?'var(--y)':'var(--r)';
-    $('sd-status').textContent = n===3?'On goal. Keep going.':n===2?'Mostly on track.':'Below baseline.';
-  } else {
-    ['dd-pb','dd-og','dd-gr'].forEach(id=>{ $('dd-pb')&&($('dd-pb').textContent='—'); });
-    $('dd-pb').textContent='—'; $('dd-og').textContent='—'; $('dd-gr').textContent='—';
-    $('sd-grade').textContent='—'; $('sd-status').textContent='Log days to unlock.';
+    const pd=pnl-bl.pnl;
+    $('dd-pb').textContent=(pd>=0?'+$':'−$')+fmt(Math.abs(pd));$('dd-pb').style.color=pd>=0?'var(--g)':'var(--r)';
+    let sc=((wr-bl.wr)/Math.max(bl.wr,.01))*30+((pnl-bl.pnl)/Math.max(Math.abs(bl.pnl),1))*30+(tw>0&&tl>0?tw/tl>=1.5?20:tw/tl>=1.0?10:0:0)+(evT>0?10:0);
+    const gs=[['S',25],['A',12],['B',3],['C',-5],['D',-15],['F',-999]];
+    const [g]=gs.find(([,t])=>sc>=t)||['F'];
+    const gc=g==='S'||g==='A'?'var(--g)':g==='B'||g==='C'?'var(--y)':'var(--r)';
+    $('dd-gr').textContent=g;$('dd-gr').style.color=gc;
+    $('sd-grade').textContent=g;$('sd-grade').style.color=gc;
+    const wo=wr>=c.wr*.85,bo=be>=c.be*.75,ro=(tw>0&&tl>0?tw/tl:c.avgP/c.avgL)>=.8;
+    const n=[wo,bo,ro].filter(Boolean).length;
+    $('dd-og').textContent=n===3?'✓ On Goal':n===2?'~ Mostly':'✗ Off';
+    $('dd-og').style.color=n===3?'var(--g)':n===2?'var(--y)':'var(--r)';
+    $('sd-status').textContent=n===3?'On goal.':n===2?'Mostly on track.':'Below baseline.';
+  }else{
+    $('dd-pb').textContent='—';$('dd-og').textContent='—';$('dd-gr').textContent='—';
+    $('sd-grade').textContent='—';$('sd-status').textContent='Log days to unlock.';
   }
 }
-
-function getBaseline(){
-  const n=dailyLog.length; if(!n) return null;
-  const tT=dailyLog.reduce((a,e)=>a+(e.w+e.l+e.b),0);
-  return{
-    wr:tT>0?dailyLog.reduce((a,e)=>a+e.w,0)/tT:0,
-    be:tT>0?dailyLog.reduce((a,e)=>a+e.b,0)/tT:0,
-    avgPnl:dailyLog.reduce((a,e)=>a+e.pnl,0)/n
-  };
-}
-
+function baseline(){const n=log.length;if(!n)return null;const tT=log.reduce((a,e)=>a+(e.w+e.l+e.b),0);return{wr:tT>0?log.reduce((a,e)=>a+e.w,0)/tT:0,pnl:log.reduce((a,e)=>a+e.pnl,0)/n};}
 function logDay(){
-  const w=Math.max(0,+$('dWins').value||0);
-  const l=Math.max(0,+$('dLoss').value||0);
-  const b=Math.max(0,+$('dBE').value||0);
-  if(w+l+b===0){
-    const dc=$('dCount'); if(dc){ dc.textContent='Enter a trade first'; dc.style.color='var(--r)'; setTimeout(()=>{dc.textContent=dailyLog.length+' logged';dc.style.color='';},2e3); }
-    return;
-  }
-  dailyLog.push({w,l,b,pnl:+$('dPnl').value||0,tw:+$('dTickW').value||0,tl:+$('dTickL').value||0});
-  $('dCount').textContent = dailyLog.length+' logged';
-  ['dWins','dLoss','dBE','dTickW','dTickL','dPnl','dShares'].forEach(id=>{ const e=$(id); if(e) e.value=''; });
-  onDaily(); saveState();
+  const w=+$('dWins').value||0,l=+$('dLoss').value||0,b=+$('dBE').value||0;
+  if(w+l+b===0){const dc=$('dCount');dc.textContent='Enter a trade first';dc.style.color='var(--r)';setTimeout(()=>{dc.textContent=log.length+' days logged';dc.style.color='';},2000);return;}
+  log.push({w,l,b,pnl:+$('dPnl').value||0,tw:+$('dTickW').value||0,tl:+$('dTickL').value||0});
+  $('dCount').textContent=log.length+' days logged';
+  ['dWins','dLoss','dBE','dTickW','dTickL','dPnl','dShares'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  onDaily();save();
 }
+function clearLog(){log=[];$('dCount').textContent='0 days logged';onDaily();save();}
 
-function clearLog(){
-  dailyLog=[]; $('dCount').textContent='0 logged';
-  onDaily(); saveState();
+/* ─── SHARPE ─── */
+function sharpe(pnls,acct){
+  const n=pnls.length;if(n<2)return null;
+  const r=pnls.map(p=>p/acct);
+  const m=r.reduce((a,b)=>a+b,0)/n;
+  const sd=Math.sqrt(r.reduce((a,v)=>a+(v-m)**2,0)/(n-1));
+  return sd>0?(m/sd)*Math.sqrt(252):null;
 }
+function sharpeStr(s){if(!s||isNaN(s))return'—';if(s>=2)return s.toFixed(2)+' ★';if(s>=1)return s.toFixed(2)+' ✓';if(s>=.5)return s.toFixed(2)+' ~';return s.toFixed(2)+' ✗';}
 
-// ═══════════════════════════════════════════
-// SHARPE
-// ═══════════════════════════════════════════
-function calcSharpe(pnls, acct){
-  const n=pnls.length; if(n<2) return null;
-  const rets=pnls.map(p=>p/acct);
-  const mean=rets.reduce((a,b)=>a+b,0)/n;
-  const std=Math.sqrt(rets.reduce((a,r)=>a+(r-mean)**2,0)/(n-1));
-  return std>0?(mean/std)*Math.sqrt(252):null;
-}
-function sharpeStr(s){
-  if(!s||isNaN(s)) return'—';
-  if(s>=2) return s.toFixed(2)+' ★';
-  if(s>=1) return s.toFixed(2)+' ✓';
-  if(s>=.5)return s.toFixed(2)+' ~';
-  return s.toFixed(2)+' ✗';
-}
-
-// ═══════════════════════════════════════════
-// SIMULATE
-// ═══════════════════════════════════════════
-function simulate(tab=0){
-  try{ _simulate(tab); }
-  catch(e){
-    const s = tab===0?'':'_'+tab;
-    const tb = document.getElementById('tbody'+s);
-    if(tb) tb.innerHTML = `<tr><td colspan="13" style="text-align:center;color:var(--r);padding:1.2rem;font-size:.75rem;">⚠ Error — try adjusting parameters<br><small style="color:var(--mut)">${e.message}</small></td></tr>`;
+/* ─── SIMULATE ─── */
+function simulate(tab){
+  try{_sim(tab);}catch(e){
+    $('sheet-tbody').innerHTML=`<tr><td colspan="14" style="text-align:center;color:var(--r);padding:1.2rem;">Error — check parameters<br><small style="color:var(--mut)">${e.message}</small></td></tr>`;
     console.error(e);
   }
 }
 
-function _simulate(tab=0){
-  const c = getConfig(tab);
-  const s = tab===0 ? '' : '_'+tab;
-  const MAX=5000, HORIZON=365;
-  const startAcct = c.startSh * c.avgPr;
-  let shares=c.startSh, surplus=0, cumPnl=0, day=0;
-  const rows=[], pnlSeries=[], equity=[];
-  const msStep = c.target<=200?50:c.target<=500?100:c.target<=1000?200:500;
-  const milestones=new Set(), msHit=new Set();
-  for(let m=msStep; m<=c.target; m+=msStep) milestones.add(m);
-  const msp={};  // month-start cumPnl
+function _sim(tab){
+  const c=cfg(tab);
+  const MAX=5000,HOR=365;
+  const acct0=c.sh*c.avgPr;
+  let shares=c.sh,surplus=0,cumPnl=0,day=0;
+  const rows=[],pnlArr=[],equity=[];
+  const msStep=c.goal<=200?50:c.goal<=500?100:c.goal<=1000?200:500;
+  const MS=new Set(),msHit=new Set();
+  for(let m=msStep;m<=c.goal;m+=msStep)MS.add(m);
+  const msp={};
 
-  while(shares < c.target && day < MAX){
+  while(shares<c.goal&&day<MAX){
     day++;
-
-    // Maturity bias — WR drifts toward max over HORIZON days
-    const t = Math.min(day/HORIZON, 1);
+    const t=Math.min(day/HOR,1);
     let ts;
-    if(c.curve==='linear') ts=t;
-    else if(c.curve==='slow') ts=Math.log1p(t*(Math.E-1));
-    else if(c.curve==='fast') ts=(Math.exp(t)-1)/(Math.E-1);
-    else ts=1/(1+Math.exp(-10*(t-.5)));
-    const dayWR = c.minWR + Math.min(Math.random()+c.bias*ts*(1-Math.random()),1)*(c.maxWR-c.minWR);
-    const dayBE = c.minBE + Math.random()*(c.maxBE-c.minBE);
-    const [wr,be] = clampDist(dayWR, dayBE);
-    const lossR   = Math.max(0, 1-wr-be);
+    if(c.curve==='linear')ts=t;else if(c.curve==='slow')ts=Math.log1p(t*(Math.E-1));
+    else if(c.curve==='fast')ts=(Math.exp(t)-1)/(Math.E-1);else ts=1/(1+Math.exp(-10*(t-.5)));
+    const dayWR=c.minWR+Math.min(Math.random()+c.bias*ts*(1-Math.random()),1)*(c.maxWR-c.minWR);
+    const dayBE=c.minBE+Math.random()*(c.maxBE-c.minBE);
+    const [wr,be]=clampD(dayWR,dayBE);
+    const dayPr=c.minPr+Math.random()*(c.maxPr-c.minPr);
+    const frTr=c.comm+(c.slip+c.spread)*c.tick*shares;
+    const effWR=Math.random()>c.disc?wr*.7:wr;
+    const effBE=Math.random()>c.disc?be*.7:be;
+    let dayPnl=0,dayTicks=0,numTr=0,dayPct=null;
+    let isBlowup=false,isGood=false;
 
-    const dayPrice   = c.minPr + Math.random()*(c.maxPr-c.minPr);
-    const frPerTrade = c.comm + (c.slip+c.spread)*c.tickSz*shares*(dayPrice/45);
-
-    // Discipline
-    const effWR = Math.random()>c.cs ? wr*.7 : wr;
-    const effBE = Math.random()>c.cs ? be*.7 : be;
-
-    // Special day events
-    let dayPnl=0;
-    const isBlowup = c.bfreq>0 && Math.random()<c.bfreq;
-    const isGood   = !isBlowup && c.gfreq>0 && Math.random()<c.gfreq;
-    if(isBlowup) dayPnl -= startAcct*c.bsize;
-    if(isGood)   dayPnl += startAcct*c.gsize;
-
-    // Trades
-    const numTr = c.mode==='rand' ? ri(c.minT,c.maxT) : Math.round(c.avgT);
-    let dayTicks=0, dayLossTicks=0;
-
-    for(let i=0; i<numTr; i++){
-      if(c.cap>0 && dayLossTicks>=c.cap) break;
-      dayPnl -= frPerTrade;
-      const roll = Math.random();
-      if(roll < effWR){
-        const t = c.mode==='rand' ? ri(c.minP,c.maxP) : Math.round(c.avgP);
-        dayPnl  += shares*t*c.tickSz*(dayPrice/45); dayTicks+=t;
-      } else if(roll < effWR+effBE){
-        // breakeven — no tick change
-      } else {
-        let t = c.mode==='rand' ? ri(c.minL,c.maxL) : Math.round(c.avgL);
-        if(c.rr>0) t = Math.round(c.avgP/c.rr);
-        dayPnl  -= shares*t*c.tickSz*(dayPrice/45); dayTicks-=t; dayLossTicks+=t;
+    if(c.dpct){
+      const pctVal=rf(c.minDp,c.maxDp);dayPct=pctVal;
+      dayPnl=(acct0+cumPnl)*(pctVal/100);numTr=0;
+    } else {
+      isBlowup=c.bf>0&&Math.random()<c.bf;isGood=!isBlowup&&c.gf>0&&Math.random()<c.gf;
+      if(isBlowup)dayPnl-=acct0*c.bs;if(isGood)dayPnl+=acct0*c.gs_;
+      numTr=c.mode==='rand'?ri(c.minT,c.maxT):Math.round(c.avgT);
+      let lossT=0;
+      for(let i=0;i<numTr;i++){
+        if(c.cap>0&&lossT>=c.cap)break;
+        dayPnl-=frTr;
+        const roll=Math.random();
+        if(roll<effWR){
+          const pt=c.mode==='rand'?ri(c.minP,c.maxP):Math.round(c.avgP);
+          const eo=c.maxEO>0?(c.mode==='rand'?ri(c.minEO,c.maxEO):Math.round((c.minEO+c.maxEO)/2)):0;
+          const effT=Math.max(0,pt-eo);
+          const pb=c.maxPB>0?(c.mode==='rand'?ri(c.minPB,c.maxPB):Math.round((c.minPB+c.maxPB)/2)):0;
+          if(c.maxPB>0&&pb>=effT){let lt=c.mode==='rand'?ri(c.minL,c.maxL):Math.round(c.avgL);if(c.rr>0)lt=Math.round(c.avgP/c.rr);dayPnl-=shares*lt*c.tick;dayTicks-=lt;lossT+=lt;}
+          else{dayPnl+=shares*effT*c.tick;dayTicks+=effT;}
+        } else if(roll<effWR+effBE){}
+        else{let lt=c.mode==='rand'?ri(c.minL,c.maxL):Math.round(c.avgL);if(c.rr>0)lt=Math.round(c.avgP/c.rr);dayPnl-=shares*lt*c.tick;dayTicks-=lt;lossT+=lt;}
       }
     }
 
-    const BE_THR = shares*2*c.tickSz*(dayPrice/45);
-    const outcome = dayPnl>BE_THR?'WIN':dayPnl<-BE_THR?'LOSS':'BE';
-
-    cumPnl  += dayPnl; surplus += dayPnl; pnlSeries.push(dayPnl);
-    equity.push({day, cumPnl});
-
-    const calMo = (day/252)*12;
-    const mIdx  = Math.floor(calMo);
-    if(!(mIdx in msp)) msp[mIdx] = cumPnl-dayPnl;
-
-    // Share purchase
-    const bufCost = c.buffer * dayPrice;
-    let newShares = 0;
-    if(surplus >= bufCost){
-      newShares = Math.max(0, Math.floor((surplus-(c.buffer-1)*dayPrice)/dayPrice));
-      if(newShares>0) surplus -= newShares*dayPrice;
-    }
-    const prev = shares;
-    shares = Math.min(shares+newShares, c.target);
-
-    const row = {day, calMo, mIdx, shares, prev, outcome, numTr, dayTicks, dayPnl, surplus, newShares, cumPnl, isBlowup, isGood, isMilestone:false, msVal:0};
-    for(const m of milestones){
-      if(prev<m && shares>=m && !msHit.has(m)){
-        msHit.add(m); row.isMilestone=true; row.msVal=m;
-      }
-    }
+    const BE_T=shares*2*c.tick;
+    const outcome=dayPnl>BE_T?'WIN':dayPnl<-BE_T?'LOSS':'BE';
+    cumPnl+=dayPnl;surplus+=dayPnl;pnlArr.push(dayPnl);equity.push({day,cumPnl});
+    const calMo=(day/252)*12;const mIdx=Math.floor(calMo);
+    if(!(mIdx in msp))msp[mIdx]=cumPnl-dayPnl;
+    const bufC=c.buf*dayPr;let newSh=0;
+    if(surplus>=bufC){newSh=Math.max(0,Math.floor((surplus-(c.buf-1)*dayPr)/dayPr));if(newSh>0)surplus-=newSh*dayPr;}
+    const prev=shares;shares=Math.min(shares+newSh,c.goal);
+    const row={day,calMo,mIdx,shares,prev,outcome,numTr,dayTicks,dayPct,dayPnl,surplus,newSh,cumPnl,isBlowup,isGood,isMilestone:false,msVal:0};
+    for(const m of MS){if(prev<m&&shares>=m&&!msHit.has(m)){msHit.add(m);row.isMilestone=true;row.msVal=m;}}
     rows.push(row);
   }
 
-  // Store results
-  simResults[tab] = {rows:[...rows], equity, acct:startAcct, c:{...c}, msp};
+  simResults[tab]={rows:[...rows],equity,acct0,c:{...c},msp};
+  const s=tab===0?'':'_'+tab;
+  drawChart(equity,acct0,tab);
 
-  // Draw chart
-  drawChart(equity, startAcct, tab);
+  const retPct=(cumPnl/acct0)*100,annPct=day>0?(retPct/day)*252:0;
+  const sp=sharpe(pnlArr,acct0);
+  const capped=day>=MAX,calMoT=(day/252)*12;
 
-  // Post-sim stats
-  const retPct = (cumPnl/startAcct)*100;
-  const annPct = day>0?(retPct/day)*252:0;
-  const sharpe = calcSharpe(pnlSeries, startAcct);
-  const capped = day>=MAX;
-  const calMoTotal = (day/252)*12;
+  $('tp-cal').textContent=cal(calMoT);
+  $('tp-sub').textContent=day.toLocaleString()+' trading days';
+  $('tp-cap').textContent='$'+fmt(acct0+cumPnl);
+  $('tp-rsub').textContent=pct(retPct)+' total · '+pct(annPct)+' ann.';
+  const sv=(id,v,cl)=>{const e=$(id);if(e){e.textContent=v;if(cl)e.className='scard-v '+cl;}};
+  sv('ss-ret',pct(retPct),retPct>=0?'pos':'neg');
+  sv('ss-ann',pct(annPct)+' p.a.',annPct>=0?'pos':'neg');
+  sv('ss-sharpe',sharpeStr(sp),'ctla');
+  sv('ss-wr',(c.wr*100).toFixed(1)+'%','cg_');
+  sv('ss-be',(c.be*100).toFixed(1)+'%','cb');
+  sv('ss-lr',(c.loss*100).toFixed(1)+'%','neg');
 
-  // Right panel
-  $('tp-cal').textContent   = calStr(calMoTotal);
-  $('tp-sub').textContent   = day.toLocaleString()+' trading days';
-  $('tp-cap').textContent   = '$'+fmt(startAcct+cumPnl);
-  $('tp-ret-sub').textContent = pct(retPct)+' total · '+pct(annPct)+' ann.';
-  const sss = (id,v,cl)=>{ const e=$(id); if(e){ e.textContent=v; if(cl) e.className='dg-val '+cl; } };
-  sss('ss-ret',    pct(retPct),       retPct>=0?'pos':'neg');
-  sss('ss-ann',    pct(annPct)+' p.a.',annPct>=0?'pos':'neg');
-  sss('ss-sharpe', sharpeStr(sharpe), 'ctla');
+  updateEdge(tab);
+  buildInsight(c,cumPnl,day,acct0,capped,retPct,annPct,tab);
 
-  updateEdgeDiag(tab);
-  buildInsight(c, cumPnl, day, startAcct, capped, retPct, annPct, tab);
-
-  // Table
-  const tbody = document.getElementById('tbody'+s);
-  if(!tbody) return;
-  tbody.innerHTML='';
-  const interval = c.interval;
-  const show = new Set([0, rows.length-1]);
-  for(let i=0; i<rows.length; i++){
-    if(rows[i].isMilestone || rows[i].day%interval===0) show.add(i);
-  }
-  const sorted = [...show].sort((a,b)=>a-b);
-  const maxAbs = Math.max(...sorted.map(i=>Math.abs(rows[i].dayPnl)),1);
-
+  // populate table
+  const tbody=$('sheet-tbody');if(!tbody)return;tbody.innerHTML='';
+  const show=new Set([0,rows.length-1]);
+  rows.forEach((r,i)=>{if(r.isMilestone||r.day%c.intv===0)show.add(i);});
+  const sorted=[...show].sort((a,b)=>a-b);
+  const maxA=Math.max(...sorted.map(i=>Math.abs(rows[i].dayPnl)),1);
   for(const idx of sorted){
-    const r = rows[idx];
-    const tr = document.createElement('tr');
-    if(r.isMilestone) tr.className = r.outcome==='WIN'?'rms-w':'rms-l';
-    else if(r.outcome==='LOSS') tr.className='rl';
-    else if(r.outcome==='BE')   tr.className='rb_';
-    if(r.isBlowup) tr.classList.add('blow');
-    if(r.isGood)   tr.classList.add('good');
-
-    const bPct = (Math.abs(r.dayPnl)/maxAbs*100).toFixed(1);
-    const bCls = r.dayPnl>0?'bfp':r.dayPnl<0?'bfn':'bfz';
-    const pCls = r.dayPnl>0?'pos':r.dayPnl<0?'neg':'neu';
-    const tCls = r.dayTicks>0?'pos':r.dayTicks<0?'neg':'neu';
-    const cCls = r.cumPnl>=0?'pos':'neg';
-    const moPnl= r.cumPnl-(msp[r.mIdx]||0);
-
+    const r=rows[idx];const tr=document.createElement('tr');
+    if(r.isMilestone)tr.className=r.outcome==='WIN'?'rms-w':'rms-l';
+    else if(r.outcome==='LOSS')tr.className='rl';else if(r.outcome==='BE')tr.className='rb_';
+    if(r.isBlowup)tr.classList.add('blow');if(r.isGood)tr.classList.add('good');
+    const bP=(Math.abs(r.dayPnl)/maxA*100).toFixed(1);
+    const bC=r.dayPnl>0?'bfp':r.dayPnl<0?'bfn':'bfz';
+    const pC=r.dayPnl>0?'pos':r.dayPnl<0?'neg':'neu';
+    const tC=r.dayTicks>0?'pos':r.dayTicks<0?'neg':'neu';
+    const moPnl=r.cumPnl-(msp[r.mIdx]||0);
+    const dpS=r.dayPct!=null?(r.dayPct>=0?'+':'')+r.dayPct.toFixed(2)+'%':'—';
+    const dpC=r.dayPct!=null?(r.dayPct>=0?'var(--g)':'var(--r)'):'var(--mut)';
     let label='—';
-    if(r.isMilestone)           label='★ '+r.msVal.toLocaleString();
-    else if(r.day===1)          label='Start';
-    else if(idx===rows.length-1) label=capped?'Cap':'Goal ✓';
-
-    tr.innerHTML=`
-      <td>${r.day}</td>
-      <td>${calStr(r.calMo)}</td>
-      <td style="color:${moPnl>=0?'var(--g)':moPnl<0?'var(--r)':'var(--mut)'};">${(moPnl>=0?'+$':'−$')+fmt(Math.abs(moPnl))}</td>
-      <td>${label}</td>
-      <td style="color:var(--y);font-weight:600;">${r.shares.toLocaleString()}</td>
-      <td style="color:${r.outcome==='WIN'?'var(--g)':r.outcome==='LOSS'?'var(--r)':'var(--b)'};font-size:.65rem;">${r.outcome}</td>
-      <td style="color:var(--or);font-size:.68rem;">${r.numTr}</td>
-      <td class="${tCls}">${(r.dayTicks>=0?'+':'')+r.dayTicks}t</td>
-      <td class="${pCls} bw"><div class="bf ${bCls}" style="width:${bPct}%"></div><span>${sgn(r.dayPnl)}</span></td>
-      <td style="color:${(r.cumPnl/startAcct*100)>=0?'var(--g)':'var(--r)'};font-size:.67rem;">${pct(r.cumPnl/startAcct*100,1)}</td>
-      <td style="color:var(--mut);font-size:.67rem;">${(r.surplus>=0?'$':'−$')+fmt(Math.abs(r.surplus))}</td>
-      <td style="color:var(--or);font-size:.67rem;">${r.newShares>0?'+'+r.newShares:'—'}</td>
-      <td class="${cCls}">${(r.cumPnl>=0?'$':'−$')+fmt(Math.abs(r.cumPnl))}</td>`;
+    if(r.isMilestone)label='★ '+r.msVal.toLocaleString();else if(r.day===1)label='Start';else if(idx===rows.length-1)label=capped?'Cap':'Goal ✓';
+    tr.innerHTML=`<td>${r.day}</td><td>${cal(r.calMo)}</td><td style="color:${moPnl>=0?'var(--g)':moPnl<0?'var(--r)':'var(--mut)'}">${(moPnl>=0?'+$':'−$')+fmt(Math.abs(moPnl))}</td><td>${label}</td><td style="color:var(--y);font-weight:600;">${r.shares.toLocaleString()}</td><td style="color:${r.outcome==='WIN'?'var(--g)':r.outcome==='LOSS'?'var(--r)':'var(--b)'};font-size:.62rem;">${r.outcome}</td><td style="color:var(--or);font-size:.65rem;">${r.numTr||'—'}</td><td class="${tC}">${r.dayTicks!==0?(r.dayTicks>0?'+':'')+r.dayTicks+'t':'—'}</td><td style="color:${dpC};font-size:.65rem;">${dpS}</td><td class="${pC} bw"><div class="bf ${bC}" style="width:${bP}%"></div><span>${sgn(r.dayPnl)}</span></td><td style="color:${(r.cumPnl/acct0*100)>=0?'var(--g)':'var(--r)'};font-size:.62rem;">${pct(r.cumPnl/acct0*100,1)}</td><td style="color:var(--mut);font-size:.62rem;">${(r.surplus>=0?'$':'−$')+fmt(Math.abs(r.surplus))}</td><td style="color:var(--or);font-size:.62rem;">${r.newSh>0?'+'+r.newSh:'—'}</td><td class="${pC}">${(r.cumPnl>=0?'$':'−$')+fmt(Math.abs(r.cumPnl))}</td>`;
     tbody.appendChild(tr);
   }
-  if(capped){
-    const w=document.createElement('tr');
-    w.innerHTML=`<td colspan="13" style="text-align:center;color:var(--r);padding:.7rem;font-size:.7rem;">⚠ CAPPED AT ${MAX.toLocaleString()} DAYS — EDGE TOO WEAK TO REACH GOAL</td>`;
-    tbody.appendChild(w);
-  }
+  if(capped){const w=document.createElement('tr');w.innerHTML=`<td colspan="14" style="text-align:center;color:var(--r);padding:.7rem;font-size:.68rem;">⚠ CAPPED AT ${MAX.toLocaleString()} DAYS</td>`;tbody.appendChild(w);}
+
+  // auto-jump to edge tab
+  const names=['Strategy A','Strategy B','Strategy C'];
+  $('sheet-title').textContent='Simulation Table — '+names[tab];
+  switchScreen('edge');
 }
 
-// ═══════════════════════════════════════════
-// CHART
-// ═══════════════════════════════════════════
-function drawChart(equity, startAcct, tab=0){
-  const s = tab===0?'':'_'+tab;
-  const canvas = document.getElementById('chart'+s);
-  if(!canvas||!canvas.getContext) return;
+/* ─── CHART ─── */
+function drawChart(equity,acct0,tab){
+  const s=tab===0?'':'_'+tab;
+  const cv=document.getElementById('chart'+s);
+  if(!cv||!cv.getContext)return;
   const dpr=window.devicePixelRatio||1;
-  const W=canvas.offsetWidth, H=canvas.offsetHeight;
-  if(W===0||H===0) return;
-  canvas.width=W*dpr; canvas.height=H*dpr;
-  const ctx=canvas.getContext('2d');
-  ctx.scale(dpr,dpr);
-  if(!equity||equity.length<2){ ctx.fillStyle='#1a1b1e'; ctx.fillRect(0,0,W,H); return; }
-  const pnls = equity.map(p=>p.cumPnl);
-  const minV = Math.min(0,...pnls), maxV = Math.max(0,...pnls);
-  const range = maxV-minV||1;
-  const pad = {t:5,b:5,l:5,r:5};
-  const pw = W-pad.l-pad.r, ph = H-pad.t-pad.b;
-  const xS = i => pad.l+(i/Math.max(equity.length-1,1))*pw;
-  const yS = v => pad.t+ph-((v-minV)/range)*ph;
-  const zy = yS(0);
-  ctx.strokeStyle='rgba(255,255,255,.07)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(pad.l,zy); ctx.lineTo(pad.l+pw,zy); ctx.stroke();
-  // Gradient fill
-  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ph);
-  grad.addColorStop(0,'rgba(25,183,143,.2)'); grad.addColorStop(1,'rgba(25,183,143,.02)');
-  ctx.beginPath();
-  ctx.moveTo(xS(0),yS(pnls[0]));
-  for(let i=1;i<pnls.length;i++) ctx.lineTo(xS(i),yS(pnls[i]));
-  ctx.lineTo(xS(pnls.length-1),pad.t+ph); ctx.lineTo(xS(0),pad.t+ph); ctx.closePath();
-  ctx.fillStyle=grad; ctx.fill();
-  // Coloured line
+  const W=cv.offsetWidth,H=cv.offsetHeight;
+  if(!W||!H)return;
+  cv.width=W*dpr;cv.height=H*dpr;
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  if(!equity||equity.length<2){ctx.fillStyle='#141820';ctx.fillRect(0,0,W,H);return;}
+  const pnls=equity.map(p=>p.cumPnl);
+  const mn=Math.min(0,...pnls),mx=Math.max(0,...pnls),rng=mx-mn||1;
+  const pd={t:5,b:5,l:5,r:5};const pw=W-pd.l-pd.r,ph=H-pd.t-pd.b;
+  const xS=i=>pd.l+(i/Math.max(equity.length-1,1))*pw;
+  const yS=v=>pd.t+ph-((v-mn)/rng)*ph;
+  ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
+  const zy=yS(0);ctx.beginPath();ctx.moveTo(pd.l,zy);ctx.lineTo(pd.l+pw,zy);ctx.stroke();
+  const gr=ctx.createLinearGradient(0,pd.t,0,pd.t+ph);
+  gr.addColorStop(0,'rgba(0,229,160,.2)');gr.addColorStop(1,'rgba(0,229,160,.02)');
+  ctx.beginPath();ctx.moveTo(xS(0),yS(pnls[0]));
+  for(let i=1;i<pnls.length;i++)ctx.lineTo(xS(i),yS(pnls[i]));
+  ctx.lineTo(xS(pnls.length-1),pd.t+ph);ctx.lineTo(xS(0),pd.t+ph);ctx.closePath();
+  ctx.fillStyle=gr;ctx.fill();
   for(let i=1;i<pnls.length;i++){
-    ctx.beginPath(); ctx.moveTo(xS(i-1),yS(pnls[i-1])); ctx.lineTo(xS(i),yS(pnls[i]));
-    ctx.strokeStyle=pnls[i]>=0?'#19b78f':'#e05a5a'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.beginPath();ctx.moveTo(xS(i-1),yS(pnls[i-1]));ctx.lineTo(xS(i),yS(pnls[i]));
+    ctx.strokeStyle=pnls[i]>=0?'#00e5a0':'#ff4d6a';ctx.lineWidth=1.5;ctx.stroke();
   }
 }
 
-// ═══════════════════════════════════════════
-// INSIGHT BOX
-// ═══════════════════════════════════════════
-function buildInsight(c, cumPnl, days, acct, capped, retPct, annPct, tab=0){
-  const s   = tab===0?'':'_'+tab;
-  const box = document.getElementById('ins'+s);
-  if(!box) return;
-  const calMo       = (days/252)*12;
-  const frTotal     = c.frPerDay*days;
-  const frPct       = Math.abs(cumPnl+frTotal)>0?(frTotal/Math.abs(cumPnl+frTotal))*100:0;
-  const minWR       = (c.avgL*(1-c.be))/(c.avgP+c.avgL);
-  const wrBuf       = ((c.wr-minWR)*100).toFixed(1);
-  const lines       = [];
-
-  if(capped||c.evDayNet<0){
-    lines.push('🚫 <strong>Target unreachable</strong> at these settings. The system loses money after costs. Adjust your parameters and re-run.');
+/* ─── INSIGHT ─── */
+function buildInsight(c,cumPnl,days,acct0,capped,retPct,annPct,tab){
+  const s=tab===0?'':'_'+tab;
+  const box=document.getElementById('ins'+s);if(!box)return;
+  const calMo=(days/252)*12;
+  const frTot=c.frDay*days;
+  const frPct=Math.abs(cumPnl+frTot)>0?(frTot/Math.abs(cumPnl+frTot))*100:0;
+  const minWR=(c.avgL*(1-c.be))/(c.avgP+c.avgL);
+  const wrB=((c.wr-minWR)*100).toFixed(1);
+  const lines=[];
+  if(capped||c.evNet<0){
+    lines.push('🚫 <strong>Target unreachable.</strong> The system loses money at these settings.');
   } else {
-    lines.push(`✅ Edge confirmed. Net EV: <strong>${sgn(c.evDayNet)}/day</strong> after all friction.`);
-    lines.push(`📅 Reaching <strong>${c.target.toLocaleString()} shares</strong> takes ~<strong>${calStr(calMo)}</strong> (${days.toLocaleString()} trading days).`);
-    if(frTotal>0) lines.push(`▼ Friction eats <strong>${sgn(frTotal)}</strong> total — <strong>${frPct.toFixed(0)}%</strong> of gross profit.`);
-    lines.push((+wrBuf>=10?'🛡️':'⚠️')+` Win rate buffer: <strong>${wrBuf}%</strong> before edge disappears. ${+wrBuf>=10?'Solid.':'Thin margin.'}`);
-    lines.push(`${retPct>=0?'📈':'📉'} Total return: <strong>${pct(retPct)}</strong> (<strong>${pct(annPct)}</strong> annualised).`);
+    lines.push(`✅ Edge confirmed. Net EV: <strong>${sgn(c.evNet)}/day</strong> after all costs.`);
+    lines.push(`📅 Reaching <strong>${c.goal.toLocaleString()} shares</strong> takes ~<strong>${cal(calMo)}</strong> (${days.toLocaleString()} trading days).`);
+    if(!c.dpct&&frTot>0)lines.push(`▼ Friction costs <strong>${sgn(frTot)}</strong> total — <strong>${frPct.toFixed(0)}%</strong> of gross profit.`);
+    if(!c.dpct&&+wrB>0)lines.push((+wrB>=10?'🛡️':'⚠️')+` WR buffer: <strong>${wrB}%</strong> before edge disappears. ${+wrB>=10?'Solid.':'Thin margin.'}`);
+    lines.push(`${retPct>=0?'📈':'📉'} Total return: <strong>${pct(retPct)}</strong> (<strong>${pct(annPct)}</strong> ann.).`);
   }
-
-  let verdict, cls;
-  if(capped||c.evDayNet<0)             { verdict='FAILING';  cls='ng'; }
-  else if(c.evDayNet>0&&+wrBuf>=8&&frPct<35){ verdict='VIABLE';   cls='vi'; }
-  else                                  { verdict='MARGINAL'; cls='mg'; }
-
-  box.className = 'insight-box show '+cls;
+  let verdict,cls;
+  if(capped||c.evNet<0){verdict='FAILING';cls='ng';}
+  else if(c.evNet>0&&+wrB>=8&&frPct<35){verdict='VIABLE';cls='vi';}
+  else{verdict='MARGINAL';cls='mg';}
+  box.className='insight-wrap show '+cls;
   const bt=document.getElementById('ins-title'+s);
   const bb=document.getElementById('ins-badge'+s);
   const bl=document.getElementById('ins-lines'+s);
-  if(bt) bt.textContent = cls==='vi'?'Edge Confirmed':cls==='mg'?'Use Caution':'Negative Edge';
-  if(bb) bb.textContent = verdict;
-  if(bl) bl.innerHTML   = lines.map(l=>`<div class="ins-line">${l}</div>`).join('');
+  if(bt)bt.textContent=cls==='vi'?'Edge Confirmed':cls==='mg'?'Use Caution':'Negative Edge';
+  if(bb)bb.textContent=verdict;
+  if(bl)bl.innerHTML=lines.map(l=>`<div class="insight-line">${l}</div>`).join('');
 }
 
-// ═══════════════════════════════════════════
-// EXPORT (CSV → Excel)
-// ═══════════════════════════════════════════
-function exportData(tab=0){
-  const res = simResults[tab];
-  if(!res||!res.rows.length){ alert('Run the simulation first.'); return; }
-  const {rows, acct, c, msp} = res;
+/* ─── EXPORT ─── */
+function exportData(tab){
+  const res=simResults[tab];
+  if(!res||!res.rows.length){alert('Run the simulation first.');return;}
+  const {rows,acct0,c,msp}=res;
   const names=['Strategy-A','Strategy-B','Strategy-C'];
-  const lines=[];
-
-  lines.push('ANTI-HOPE MACHINE — '+names[tab]+' Export');
-  lines.push('Generated,'+new Date().toLocaleString());
-  lines.push('');
-  lines.push('=== STRATEGY SETTINGS ===');
-  const st = [
-    ['Profit Ticks Min',c.minP],['Profit Ticks Max',c.maxP],
-    ['Stop Loss Min',c.minL],['Stop Loss Max',c.maxL],
-    ['Win Rate Min %',(c.minWR*100).toFixed(1)],['Win Rate Max %',(c.maxWR*100).toFixed(1)],
-    ['BE Rate Min %',(c.minBE*100).toFixed(1)],['BE Rate Max %',(c.maxBE*100).toFixed(1)],
-    ['Trades/Day Min',c.minT],['Trades/Day Max',c.maxT],
-    ['Tick Value','$'+c.tickSz.toFixed(4)],
-    ['Price Min','$'+c.minPr],['Price Max','$'+c.maxPr],
-    ['Spread (ticks)',c.spread],['Slippage (ticks)',c.slip],
-    ['Commission/Trade','$'+c.comm.toFixed(2)],
-    ['Starting Shares',c.startSh],['Share Goal',c.target],
-    ['Cash Buffer (shares)',c.buffer],
-    ['Daily Loss Cap (ticks)',c.cap||'Off'],
-    ['Discipline Rate %',(c.cs*100).toFixed(0)],
-    ['Bad Day Freq %',(c.bfreq*100).toFixed(0)],['Bad Day Loss %',(c.bsize*100).toFixed(0)],
-    ['Good Day Freq %',(c.gfreq*100).toFixed(0)],['Good Day Gain %',(c.gsize*100).toFixed(0)],
-  ];
-  st.forEach(([k,v])=>lines.push(k+','+v));
-  lines.push('');
-
-  lines.push('=== EDGE DIAGNOSTICS ===');
-  const actRR=c.avgL>0?c.avgP/c.avgL:0;
-  const minWR=(c.avgL*(1-c.be))/(c.avgP+c.avgL);
-  const monthly=c.evDayNet*21;
-  const ed = [
-    ['Avg Win Rate %',(c.wr*100).toFixed(1)],['Avg BE Rate %',(c.be*100).toFixed(1)],
-    ['Avg Loss Rate %',(c.loss*100).toFixed(1)],
-    ['Avg Profit Ticks',c.avgP.toFixed(1)],['Avg Loss Ticks',c.avgL.toFixed(1)],
-    ['R:R Ratio',actRR.toFixed(2)+':1'],
-    ['Exp $ / Trade (net)',(c.evDollar-c.frPerTrade).toFixed(2)],
-    ['Exp $ / Day (net)',c.evDayNet.toFixed(2)],
-    ['Est Monthly P&L',monthly.toFixed(2)],
-    ['Friction/Trade','$'+c.frPerTrade.toFixed(2)],
-    ['Friction/Day','$'+c.frPerDay.toFixed(2)],
-    ['Min WR to Break Even %',(minWR*100).toFixed(1)],
-    ['WR Buffer %',((c.wr-minWR)*100).toFixed(1)],
-    ['System Status',c.evDayNet>0&&c.wr>=minWR?'PROFITABLE':c.evDayNet>0?'MARGINAL':'NEGATIVE'],
-  ];
-  ed.forEach(([k,v])=>lines.push(k+','+v));
-  lines.push('');
-
-  const cumPnl = rows[rows.length-1].cumPnl;
-  const totalDays = rows[rows.length-1].day;
-  const calMo = (totalDays/252)*12;
-  const retPct = (cumPnl/acct)*100;
-  const annPct = totalDays>0?(retPct/totalDays)*252:0;
-  const frTotal = c.frPerDay*totalDays;
-  const frPct = Math.abs(cumPnl+frTotal)>0?(frTotal/Math.abs(cumPnl+frTotal))*100:0;
-  lines.push('=== SIMULATION RESULTS ===');
-  [
-    ['Trading Days',totalDays],['Calendar Time',calStr(calMo)],
-    ['Starting Capital','$'+fmt(acct)],['Ending Capital','$'+fmt(acct+cumPnl)],
-    ['Total P&L','$'+fmt(cumPnl)],['Total Return %',retPct.toFixed(2)],
-    ['Annualised Return %',annPct.toFixed(2)],
-    ['Total Friction Cost','$'+fmt(frTotal)],['Friction % of Gross',frPct.toFixed(1)],
-  ].forEach(([k,v])=>lines.push(k+','+v));
-  lines.push('');
-
-  lines.push('=== DAY BY DAY TABLE ===');
-  lines.push('Day,Calendar,Mo P&L,Label,Shares,Result,Trades,Net Ticks,Net P&L,Acct Ret%,Surplus,Shares Added,Cumul P&L');
-  const interval=c.interval;
+  const L=[];
+  L.push('ANTI-HOPE MACHINE — '+names[tab]);
+  L.push('Generated,'+new Date().toLocaleString());
+  L.push('');
+  L.push('=== SETTINGS ===');
+  [['Mode',c.dpct?'Daily % Override':'Tick-based'],
+   ['Profit Ticks Min/Max',c.minP+'/'+c.maxP],['Stop Loss Min/Max',c.minL+'/'+c.maxL],
+   ['Win Rate Min/Max %',(c.minWR*100).toFixed(1)+'/'+(c.maxWR*100).toFixed(1)],
+   ['BE Rate Min/Max %',(c.minBE*100).toFixed(1)+'/'+(c.maxBE*100).toFixed(1)],
+   ['Trades/Day',c.minT+'/'+c.maxT],['Commission','$'+c.comm.toFixed(2)],
+   ['Starting Shares',c.sh],['Share Goal',c.goal],
+  ].forEach(([k,v])=>L.push(k+','+v));
+  L.push('');
+  L.push('=== DAY BY DAY TABLE ===');
+  L.push('Day,Calendar,Mo P&L,Label,Shares,Result,Trades,Net Ticks,Day%,Net P&L,Acct Ret%,Surplus,Shares Added,Cumul P&L');
   const show=new Set([0,rows.length-1]);
-  for(let i=0;i<rows.length;i++) if(rows[i].isMilestone||rows[i].day%interval===0) show.add(i);
-  const sorted=[...show].sort((a,b)=>a-b);
-  for(const idx of sorted){
+  rows.forEach((r,i)=>{if(r.isMilestone||r.day%c.intv===0)show.add(i);});
+  for(const idx of [...show].sort((a,b)=>a-b)){
     const r=rows[idx];
-    const moPnl=r.cumPnl-(msp[r.mIdx]||0);
-    let label=''; if(r.isMilestone) label='Milestone '+r.msVal; else if(r.day===1) label='Start'; else if(idx===rows.length-1) label='Goal';
-    const row=[r.day,calStr(r.calMo),moPnl.toFixed(2),label,r.shares,r.outcome,r.numTr,r.dayTicks,r.dayPnl.toFixed(2),(r.cumPnl/acct*100).toFixed(2)+'%',r.surplus.toFixed(2),r.newShares,r.cumPnl.toFixed(2)];
-    lines.push(row.map(v=>typeof v==='string'&&v.includes(',')?'"'+v+'"':v).join(','));
+    const mo=r.cumPnl-(msp[r.mIdx]||0);
+    let lbl='';if(r.isMilestone)lbl='Milestone '+r.msVal;else if(r.day===1)lbl='Start';else if(idx===rows.length-1)lbl='Goal';
+    const dp=r.dayPct!=null?r.dayPct.toFixed(2)+'%':'—';
+    L.push([r.day,cal(r.calMo),mo.toFixed(2),lbl,r.shares,r.outcome,r.numTr||0,r.dayTicks,dp,r.dayPnl.toFixed(2),(r.cumPnl/acct0*100).toFixed(2)+'%',r.surplus.toFixed(2),r.newSh,r.cumPnl.toFixed(2)].map(v=>typeof v==='string'&&v.includes(',')?'"'+v+'"':v).join(','));
   }
-
-  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const blob=new Blob([L.join('\n')],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url;
-  a.download='AHM-'+names[tab]+'-'+new Date().toISOString().slice(0,10)+'.csv';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const a=document.createElement('a');a.href=url;a.download='AHM-'+names[tab]+'-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
 }
 
-// ═══════════════════════════════════════════
-// INFO MODAL DATA
-// ═══════════════════════════════════════════
-const INFO = {
-  profit:{title:'PROFIT TARGET',body:'<p>How many <span class="term">ticks</span> you aim to capture on a winning trade. Min/Max defines the random range per trade.</p><ul><li>100 shares × 15 ticks × $0.01 = <strong>$15 per win</strong></li></ul>'},
-  loss:{title:'STOP LOSS',body:'<p>Ticks lost before you close a losing trade.</p><ul><li>R:R = avg ticks won ÷ avg ticks lost</li><li>Tight stops = smaller losses but more of them</li></ul>'},
-  wr:{title:'WIN RATE',body:'<p>Percentage of trades that reach profit target before stop loss.</p><ul><li>40% WR at 2.5:1 R:R is still a profitable system</li></ul>'},
-  be:{title:'BREAKEVEN RATE',body:'<p>Trades closed at your entry price. Zero P&L before costs.</p><ul><li>A breakeven is always better than a full loss</li><li>Loss% = 100 − Win% − BE%</li></ul>'},
-  trades:{title:'TRADES PER DAY',body:'<p>How many trades per session. More trades = more edge, but also more friction costs.</p>'},
-  rr:{title:'REWARD:RISK OVERRIDE',body:'<p>Forces a specific R:R ratio. 0 = disabled, uses tick sliders instead.</p>'},
-  tick:{title:'TICK VALUE',body:'<p>Dollar value of one tick movement.</p><ul><li>US stocks: $0.01/share</li><li>NQ Micro: $0.50/tick</li><li>ES: $12.50/tick</li></ul>'},
-  price:{title:'PRICE RANGE',body:'<p>Daily price range. Price matters for share purchases — if price is $47 today, you need $47 surplus to buy one more share.</p>'},
-  spread:{title:'BID/ASK SPREAD',body:'<p>Gap between buy and sell price. 1 tick spread = 1 full tick lost per round trip on every trade.</p>'},
-  slip:{title:'SLIPPAGE',body:'<p>Ticks lost getting filled at a worse price than expected. Common during fast markets or market opens.</p>'},
-  comm:{title:'COMMISSION',body:'<p>Broker fee per trade. Applied to every trade regardless of outcome.</p><ul><li>IBKR: ~$0.005/share (100 shares = $0.50)</li></ul>'},
-  buffer:{title:'CASH BUFFER',body:'<p>Surplus held before buying more shares.</p><ul><li>1 = buy immediately</li><li>10 = wait until surplus = 10× share price</li></ul>'},
-  cap:{title:'DAILY LOSS LIMIT',body:'<p>Hard stop. When tick losses hit this number, no more trades that day. Set 0 to disable.</p>'},
-  cs:{title:'DISCIPLINE RATE',body:'<p>How often you actually follow your rules.</p><ul><li>100% = perfect every day</li><li>85% ≈ one off day per week</li><li>Off days: WR drops 30%</li></ul>'},
-  bd:{title:'BAD DAYS',body:'<p>Occasional blow-up sessions — revenge trading, oversizing. Applied as % of starting account.</p>'},
-  gd:{title:'GOOD DAYS',body:'<p>Exceptional sessions. Same logic as bad days but in your favour. Cannot occur on same day as a bad day.</p>'},
-  bias:{title:'SKILL GROWTH',body:'<p>Win rate drifts from minimum toward maximum over 365 days.</p><ul><li>Slow start / Linear / Fast start / S-curve control the shape of improvement</li></ul>'},
+/* ─── INFO DATA ─── */
+const INFO={
+  profit:{t:'PROFIT TARGET',b:'<p>Ticks captured on a winning trade. Min/Max sets the per-trade range.</p><ul><li>100 shares × 15t × $0.01 = <strong>$15 per win</strong></li></ul>'},
+  loss:{t:'STOP LOSS',b:'<p>Ticks lost before closing a losing trade.</p><ul><li>R:R = profit ticks ÷ loss ticks</li></ul>'},
+  wr:{t:'WIN RATE',b:'<p>% of trades that hit profit target before stop.</p><ul><li>40% WR at 2.5:1 R:R can still be profitable</li></ul>'},
+  be:{t:'BREAKEVEN RATE',b:'<p>Trades closed at entry — zero P&L before costs.</p>'},
+  trades:{t:'TRADES PER DAY',b:'<p>How many trades per session. More = more edge exposure but more friction.</p>'},
+  swing:{t:'AVG PRICE SWING',b:'<p>Typical tick range of a single price move on your timeframe.</p><ul><li>INTC: 15–40t &nbsp; SPY: 8–20t &nbsp; NVDA: 30–80t</li></ul>'},
+  spread:{t:'BID/ASK SPREAD',b:'<p>Gap between buy and sell price. 1 tick = 1 tick lost per round trip.</p>'},
+  slip:{t:'SLIPPAGE',b:'<p>Ticks lost getting a worse fill than expected.</p>'},
+  comm:{t:'COMMISSION',b:'<p>Broker fee per trade.</p><ul><li>IBKR: ~$0.005/share → 100 shares = $0.50</li></ul>'},
+  pullback:{t:'AVG PULLBACK',b:'<p>How far price retraces after entry. If pullback ≥ effective target, win becomes stop-out.</p>'},
+  entryoffset:{t:'ENTRY OFFSET',b:'<p>Ticks lost by entering late. Subtracted from your profit target immediately.</p>'},
+  rr:{t:'R:R OVERRIDE',b:'<p>Forces a specific R:R ratio instead of tick sliders. 0 = disabled.</p>'},
+  tick:{t:'TICK VALUE',b:'<p>Dollar value of one tick per share.</p><ul><li>US stocks: $0.01</li></ul>'},
+  price:{t:'PRICE RANGE',b:'<p>Daily price range. Used for share purchases.</p>'},
+  disc:{t:'DISCIPLINE RATE',b:'<p>How often you follow your rules. Off days: WR drops 30%.</p>'},
+  buffer:{t:'CASH BUFFER',b:'<p>Surplus held before buying more shares.</p>'},
+  cap:{t:'DAILY LOSS LIMIT',b:'<p>Hard stop — no more trades once tick losses hit this.</p>'},
+  bd:{t:'BAD DAYS',b:'<p>Occasional blow-up sessions — applied as % of starting account.</p>'},
+  gd:{t:'GOOD DAYS',b:'<p>Exceptional sessions. Cannot occur same day as bad day.</p>'},
+  dpct:{t:'DAILY % OVERRIDE',b:'<p>Bypasses all tick math. Each day draws a random % from your range.</p>'},
+  bias:{t:'SKILL GROWTH',b:'<p>Win rate drifts from minimum toward maximum over 365 days.</p>'},
 };
 
-function showInfo(key){
-  const d=INFO[key]; if(!d) return;
-  $('info-title').textContent=d.title;
-  $('info-body').innerHTML=d.body;
-  openModal('info');
-}
-
-// ═══════════════════════════════════════════
-// TAB PANE BUILDER
-// Builds all three tab panes programmatically
-// ═══════════════════════════════════════════
+/* ─── BUILD TABS ─── */
 function buildTabs(){
-  [0,1,2].forEach(n => {
-    const pane = $('tp'+n);
-    if(!pane) return;
-    const s = n===0 ? '' : '_'+n;
-    const label = ['A','B','C'][n];
+  [0,1,2].forEach(n=>{
+    const pane=$('strat-pane-'+n);if(!pane)return;
+    const s=n===0?'':'_'+n;
+    const L=['A','B','C'][n];
 
-    // Helper to build a ctrl card
-    const ctrl = (id, borderColor, labelColor, labelText, infoKey, body, hasToggle=true, extra='') => {
-      const tId = 'tog-'+id+s;
-      const togHtml = hasToggle
-        ? `<label class="tog-wrap"><input type="checkbox" class="tog" id="${tId}" checked onchange="onTog(this,'ctrl-${id}${s}',${n})"><span class="tog-lbl" id="${tId}-l">ON</span></label>`
-        : '';
-      return `<div class="ctrl${extra}" id="ctrl-${id}${s}" style="border-left-color:${borderColor};">
-        <div class="ctrl-head">
-          <span class="ctrl-lbl" style="color:${labelColor};">${labelText}${infoKey?` <button class="info-btn" onclick="showInfo('${infoKey}')">?</button>`:''}</span>
-          ${togHtml}
+    function mk(id,bc,lc,lt,ik,body,hasTog=true,xtra=''){
+      const tid='tog-'+id+s;
+      const tog=hasTog?`<label class="tog-wrap"><input type="checkbox" class="tog" id="${tid}" checked onchange="onTog(this,'ctrl-${id}${s}',${n})"><span class="tog-lbl" id="${tid}-l">ON</span></label>`:'';
+      const ib=ik?`<button class="ibtn" onclick="openInfo('${ik}')">?</button>`:'';
+      return `<div class="ctrl-card${xtra}" id="ctrl-${id}${s}" style="border-left-color:${bc};"><div class="ctrl-top"><span class="ctrl-lbl" style="color:${lc};">${lt}${ib}</span>${tog}</div>${body}</div>`;
+    }
+    function dv(id,def){return `<div class="ctrl-val" id="d-${id}${s}">${def}</div>`;}
+    function s1(id,cls,mn,mx,val,step=''){return `<input type="range" class="${cls}" id="${id}${s}" min="${mn}" max="${mx}" value="${val}"${step?' step="'+step+'"':''} oninput="onSlider(${n})" style="width:100%;">`;}
+    function s2(i1,c1,mn1,mx1,v1,i2,c2,mn2,mx2,v2){return `<div class="dual-track">${s1(i1,c1,mn1,mx1,v1)}${s1(i2,c2,mn2,mx2,v2)}</div>`;}
+    function sel(id,opts){return `<select class="ctrl-sel" id="${id}${s}" onchange="onSlider(${n})">${opts}</select>`;}
+
+    const core=
+      mk('p','var(--y)','var(--y)','Profit Target','profit',dv('minP','15/30t')+s2('minP','rg',1,400,15,'maxP','rg',1,400,30))+
+      mk('l','var(--r)','var(--r)','Stop Loss','loss',dv('minL','5/15t')+s2('minL','rr_',1,400,5,'maxL','rr_',1,400,15))+
+      mk('wr','var(--g)','var(--g)','Win Rate %','wr',dv('minWR','55/65%')+s2('minWR','rg',5,99,55,'maxWR','rg',6,100,65))+
+      mk('be','var(--b)','var(--b)','Breakeven Rate %','be',dv('minBE','10/20%')+s2('minBE','rb',0,99,10,'maxBE','rb',0,99,20))+
+      mk('t','var(--or)','var(--or)','Trades / Day','trades',dv('minT','2/5')+s2('minT','ro',1,50,2,'maxT','ro',1,50,5))+
+      mk('swing','var(--mut)','var(--sub)','Avg Price Swing','swing',dv('minSw','15/40t')+s2('minSw','rm',5,200,15,'maxSw','rm',5,200,40),false)+
+      mk('sh','var(--y)','var(--y)','Starting Shares',null,dv('sh','100')+s1('sh','ry',10,500,100,'10'),false)+
+      mk('goal','var(--g)','var(--g)','Share Goal',null,dv('goal','500')+s1('goal','rg',50,5000,500,'50'),false)+
+      mk('intv','var(--or)','var(--or)','Table Detail',null,dv('intv','Every 5 days')+s1('intv','ro',1,30,5),false);
+
+    const real=
+      mk('sp','var(--or)','var(--or)','Spread','spread',dv('spread','1 tick')+s1('spread','ro',0,20,1))+
+      mk('sl','var(--r)','var(--r)','Slippage','slip',dv('slip','1 tick')+s1('slip','rr_',0,10,1))+
+      mk('co','var(--y)','var(--y)','Commission','comm',dv('comm','$0.50')+s1('comm','ry',0,2000,50,'5'))+
+      mk('cs','var(--tl)','var(--tl)','Discipline Rate','disc',dv('disc','85%')+s1('disc','rtl',50,100,85))+
+      mk('buf','var(--p)','var(--p)','Cash Buffer','buffer',dv('buf','1 (buy now)')+s1('buf','rp',1,100,1))+
+      mk('cap','var(--r)','var(--r)','Daily Loss Limit','cap',dv('cap','30t')+s1('cap','rr_',0,500,30,'5'))+
+      mk('bd','var(--r)','var(--r)','Bad Days','bd',dv('bd','3%/2%')+s2('bf','rr_',0,20,3,'bs','rr_',1,10,2))+
+      mk('gd','var(--g)','var(--g)','Good Days','gd',dv('gd','3%/2%')+s2('gf','rg',0,20,3,'gs_','rg',1,10,2))+
+      mk('pb','var(--b)','var(--b)','Avg Pullback','pullback',dv('minPB','3/8t')+s2('minPB','rb',0,80,3,'maxPB','rb',0,80,8))+
+      mk('eo','var(--tl)','var(--tl)','Entry Offset','entryoffset',dv('minEO','1/4t')+s2('minEO','rtl',0,30,1,'maxEO','rtl',0,30,4))+
+      mk('rr','var(--p)','var(--p)','R:R Override','rr',dv('rr','Off')+s1('rrSlider','rp',0,200,0))+
+      mk('tk','var(--tl)','var(--tl)','Tick Value','tick',dv('tick','$0.01')+s1('tickSz','rtl',1,100,1))+
+      mk('pr','var(--p)','var(--p)','Price Range','price',dv('pr','$43/$47')+s2('minPr','rp',1,1000,43,'maxPr','rp',1,1000,47))+
+      `<div class="ctrl-card" id="ctrl-bias${s}" style="border-left-color:var(--mut);">
+        <div class="ctrl-top"><span class="ctrl-lbl" style="color:var(--mut);">Skill Growth <button class="ibtn" onclick="openInfo('bias')">?</button></span>
+        <label class="tog-wrap"><input type="checkbox" class="tog" id="tog-bias${s}" checked onchange="onTog(this,'ctrl-bias${s}',${n})"><span class="tog-lbl" id="tog-bias${s}-l">ON</span></label></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;">
+          <div>${dv('bias','50%')}${s1('bias','rm',0,100,50)}</div>
+          <div><div class="ctrl-val">Curve</div>${sel('curve','<option value="slow" selected>Slow Start</option><option value="linear">Linear</option><option value="fast">Fast Start</option><option value="scurve">S-Curve</option>')}</div>
         </div>
-        ${body}
-      </div>`;
-    };
-
-    const rangeDisp = (dispId, defaultVal) =>
-      `<div class="ctrl-disp" id="v-${dispId}${s}">${defaultVal}</div>`;
-
-    const slider1 = (id, cls, min, max, val, step='') =>
-      `<input type="range" class="${cls}" id="${id}${s}" min="${min}" max="${max}" value="${val}" ${step?'step="'+step+'"':''} oninput="onSlider(${n})" style="width:100%;">`;
-
-    const sliderPair = (id1, cls1, min1, max1, val1, id2, cls2, min2, max2, val2) =>
-      `<div class="sl-pair">${slider1(id1,cls1,min1,max1,val1)} ${slider1(id2,cls2,min2,max2,val2)}</div>`;
-
-    // ── CORE CONTROLS ──
-    const core = `
-      ${ctrl('p', 'var(--y)', 'var(--y)', 'Profit Target', 'profit',
-        rangeDisp('minP','15/30t') + sliderPair('minP','rg',1,400,15,'maxP','rg',1,400,30))}
-      ${ctrl('l', 'var(--r)', 'var(--r)', 'Stop Loss', 'loss',
-        rangeDisp('minL','5/15t') + sliderPair('minL','rr_',1,400,5,'maxL','rr_',1,400,15))}
-      ${ctrl('wr','var(--g)','var(--g)','Win Rate %','wr',
-        rangeDisp('minWR','55/65%') + sliderPair('minWR','rg',5,99,55,'maxWR','rg',6,100,65))}
-      ${ctrl('be','var(--b)','var(--b)','Breakeven Rate %','be',
-        rangeDisp('minBE','10/20%') + sliderPair('minBE','rb',0,99,10,'maxBE','rb',0,99,20))}
-      ${ctrl('t', 'var(--or)','var(--or)','Trades / Day','trades',
-        rangeDisp('minT','2/5') + sliderPair('minT','ro',1,50,2,'maxT','ro',1,50,5))}
-      ${ctrl('sh','var(--y)','var(--y)','Starting Shares',null,
-        rangeDisp('startSh','100') + slider1('startShares','ry',10,500,100,'10'), false)}
-      ${ctrl('tg','var(--g)','var(--g)','Share Goal',null,
-        rangeDisp('target','500') + slider1('shareTarget','rg',50,5000,500,'50'), false)}
-      ${ctrl('in','var(--or)','var(--or)','Table Detail',null,
-        rangeDisp('interval','Every 5 days') + slider1('interval','ro',1,30,5), false)}`;
-
-    // ── REALISTIC CONTROLS ──
-    const real = `
-      ${ctrl('sp','var(--or)','var(--or)','Spread','spread',
-        rangeDisp('spread','1 tick') + slider1('spread','ro',0,20,1))}
-      ${ctrl('sl','var(--r)','var(--r)','Slippage','slip',
-        rangeDisp('slip','1 tick') + slider1('slippage','rr_',0,10,1))}
-      ${ctrl('co','var(--y)','var(--y)','Commission','comm',
-        rangeDisp('comm','$0.50') + slider1('commission','ry',0,2000,50,'5'))}
-      ${ctrl('cs','var(--tl)','var(--tl)','Discipline Rate','cs',
-        rangeDisp('cs','85%') + slider1('consistency','rtl',50,100,85))}
-      ${ctrl('buf','var(--p)','var(--p)','Cash Buffer','buffer',
-        rangeDisp('buf','1 (buy now)') + slider1('buffer','rp_',1,100,1))}
-      ${ctrl('cap','var(--r)','var(--r)','Daily Loss Limit','cap',
-        rangeDisp('cap','30t') + slider1('lossCap','rr_',0,500,30,'5'))}
-      ${ctrl('bd','var(--r)','var(--r)','Bad Days','bd',
-        rangeDisp('bd','3%/2%') + sliderPair('blowFreq','rr_',0,20,3,'blowSize','rr_',1,10,2))}
-      ${ctrl('gd','var(--g)','var(--g)','Good Days','gd',
-        rangeDisp('gd','3%/2%') + sliderPair('goodFreq','rg',0,20,3,'goodSize','rg',1,10,2))}
-      ${ctrl('rr','var(--p)','var(--p)','R:R Override','rr',
-        rangeDisp('rr','Off') + slider1('rrSlider','rp_',0,200,0))}
-      ${ctrl('tk','var(--tl)','var(--tl)','Tick Value','tick',
-        rangeDisp('tick','$0.01') + slider1('tickSize','rtl',1,100,1))}
-      ${ctrl('pr','var(--p)','var(--p)','Price Range','price',
-        rangeDisp('pr','$43/$47') + sliderPair('minPrice','rp_',1,1000,43,'maxPrice','rp_',1,1000,47))}
-      <div class="ctrl ctrl-span3" id="ctrl-bias${s}" style="border-left-color:var(--mut);">
-        <div class="ctrl-head">
-          <span class="ctrl-lbl" style="color:var(--mut);">Skill Growth Bias <button class="info-btn" onclick="showInfo('bias')">?</button></span>
-          <label class="tog-wrap"><input type="checkbox" class="tog" id="tog-bias${s}" checked onchange="onTog(this,'ctrl-bias${s}',${n})"><span class="tog-lbl" id="tog-bias${s}-l">ON</span></label>
+        <div style="margin-top:.4rem;"><div class="ctrl-val">Sim Mode</div>${sel('mode','<option value="rand" selected>Randomise Daily</option><option value="avg">Use Midpoints</option>')}</div>
+      </div>`+
+      `<div class="ctrl-card off" id="ctrl-dp${s}" style="border-left-color:var(--y);">
+        <div class="ctrl-top"><span class="ctrl-lbl" style="color:var(--y);">Daily % Override <button class="ibtn" onclick="openInfo('dpct')">?</button></span>
+        <label class="tog-wrap"><input type="checkbox" class="tog" id="tog-dp${s}" onchange="onTog(this,'ctrl-dp${s}',${n})"><span class="tog-lbl" id="tog-dp${s}-l">OFF</span></label></div>
+        <div class="ctrl-val" id="d-dp${s}">Off — toggle to enable</div>
+        <div class="dual-track" style="margin-top:.3rem;">
+          <input type="range" class="rr_" id="minDp${s}" min="-20" max="20" value="-2" step="0.1" oninput="onSlider(${n})">
+          <input type="range" class="rg" id="maxDp${s}" min="-20" max="20" value="3" step="0.1" oninput="onSlider(${n})">
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem 1rem;">
-          <div>
-            <div class="ctrl-disp" id="v-bias${s}">50%</div>
-            ${slider1('bias','rmut',0,100,50)}
-          </div>
-          <div>
-            <div class="ctrl-disp">Learning Curve</div>
-            <select class="ctrl-select" id="biasCurve${s}" onchange="onSlider(${n})">
-              <option value="slow" selected>Slow Start</option>
-              <option value="linear">Linear</option>
-              <option value="fast">Fast Start</option>
-              <option value="scurve">S-Curve</option>
-            </select>
-          </div>
-          <div>
-            <div class="ctrl-disp">Sim Mode</div>
-            <select class="ctrl-select" id="simMode${s}" onchange="onSlider(${n})">
-              <option value="rand" selected>Randomise Daily</option>
-              <option value="avg">Use Midpoints</option>
-            </select>
-          </div>
-        </div>
+        <div class="sl-note">When on: ignores ticks, friction, bad/good days. Day% column shows result.</div>
       </div>`;
 
-    pane.innerHTML = `
-      <!-- DIST BAR -->
-      <div class="dist-wrap" style="flex-shrink:0;">
+    pane.innerHTML=`
+      <div class="dist-card">
         <div class="dist-row">
-          <span class="dist-label">Distribution</span>
-          <span class="dist-ev" id="ev-q${s}">EV: —</span>
+          <span class="dist-lbl">Distribution</span>
+          <span class="ev-badge" id="ev-q${s}">EV —</span>
         </div>
-        <div class="dist-bar">
-          <div class="db-g" id="dbg${s}" style="width:60%;"></div>
-          <div class="db-b" id="dbb${s}" style="width:20%;"></div>
-          <div class="db-r" id="dbr${s}" style="width:20%;"></div>
-        </div>
-        <div class="dist-lbls">
-          <span style="color:var(--g);" id="db-gl${s}">WIN 60%</span>
-          <span style="color:var(--b);" id="db-bl${s}">BE 20%</span>
-          <span style="color:var(--r);" id="db-rl${s}">LOSS 20%</span>
-        </div>
+        <div class="dist-bar"><div class="dbg" id="dbg${s}" style="width:60%;"></div><div class="dbb" id="dbb${s}" style="width:20%;"></div><div class="dbr" id="dbr${s}" style="width:20%;"></div></div>
+        <div class="dist-lbls"><span style="color:var(--g);" id="db-gl${s}">WIN 60%</span><span style="color:var(--b);" id="db-bl${s}">BE 20%</span><span style="color:var(--r);" id="db-rl${s}">LOSS 20%</span></div>
       </div>
 
-      <!-- CONTROLS -->
-      <div class="ctrl-groups">
-        <div class="ctrl-group">
-          <div class="ctrl-group-head" onclick="toggleCtrlGroup(this)">
-            <span class="ctrl-group-title">Core Settings</span>
-            <span class="ctrl-group-arrow">▲</span>
-          </div>
-          <div class="ctrl-group-body open">
-            <div class="ctrl-grid">${core}</div>
-          </div>
+      <div class="ctrl-group">
+        <div class="ctrl-group-hd" onclick="toggleGrp(this)">
+          <span class="ctrl-group-title">Core Settings</span>
+          <span class="ctrl-group-arr open">▲</span>
         </div>
-        <div class="ctrl-group">
-          <div class="ctrl-group-head" onclick="toggleCtrlGroup(this)">
-            <span class="ctrl-group-title">Realistic Conditions</span>
-            <span class="ctrl-group-arrow">▲</span>
-          </div>
-          <div class="ctrl-group-body open">
-            <div class="ctrl-grid">${real}</div>
-          </div>
-        </div>
+        <div class="ctrl-group-body open"><div class="ctrls-list">${core}</div></div>
       </div>
 
-      <!-- SIMULATE -->
-      <div class="sim-row" style="flex-shrink:0;">
-        <button class="sim-btn" onclick="simulate(${n})">▶ SIMULATE — STRATEGY ${label}</button>
-        <button class="export-btn" onclick="exportData(${n})">⬇ XLSX</button>
+      <div class="ctrl-group">
+        <div class="ctrl-group-hd" onclick="toggleGrp(this)">
+          <span class="ctrl-group-title">Realistic Conditions</span>
+          <span class="ctrl-group-arr open">▲</span>
+        </div>
+        <div class="ctrl-group-body open"><div class="ctrls-list">${real}</div></div>
       </div>
 
-      <!-- CHART + INSIGHT SIDE BY SIDE -->
-      <div class="chart-zone" style="flex-shrink:0;">
-        <div class="chart-half">
-          <div class="chart-title">Equity Curve — Strategy ${label}</div>
-          <canvas id="chart${s}"></canvas>
-        </div>
-        <div class="insight-box" id="ins${s}">
-          <div class="ins-head">
-            <span id="ins-title${s}">Verdict</span>
-            <span class="ins-badge" id="ins-badge${s}">—</span>
-          </div>
-          <div class="ins-lines" id="ins-lines${s}"></div>
-        </div>
+      <div class="sim-row">
+        <button class="sim-btn" onclick="simulate(${n})">▶ SIMULATE ${L}</button>
+        <button class="exp-btn" onclick="exportData(${n})">⬇ CSV</button>
       </div>
 
-      <!-- TABLE -->
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr>
-            <th>Day</th><th>Cal</th><th>Mo P&L</th><th>Label</th>
-            <th>Shares</th><th>Result</th><th>Tr</th>
-            <th>Ticks</th><th>P&L</th><th>Ret%</th>
-            <th>Surplus</th><th>+Sh</th><th>Cumul</th>
-          </tr></thead>
-          <tbody id="tbody${s}"></tbody>
-        </table>
-      </div>`;
+      <div class="chart-wrap">
+        <div class="chart-title">Equity Curve — Strategy ${L}</div>
+        <canvas id="chart${s}"></canvas>
+      </div>
+
+      <div class="insight-wrap" id="ins${s}">
+        <div class="insight-hd"><span id="ins-title${s}">Verdict</span><span class="insight-badge" id="ins-badge${s}">—</span></div>
+        <div class="insight-lines" id="ins-lines${s}"></div>
+      </div>
+
+      <div style="padding:.5rem .9rem .75rem;">
+        <button style="width:100%;height:40px;background:rgba(77,166,255,.1);border:1px solid rgba(77,166,255,.3);color:var(--b);font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:4px;" onclick="openSheet()">📋 VIEW TABLE</button>
+      </div>
+    `;
   });
 }
 
-// ═══════════════════════════════════════════
-// PERSIST
-// ═══════════════════════════════════════════
-const SAVE_KEY = 'ahm-v2';
-
-function getSliderIds(){
-  const base=['minP','maxP','minL','maxL','minWR','maxWR','minBE','maxBE','minT','maxT',
-    'startShares','shareTarget','interval','spread','slippage','commission','consistency',
-    'buffer','lossCap','blowFreq','blowSize','goodFreq','goodSize',
-    'rrSlider','tickSize','minPrice','maxPrice','bias','biasCurve','simMode'];
-  const ids=[];
-  [0,1,2].forEach(n=>{ const s=n===0?'':'_'+n; base.forEach(id=>ids.push(id+s)); });
-  return ids;
+/* ─── PERSIST ─── */
+const SK='ahm-mob-v1';
+function sliderIds(){
+  const base=['minP','maxP','minL','maxL','minWR','maxWR','minBE','maxBE','minT','maxT','sh','goal','intv','spread','slip','comm','disc','buf','cap','bf','bs','gf','gs_','minPB','maxPB','minEO','maxEO','minSw','maxSw','minDp','maxDp','rrSlider','tickSz','minPr','maxPr','bias','curve','mode'];
+  const ids=[];[0,1,2].forEach(n=>{const s=n===0?'':'_'+n;base.forEach(id=>ids.push(id+s));});return ids;
 }
-function getTogIds(){
-  const base=['tog-p','tog-l','tog-wr','tog-be','tog-t','tog-sp','tog-sl','tog-co',
-    'tog-cs','tog-buf','tog-cap','tog-bd','tog-gd','tog-rr','tog-tk','tog-pr','tog-bias'];
-  const ids=[];
-  [0,1,2].forEach(n=>{ const s=n===0?'':'_'+n; base.forEach(id=>ids.push(id+s)); });
-  return ids;
+function togIds(){
+  const base=['tog-p','tog-l','tog-wr','tog-be','tog-t','tog-sp','tog-sl','tog-co','tog-cs','tog-buf','tog-cap','tog-bd','tog-gd','tog-pb','tog-eo','tog-rr','tog-tk','tog-pr','tog-bias','tog-dp'];
+  const ids=[];[0,1,2].forEach(n=>{const s=n===0?'':'_'+n;base.forEach(id=>ids.push(id+s));});return ids;
 }
-const realIds=['rTrades','rDays','rWR','rBE','rTickW','rTickL','rCapS','rCapC','rSharpe',
-               'dWins','dLoss','dBE','dTickW','dTickL','dPnl','dShares'];
+const RIDS=['rTrades','rDays','rWR','rBE','rTickW','rTickL','rCapS','rCapC','rSharpe','dWins','dLoss','dBE','dTickW','dTickL','dPnl','dShares'];
 
-function saveState(){
+function save(){
   try{
     const sl={},tg={};
-    getSliderIds().forEach(id=>{ const e=$(id); if(e) sl[id]=e.value; });
-    getTogIds().forEach(id=>{ const e=$(id); if(e) tg[id]=e.checked; });
-    const rl={};
-    realIds.forEach(id=>{ const e=$(id); if(e) rl[id]=e.value; });
-    const data=JSON.stringify({sl,tg,rl,log:dailyLog});
-    if(window.storage) window.storage.set(SAVE_KEY, data);
+    sliderIds().forEach(id=>{const e=$(id);if(e)sl[id]=e.value;});
+    togIds().forEach(id=>{const e=$(id);if(e)tg[id]=e.checked;});
+    const rl={};RIDS.forEach(id=>{const e=$(id);if(e)rl[id]=e.value;});
+    if(window.storage)window.storage.set(SK,JSON.stringify({sl,tg,rl,log}));
   }catch(e){}
 }
 
-async function loadState(){
+async function load(){
   try{
-    if(!window.storage) return false;
-    let r; try{ r=await window.storage.get(SAVE_KEY); }catch(e){ return false; }
-    if(!r||!r.value) return false;
-    let st; try{ st=JSON.parse(r.value); }catch(e){ return false; }
-    if(st.sl) getSliderIds().forEach(id=>{ const e=$(id); if(e&&st.sl[id]!==undefined) e.value=st.sl[id]; });
-    if(st.tg) getTogIds().forEach(id=>{
-      const e=$(id); if(e&&st.tg[id]!==undefined){
-        e.checked=st.tg[id];
-        const ctrl=e.closest('.ctrl'), lbl=$(id+'-l');
-        if(ctrl){ if(e.checked) ctrl.classList.remove('off'); else ctrl.classList.add('off'); }
-        if(lbl) lbl.textContent=e.checked?'ON':'OFF';
-      }
+    if(!window.storage)return false;
+    let r;try{r=await window.storage.get(SK);}catch(e){return false;}
+    if(!r||!r.value)return false;
+    let st;try{st=JSON.parse(r.value);}catch(e){return false;}
+    if(st.sl)sliderIds().forEach(id=>{const e=$(id);if(e&&st.sl[id]!==undefined)e.value=st.sl[id];});
+    if(st.tg)togIds().forEach(id=>{
+      const e=$(id);if(!e||st.tg[id]===undefined)return;
+      e.checked=st.tg[id];
+      const ctrl=e.closest('.ctrl-card'),lbl=$(id+'-l');
+      if(ctrl){if(e.checked)ctrl.classList.remove('off');else ctrl.classList.add('off');}
+      if(lbl)lbl.textContent=e.checked?'ON':'OFF';
     });
-    if(st.rl) realIds.forEach(id=>{ const e=$(id); if(e&&st.rl[id]!==undefined) e.value=st.rl[id]; });
-    if(st.log&&Array.isArray(st.log)) dailyLog=st.log;
+    if(st.rl)RIDS.forEach(id=>{const e=$(id);if(e&&st.rl[id]!==undefined)e.value=st.rl[id];});
+    if(st.log&&Array.isArray(st.log))log=st.log;
     return true;
-  }catch(e){ return false; }
+  }catch(e){return false;}
 }
 
-// ═══════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════
+/* ─── INIT ─── */
 async function init(){
   buildTabs();
-  const loaded = await loadState();
+  const loaded=await load();
   [0,1,2].forEach(n=>onSlider(n));
   onReal();
-  if(loaded&&dailyLog.length>0){
-    $('dCount').textContent = dailyLog.length+' logged';
-    onDaily();
-  }
+  if(loaded&&log.length>0){$('dCount').textContent=log.length+' days logged';onDaily();}
   simulate(0);
-
-  // Toast
-  const t=document.createElement('div');
-  t.style.cssText='position:fixed;bottom:.7rem;right:.7rem;background:var(--g);color:var(--g2);padding:4px 12px;font-family:JetBrains Mono,monospace;font-size:.62rem;letter-spacing:.14em;opacity:0;transition:opacity .3s;z-index:999;pointer-events:none;text-transform:uppercase;';
-  t.textContent = loaded ? 'State Restored' : 'Ready';
-  document.body.appendChild(t);
-  setTimeout(()=>t.style.opacity='1', 80);
-  setTimeout(()=>t.style.opacity='0', 2100);
-  setTimeout(()=>t.remove(), 2500);
 }
-
 init();
 </script>
+
 </body>
 </html>
