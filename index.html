@@ -6,23 +6,6 @@
 <title>Anti-Hope Machine</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Cabinet+Grotesk:wght@700;800&display=swap" rel="stylesheet">
 <style>
-/*
-  PALETTE
-  Page:     #0d0f12   near-black, blue undertone
-  Card:     #131720   one step up
-  Inset:    #1a2030   inputs, table headers, inset bg
-  Elevated: #1e2535   hover states
-  Border:   #252d3d   structural
-  Subtle:   #1e2535   same-surface dividers
-  ─────────────────────────────────────────
-  Text primary:   #e2e6ed   warm off-white
-  Text secondary: #8892a4   readable mid-grey
-  Text tertiary:  #4d5a6e   dim — timestamps, notes
-  ─────────────────────────────────────────
-  Signal green:   #34d399   emerald — positive
-  Signal red:     #f87171   muted — negative
-  Signal amber:   #fbbf24   amber — caution only
-*/
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 input,textarea,select{font-size:16px !important;-webkit-appearance:none;appearance:none;}
 input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
@@ -30,11 +13,7 @@ input[type=number]{-moz-appearance:textfield;}
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-thumb{background:#252d3d;border-radius:2px;}
 html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mono',monospace;font-size:13px;overflow:hidden;}
-
-/* SHELL */
 .app{display:flex;flex-direction:column;height:100%;}
-
-/* TOPBAR */
 .topbar{height:48px;background:#131720;border-bottom:1px solid #252d3d;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;z-index:50;}
 .brand{display:flex;align-items:baseline;gap:8px;}
 .brand-name{font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:800;color:#e2e6ed;text-transform:uppercase;letter-spacing:-.01em;}
@@ -44,13 +23,9 @@ html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mon
 @keyframes blink{0%,90%,100%{opacity:1;}95%{opacity:.15;}}
 .guide-btn{height:24px;padding:0 10px;background:transparent;border:1px solid #252d3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;}
 .guide-btn:active{border-color:#fbbf24;color:#fbbf24;}
-
-/* SCREENS */
 .screens{flex:1;overflow:hidden;position:relative;}
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(60px + env(safe-area-inset-bottom,0px));display:none;}
 .screen.active{display:block;}
-
-/* NAV */
 .bnav{position:fixed;bottom:0;left:0;right:0;height:calc(56px + env(safe-area-inset-bottom,0px));background:#131720;border-top:1px solid #252d3d;display:flex;align-items:flex-start;padding-top:4px;z-index:100;}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:5px 0 0;position:relative;color:#4d5a6e;transition:color .12s;touch-action:manipulation;}
 .nb.on{color:#34d399;}
@@ -59,16 +34,10 @@ html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mon
 .nb span{font-size:7px;letter-spacing:.1em;text-transform:uppercase;}
 .nb-pip{position:absolute;top:4px;right:calc(50% - 13px);width:5px;height:5px;border-radius:50%;background:#34d399;display:none;}
 .nb-pip.on{display:block;}
-
-/* SECTION LABEL */
 .slbl{padding:5px 16px 4px;font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.2em;border-bottom:1px solid #252d3d;background:#0d0f12;position:sticky;top:0;z-index:20;}
-
-/* STRAT BAR */
 .sbar{display:flex;border-bottom:1px solid #252d3d;background:#131720;}
 .sbtn{flex:1;height:34px;background:none;border:none;border-bottom:1px solid transparent;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#4d5a6e;cursor:pointer;transition:color .12s,border-color .12s;}
 .sbtn.on{color:#34d399;border-color:#34d399;}
-
-/* DROPDOWN GROUPS */
 .dgrp{border-bottom:1px solid #252d3d;}
 .dgrp-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;user-select:none;background:#131720;transition:background .08s;}
 .dgrp-hd:active{background:#1a2030;}
@@ -81,8 +50,6 @@ html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mon
 .dgrp-body{overflow:hidden;max-height:0;transition:max-height .28s ease;}
 .dgrp-body.open{max-height:9999px;}
 .dgrp-inner{padding:7px 16px 10px;background:#1a2030;}
-
-/* FIELD CARDS */
 .fc{background:#131720;border:1px solid #252d3d;border-left-width:2px;border-radius:3px;padding:8px 10px;margin-bottom:5px;}
 .fc.off{opacity:.22;pointer-events:none;}
 .fc.off .fc-top{pointer-events:auto;opacity:1;}
@@ -91,32 +58,21 @@ html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mon
 .ib{display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;border:1px solid #252d3d;font-size:8px;color:#4d5a6e;cursor:pointer;border-radius:2px;background:#131720;font-family:'IBM Plex Mono',monospace;}
 .ib:active{color:#fbbf24;border-color:#fbbf24;}
 .fc-note{font-size:9px;color:#4d5a6e;margin-top:4px;line-height:1.55;}
-
-/* TOGGLE */
 .tog-wrap{display:flex;align-items:center;gap:5px;cursor:pointer;}
 .tog{appearance:none;-webkit-appearance:none;width:28px;height:15px;border-radius:100px;background:#252d3d;border:1px solid #252d3d;position:relative;cursor:pointer;outline:none;transition:background .15s;flex-shrink:0;}
 .tog:checked{background:#34d399;border-color:#2ab882;}
 .tog::after{content:'';position:absolute;width:9px;height:9px;border-radius:50%;background:#0d0f12;top:2px;left:2px;transition:transform .15s;}
 .tog:checked::after{transform:translateX(13px);}
 .tog-lbl{font-size:8px;color:#4d5a6e;letter-spacing:.07em;}
-
-/* STEPPER */
 .stp{display:flex;align-items:center;width:100%;background:#1a2030;border:1px solid #252d3d;border-radius:3px;overflow:hidden;}
 .stp-btn{width:36px;height:32px;background:#131720;border:none;color:#8892a4;font-family:'IBM Plex Mono',monospace;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;user-select:none;-webkit-user-select:none;touch-action:manipulation;border-right:1px solid #252d3d;}
 .stp-btn:last-child{border-right:none;border-left:1px solid #252d3d;}
 .stp-btn:active{background:#1e2535;color:#34d399;}
 .stp-val{flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:16px !important;color:#e2e6ed;background:#1a2030;border:none;outline:none;height:32px;padding:0 4px;min-width:0;}
 .stp-unit{font-size:8px;color:#4d5a6e;padding-right:7px;flex-shrink:0;background:#1a2030;}
-
-/* SELECT */
 .fc-sel{width:100%;background:#1a2030;border:1px solid #252d3d;color:#e2e6ed;font-family:'IBM Plex Mono',monospace;font-size:11px !important;height:32px;padding:0 8px;outline:none;border-radius:3px;margin-top:4px;}
-
-/* RO PILL */
 .ro-pill{display:inline-flex;align-items:center;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:2px;padding:2px 8px;margin-top:4px;}
 .ro-pill span{font-size:11px;color:#f87171;}
-
-/* DIST BAR */
-.dist-card{margin:8px 16px;background:#131720;border:1px solid #252d3d;padding:9px 12px;border-radius:3px;}
 .dist-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .dist-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;}
 .ev-tag{font-size:11px;font-weight:500;}
@@ -124,20 +80,14 @@ html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mon
 .db-g{background:#34d399;}.db-b{background:#60a5fa;}.db-r{background:#f87171;}
 .dist-labels{display:flex;justify-content:space-between;margin-top:5px;}
 .dist-labels span{font-size:8px;}
-
-/* SIM ROW */
 .sim-row{padding:9px 16px;border-bottom:1px solid #252d3d;display:flex;gap:7px;}
 .sim-btn{flex:1;height:42px;background:transparent;color:#34d399;font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:10px;letter-spacing:.2em;text-transform:uppercase;border:1px solid #34d399;cursor:pointer;border-radius:3px;touch-action:manipulation;transition:background .1s;}
 .sim-btn:active{background:rgba(52,211,153,.08);}
 .exp-btn{height:42px;padding:0 12px;background:transparent;border:1px solid #252d3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;touch-action:manipulation;}
 .exp-btn:active{border-color:#60a5fa;color:#60a5fa;}
-
-/* SIM MODE */
 .mode-row{padding:5px 16px 7px;border-bottom:1px solid #252d3d;display:flex;align-items:center;gap:8px;background:#131720;}
 .mode-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;white-space:nowrap;}
 .mode-sel{flex:1;background:#1a2030;border:1px solid #252d3d;color:#8892a4;font-family:'IBM Plex Mono',monospace;font-size:11px !important;height:28px;padding:0 7px;outline:none;border-radius:3px;}
-
-/* CHART PANEL */
 .chart-panel{margin:8px 16px;background:#131720;border:1px solid #252d3d;border-radius:3px;overflow:hidden;}
 .chart-hd{display:flex;align-items:center;justify-content:space-between;padding:7px 12px 3px;}
 .chart-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;}
@@ -152,8 +102,6 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
 .cmv{font-size:13px;font-weight:600;}
 .cms{font-size:8px;color:#4d5a6e;margin-top:2px;}
 .cmv.go{color:#34d399;}.cmv.stop{color:#f87171;}.cmv.amb{color:#fbbf24;}.cmv.steel{color:#60a5fa;}
-
-/* DIAGNOSTICS */
 .diag{margin:8px 16px;border-radius:3px;overflow:hidden;display:none;border:1px solid #252d3d;}
 .diag.show{display:block;}
 .diag-hd{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #252d3d;}
@@ -176,12 +124,8 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
 .dneu{color:#fbbf24;font-weight:600;}
 .dval{color:#e2e6ed;font-weight:600;}
 .dnote{font-size:9px;color:#4d5a6e;}
-
-/* DISCLAIMER */
 .disc{margin:8px 16px 16px;padding:7px 10px;background:#131720;border:1px solid #252d3d;border-radius:3px;}
 .disc p{font-size:9px;color:#4d5a6e;line-height:1.6;}
-
-/* TABLE */
 .tbl-controls{display:flex;gap:8px;padding:8px 16px;border-bottom:1px solid #252d3d;align-items:center;background:#131720;}
 .tc-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap;}
 .tc-stp{flex:1;}
@@ -203,8 +147,6 @@ td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
 .bfp{background:rgba(52,211,153,.06);}.bfn{background:rgba(248,113,113,.07);}.bfz{background:rgba(96,165,250,.05);}
 .bw span{position:relative;}
 .tbl-empty{padding:32px;text-align:center;font-size:10px;color:#4d5a6e;}
-
-/* LOG (session + journal) */
 .log-body{padding:8px 16px;}
 .log-info{font-size:9px;color:#4d5a6e;text-align:center;margin-bottom:6px;letter-spacing:.07em;}
 .inp-grp{background:#131720;border-radius:3px;margin-bottom:7px;overflow:hidden;border:1px solid #252d3d;}
@@ -226,8 +168,6 @@ td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
 .grade-info .gs{font-size:10px;color:#8892a4;}
 .grade-big{font-family:'Cabinet Grotesk',sans-serif;font-size:40px;font-weight:800;line-height:1;color:#e2e6ed;}
 .log-divider{border-top:1px solid #252d3d;margin:4px 0 8px;}
-
-/* JOURNAL */
 .jdate{font-size:9px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;text-align:center;margin-bottom:7px;}
 .jsec{background:#131720;border-radius:3px;margin-bottom:6px;overflow:hidden;border:1px solid #252d3d;}
 .jsec-hd{padding:5px 12px;font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.15em;border-bottom:1px solid #252d3d;background:#1a2030;}
@@ -256,8 +196,6 @@ canvas.spark{width:100%;height:34px;display:block;}
 .jentry-cell{font-size:9px;color:#8892a4;display:flex;flex-direction:column;gap:1px;}
 .jentry-cell .jk{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;}
 .jentry-note{font-size:9px;color:#4d5a6e;margin-top:4px;border-left:1px solid #252d3d;padding-left:8px;font-style:italic;}
-
-/* STATS */
 .stats-body{padding:8px 16px;}
 .vs-card{background:#131720;border-radius:3px;margin-bottom:7px;overflow:hidden;border:1px solid #252d3d;}
 .vs-hd{padding:7px 12px;border-bottom:1px solid #252d3d;display:flex;align-items:center;justify-content:space-between;background:#1a2030;}
@@ -286,8 +224,6 @@ canvas.spark{width:100%;height:34px;display:block;}
 .sg{background:#131720;padding:7px 9px;border-radius:3px;border:1px solid #252d3d;}
 .sgl{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
 .sgv{font-size:13px;font-weight:600;color:#e2e6ed;}
-
-/* MODALS */
 .modal,.imodal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:flex-end;justify-content:center;}
 .modal.open,.imodal.open{display:flex;}
 .mbox,.ibox{background:#131720;border-top:1px solid #34d399;max-width:600px;width:100%;padding:14px 16px 32px;max-height:80vh;overflow-y:auto;border-radius:8px 8px 0 0;position:relative;}
@@ -301,6 +237,15 @@ canvas.spark{width:100%;height:34px;display:block;}
 .ibox h2{font-family:'Cabinet Grotesk',sans-serif;font-size:10px;color:#fbbf24;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
 .ibox p,.ibox li{font-size:11px;color:#8892a4;line-height:1.65;margin-bottom:3px;}
 .ibox ul{padding-left:14px;}
+.friction-breakdown{background:#1a2030;border:1px solid #252d3d;border-radius:3px;padding:6px 8px;margin-top:6px;}
+.fb-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #1e2535;}
+.fb-row:last-child{border:none;}
+.fb-lbl{font-size:8px;color:#4d5a6e;}
+.fb-val{font-size:8px;color:#8892a4;font-weight:500;}
+.fb-total{display:flex;justify-content:space-between;padding:4px 0 0;}
+.fb-total .fb-lbl{color:#8892a4;font-weight:600;}
+.fb-total .fb-val{color:#34d399;font-weight:600;}
+.fb-tier{font-size:8px;color:#fbbf24;margin-top:4px;letter-spacing:.04em;}
 </style>
 </head>
 <body>
@@ -309,7 +254,7 @@ canvas.spark{width:100%;height:34px;display:block;}
 <div class="topbar">
   <div class="brand">
     <span class="brand-name">Anti-Hope Machine</span>
-    <span class="brand-ver">v9</span>
+    <span class="brand-ver">v12</span>
   </div>
   <div class="top-r">
     <button class="guide-btn" onclick="openGuide()">Guide</button>
@@ -319,7 +264,6 @@ canvas.spark{width:100%;height:34px;display:block;}
 
 <div class="screens">
 
-  <!-- SIM -->
   <div class="screen active" id="scr-sim">
     <div class="sbar">
       <button class="sbtn on" id="stb0" onclick="switchStrat(0)">Strat A</button>
@@ -331,7 +275,6 @@ canvas.spark{width:100%;height:34px;display:block;}
     <div id="sp2" style="display:none;"></div>
   </div>
 
-  <!-- TABLE -->
   <div class="screen" id="scr-tbl">
     <div class="sbar">
       <button class="sbtn on" id="tsb0" onclick="switchTblStrat(0)">Strat A</button>
@@ -351,7 +294,6 @@ canvas.spark{width:100%;height:34px;display:block;}
     </div>
   </div>
 
-  <!-- LOG -->
   <div class="screen" id="scr-log">
     <div class="slbl">Session &amp; Journal</div>
     <div class="log-body">
@@ -414,7 +356,6 @@ canvas.spark{width:100%;height:34px;display:block;}
     </div>
   </div>
 
-  <!-- STATS -->
   <div class="screen" id="scr-stats">
     <div class="slbl">Real-World Stats</div>
     <div class="stats-body">
@@ -467,7 +408,6 @@ canvas.spark{width:100%;height:34px;display:block;}
 </nav>
 </div>
 
-<!-- GUIDE -->
 <div class="modal" id="gmodal" onclick="if(event.target===this)closeGuide()">
   <div class="mbox">
     <button class="mx" onclick="closeGuide()">✕</button>
@@ -485,7 +425,6 @@ canvas.spark{width:100%;height:34px;display:block;}
   </div>
 </div>
 
-<!-- INFO -->
 <div class="imodal" id="imodal" onclick="if(event.target===this)closeInfo()">
   <div class="ibox">
     <button class="mx" onclick="closeInfo()">✕</button>
@@ -513,7 +452,7 @@ const LIM={
   minT:{min:1,max:50,step:1},maxT:{min:1,max:50,step:1},
   sh:{min:1,max:10000,step:1},goal:{min:10,max:10000,step:10},
   minPr:{min:1,max:9999,step:1},maxPr:{min:1,max:9999,step:1},
-  spread:{min:0,max:20,step:1},slip:{min:0,max:20,step:1},comm:{min:0,max:2000,step:5},
+  spread:{min:0,max:20,step:1},slip:{min:0,max:20,step:1},
   buf:{min:1,max:500,step:1},cap:{min:0,max:1000,step:5},disc:{min:50,max:100,step:1},
   bf:{min:0,max:20,step:1},bs:{min:1,max:20,step:1},gf:{min:0,max:20,step:1},gs_:{min:1,max:20,step:1},
   minPB:{min:0,max:200,step:1},maxPB:{min:0,max:200,step:1},
@@ -522,6 +461,8 @@ const LIM={
   rrSlider:{min:0,max:200,step:1},tickSz:{min:1,max:100,step:1},
   minDp:{min:-200,max:200,step:1},maxDp:{min:-200,max:200,step:1},
   bias:{min:0,max:100,step:5},intv:{min:1,max:30,step:1},
+  startCap:{min:0,max:1000000,step:100},
+  volCeil:{min:0,max:1000000,step:50},
 };
 
 let _ht=null,_hi=null;
@@ -590,10 +531,15 @@ function onTog(cb,ctrl,tab){
   const lbl=$(cb.id+'-l');if(lbl)lbl.textContent=cb.checked?'ON':'OFF';
   onSlider(tab);
   const s=tab===0?'':'_'+tab;
-  const b=$('ovr-badge'+s);if(b)b.classList.toggle('on',isOn('tog-rr'+s)||isOn('tog-dp'+s));
+  const b=$('ovr-badge'+s);if(b)b.classList.toggle('on',isOn('tog-rr'+s)||isOn('tog-dp'+s)||isOn('tog-volceil'+s));
 }
 const isOn=id=>{const e=$(id);return!e||e.checked;};
 function toggleGrp(hd){const body=hd.nextElementSibling;const arr=hd.querySelector('.dgrp-arr');const o=body.classList.toggle('open');if(arr)arr.classList.toggle('open',o);}
+
+function commissionForShares(shares){
+  if(shares<100) return 0.35;
+  return shares*0.0070*2;
+}
 
 function cfg(tab){
   const s=tab===0?'':'_'+tab;
@@ -607,7 +553,7 @@ function cfg(tab){
     minT:n('minT',2),maxT:n('maxT',5),
     rr:n('rrSlider',0)/10,tick:n('tickSz',1)/100,
     minPr:n('minPr',43),maxPr:n('maxPr',47),
-    spread:n('spread',1),slip:n('slip',1),comm:n('comm',50)/100,
+    spread:n('spread',1),slip:n('slip',1),
     sh:n('sh',100)||100,goal:n('goal',500)||500,
     buf:n('buf',1)||1,cap:n('cap',0),intv:n('intv',5)||5,disc:n('disc',85)/100,
     bf:n('bf',3)/100,bs:n('bs',2)/100,gf:n('gf',3)/100,gs_:n('gs_',2)/100,
@@ -615,6 +561,7 @@ function cfg(tab){
     minSw:n('minSw',15),maxSw:n('maxSw',40),
     minDp:n('minDp',-2),maxDp:n('maxDp',3),
     bias:n('bias',50)/100,curve:str('curve','linear'),mode:str('mode','rand'),
+    startCap:n('startCap',0),volCeil:n('volCeil',0),
   };
   const c={
     minP:on('tog-p')?r.minP:Math.round((r.minP+r.maxP)/2),maxP:on('tog-p')?r.maxP:Math.round((r.minP+r.maxP)/2),
@@ -624,22 +571,29 @@ function cfg(tab){
     minT:on('tog-t')?r.minT:Math.round((r.minT+r.maxT)/2),maxT:on('tog-t')?r.maxT:Math.round((r.minT+r.maxT)/2),
     rr:on('tog-rr')?r.rr:0,tick:on('tog-tk')?r.tick:0.01,
     minPr:on('tog-pr')?r.minPr:45,maxPr:on('tog-pr')?r.maxPr:45,
-    spread:on('tog-sp')?r.spread:0,slip:on('tog-sl')?r.slip:0,comm:on('tog-co')?r.comm:0,
+    spread:on('tog-fees')?r.spread:0,slip:on('tog-sl')?r.slip:0,
+    feesOn:on('tog-fees'),
     sh:r.sh,goal:r.goal,buf:on('tog-buf')?r.buf:1,cap:on('tog-cap')?r.cap:0,intv:r.intv,
     disc:on('tog-cs')?r.disc:1,bf:on('tog-bd')?r.bf:0,bs:r.bs,gf:on('tog-gd')?r.gf:0,gs_:r.gs_,
     minPB:on('tog-pb')?r.minPB:0,maxPB:on('tog-pb')?r.maxPB:0,
     minEO:on('tog-eo')?r.minEO:0,maxEO:on('tog-eo')?r.maxEO:0,
-    minSw:r.minSw,maxSw:r.maxSw,dpct:on('tog-dp'),
+    minSw:on('tog-swing')?r.minSw:Math.round((r.minSw+r.maxSw)/2),maxSw:on('tog-swing')?r.maxSw:Math.round((r.minSw+r.maxSw)/2),dpct:on('tog-dp'),
     minDp:on('tog-dp')?r.minDp:0,maxDp:on('tog-dp')?r.maxDp:0,
     bias:on('tog-bias')?r.bias:0,curve:r.curve,mode:r.mode,
+    startCap:on('tog-startcap')?r.startCap:0,
+    volCeil:on('tog-volceil')?r.volCeil:0,
   };
   const avgWR=(c.minWR+c.maxWR)/2,avgBE=(c.minBE+c.maxBE)/2;
   const [wr,be]=clampD(avgWR,avgBE);
   const loss=Math.max(0,1-wr-be);
   const avgP=(c.minP+c.maxP)/2;
   let avgL=(c.minL+c.maxL)/2;if(c.rr>0)avgL=avgP/c.rr;
-  const avgT=(c.minT+c.maxT)/2,avgPr=(c.minPr+c.maxPr)/2,acct0=c.sh*avgPr;
-  const frTr=c.comm+(c.slip+c.spread)*c.tick*c.sh,frDay=frTr*avgT;
+  const avgT=(c.minT+c.maxT)/2,avgPr=(c.minPr+c.maxPr)/2;
+  const acct0=c.startCap>0?c.startCap:c.sh*avgPr;
+  const exFee=0.0067;
+  const exCost=c.feesOn?(c.sh*exFee):0;
+  const commCost=commissionForShares(c.sh);
+  const frTr=commCost+exCost+(c.slip*c.tick*c.sh*2)+(c.spread*c.tick*c.sh),frDay=frTr*avgT;
   const avgEO=(c.minEO+c.maxEO)/2,effTgt=Math.max(0,avgP-avgEO);
   const pbRange=Math.max(c.maxPB-c.minPB,1);
   const pbKill=c.maxPB>0?Math.max(0,Math.min(1,(c.maxPB-effTgt)/pbRange)):0;
@@ -648,7 +602,7 @@ function cfg(tab){
   const evDol=evTick*c.tick*c.sh,evGross=evDol*avgT;
   const evNet=c.dpct?(c.minDp+c.maxDp)/2/100*acct0:evGross-frDay;
   const avgSw=(c.minSw+c.maxSw)/2,swUtil=avgSw>0?Math.min(100,(effTgt/avgSw)*100):0;
-  return{...c,wr,be,loss,avgP,avgL,avgT,avgPr,acct0,frTr,frDay,effTgt,pbKill,effWR,effLoss,evTick,evDol,evGross,evNet,avgSw,swUtil};
+  return{...c,wr,be,loss,avgP,avgL,avgT,avgPr,acct0,frTr,frDay,effTgt,pbKill,effWR,effLoss,evTick,evDol,evGross,evNet,avgSw,swUtil,commCost,exCost};
 }
 
 function updateDist(tab){
@@ -661,23 +615,36 @@ function updateDist(tab){
   se('ev-tag',e=>{e.textContent='EV '+(ev>=0?'+$':'−$')+fmt(Math.abs(ev))+'/day';e.style.color=ev>0?'#34d399':ev<0?'#f87171':'#fbbf24';});
   const lr=$('lr-disp'+s);if(lr)lr.textContent=(c.loss*100).toFixed(1)+'%';
 }
-function onSlider(tab){updateDist(tab);save();}
+function onSlider(tab){updateDist(tab);updateFrictionBreakdown(tab);save();}
 
 function sharpe(pnls,acct){const n=pnls.length;if(n<2)return null;const r=pnls.map(p=>p/acct);const m=r.reduce((a,b)=>a+b,0)/n;const sd=Math.sqrt(r.reduce((a,v)=>a+(v-m)**2,0)/(n-1));return sd>0?(m/sd)*Math.sqrt(252):null;}
 function sharpeStr(s){if(!s||isNaN(s))return'—';if(s>=2)return s.toFixed(2)+' ★';if(s>=1)return s.toFixed(2)+' ✓';if(s>=.5)return s.toFixed(2)+' ~';return s.toFixed(2)+' ✗';}
+
+function updateFrictionBreakdown(tab){
+  const s=tab===0?'':'_'+tab;
+  const c=cfg(tab);
+  const f=v=>'$'+Math.abs(v).toFixed(2);
+  const se=(id,v)=>{const e=$(id+s);if(e)e.textContent=v;};
+  se('fb-comm',f(c.commCost));se('fb-ex',f(c.exCost));
+  se('fb-slip',f(c.slip*c.tick*c.sh*2));se('fb-spr',f(c.spread*c.tick*c.sh));
+  se('fb-rt','$'+c.frTr.toFixed(2)+' / trade');
+  const tierEl=$('fb-tier'+s);
+  if(tierEl)tierEl.textContent=c.sh<100?'Under 100 shares: $0.35 flat round trip':'100+ shares: $0.0070/share × 2 legs';
+}
 
 function simulate(tab){try{_sim(tab);}catch(e){console.error(e);}}
 
 function _sim(tab){
   const c=cfg(tab);const MAX=5000,HOR=365;
-  const acct0=c.sh*c.avgPr;
+  const acct0=c.startCap>0?c.startCap:c.sh*c.avgPr;
   let shares=c.sh,surplus=0,cumPnl=0,day=0;
   const rows=[],pnlArr=[],equity=[];
-  const msStep=c.goal<=200?50:c.goal<=500?100:c.goal<=1000?200:500;
+  const effectiveGoal=c.volCeil>0?Math.min(c.goal,c.volCeil):c.goal;
+  const msStep=effectiveGoal<=200?50:effectiveGoal<=500?100:effectiveGoal<=1000?200:500;
   const MS=new Set(),msHit=new Set();
-  for(let m=msStep;m<=c.goal;m+=msStep)MS.add(m);
+  for(let m=msStep;m<=effectiveGoal;m+=msStep)MS.add(m);
   const msp={};
-  while(shares<c.goal&&day<MAX){
+  while(shares<effectiveGoal&&day<MAX){
     day++;
     const t=Math.min(day/HOR,1);
     let ts;if(c.curve==='linear')ts=t;else if(c.curve==='slow')ts=Math.log1p(t*(Math.E-1));else if(c.curve==='fast')ts=(Math.exp(t)-1)/(Math.E-1);else ts=1/(1+Math.exp(-10*(t-.5)));
@@ -685,7 +652,8 @@ function _sim(tab){
     const dayBE=c.minBE+Math.random()*(c.maxBE-c.minBE);
     const [wr,be]=clampD(dayWR,dayBE);
     const dayPr=c.minPr+Math.random()*(c.maxPr-c.minPr);
-    const frTr=c.comm+(c.slip+c.spread)*c.tick*shares;
+    const exCost=c.feesOn?(shares*0.0067):0;
+    const frTr=commissionForShares(shares)+exCost+(c.slip*c.tick*shares*2)+(c.spread*c.tick*shares);
     const effWR=Math.random()>c.disc?wr*.7:wr;const effBE=Math.random()>c.disc?be*.7:be;
     let dayPnl=0,dayTicks=0,numTr=0,dayPct=null,isBlowup=false,isGood=false;
     if(c.dpct){const pv=rf(c.minDp,c.maxDp);dayPct=pv;dayPnl=(acct0+cumPnl)*(pv/100);numTr=0;}
@@ -713,12 +681,12 @@ function _sim(tab){
     if(!(mIdx in msp))msp[mIdx]=cumPnl-dayPnl;
     const bufC=c.buf*dayPr;let newSh=0;
     if(surplus>=bufC){newSh=Math.max(0,Math.floor((surplus-(c.buf-1)*dayPr)/dayPr));if(newSh>0)surplus-=newSh*dayPr;}
-    const prev=shares;shares=Math.min(shares+newSh,c.goal);
+    const prev=shares;shares=Math.min(shares+newSh,effectiveGoal);
     const row={day,calMo,mIdx,shares,prev,outcome,numTr,dayTicks,dayPct,dayPnl,surplus,newSh,cumPnl,isBlowup,isGood,isMilestone:false,msVal:0};
     for(const m of MS){if(prev<m&&shares>=m&&!msHit.has(m)){msHit.add(m);row.isMilestone=true;row.msVal=m;}}
     rows.push(row);
   }
-  simResults[tab]={rows:[...rows],equity,acct0,c:{...c},msp};
+  simResults[tab]={rows:[...rows],equity,acct0,c:{...c,effectiveGoal},msp};
   const retPct=(cumPnl/acct0)*100,annPct=day>0?(retPct/day)*252:0;
   const sp=sharpe(pnlArr,acct0);const capped=day>=MAX,calMoT=(day/252)*12;
   const s=tab===0?'':'_'+tab;
@@ -825,6 +793,7 @@ function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,tab){
     rows.push(row('Days/share',dts?'~'+dts+'d':'∞',dts&&dts<30?'pos':dts&&dts<100?'neu':'neg'));
     rows.push(row('Swing capture',c.swUtil.toFixed(0)+'%',c.swUtil>=60?'pos':c.swUtil>=35?'neu':'neg'));
     rows.push(row('Sharpe',sp!==null&&!isNaN(sp)?sharpeStr(sp):'—',sp===null?'neu':sp>=1?'pos':sp>=.5?'neu':'neg'));
+    if(c.volCeil>0)rows.push(row('Volume ceiling','CAPPED at '+c.volCeil.toLocaleString()+' sh','neu','growth stops here'));
     rows.push(row('Status',wrOk&&c.evNet>0?'PROFITABLE':c.evNet>0?'MARGINAL':'NEGATIVE',wrOk&&c.evNet>0?'pos':c.evNet>0?'neu':'neg'));
   }
   let cls;
@@ -873,7 +842,7 @@ function renderTable(tab,rowsIn,acct0In,cIn,mspIn,cappedIn){
 function exportData(tab){
   const res=simResults[tab];if(!res||!res.rows.length){alert('Run a simulation first.');return;}
   const {rows,acct0,c,msp}=res;const names=['Strat-A','Strat-B','Strat-C'];
-  const L=['AHM v9 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,Trades,Ticks,Day%,P&L,Ret%,Surplus,+Sh,Cumul'];
+  const L=['AHM v12 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,Trades,Ticks,Day%,P&L,Ret%,Surplus,+Sh,Cumul'];
   const show=new Set([0,rows.length-1]);rows.forEach((r,i)=>{if(r.isMilestone||r.day%c.intv===0)show.add(i);});
   for(const idx of [...show].sort((a,b)=>a-b)){const r=rows[idx];const mo=r.cumPnl-((msp||{})[r.mIdx]||0);const dp=r.dayPct!=null?r.dayPct.toFixed(2)+'%':'—';let lbl='';if(r.isMilestone)lbl='Milestone '+r.msVal;else if(r.day===1)lbl='Start';else if(idx===rows.length-1)lbl='Goal';L.push([r.day,cal(r.calMo),mo.toFixed(2),lbl,r.shares,r.outcome,r.numTr||0,r.dayTicks,dp,r.dayPnl.toFixed(2),(r.cumPnl/acct0*100).toFixed(2)+'%',r.surplus.toFixed(2),r.newSh,r.cumPnl.toFixed(2)].join(','));}
   const blob=new Blob([L.join('\n')],{type:'text/csv'});const url=URL.createObjectURL(blob);
@@ -996,56 +965,80 @@ function onReal(){
 }
 
 const INFO={
-  wr:{t:'Win Rate',b:'<p>% of trades hitting profit target before stop.</p>'},
-  be:{t:'Breakeven Rate',b:'<p>Trades closed at entry. Zero P&L before costs.</p>'},
-  profit:{t:'Profit Target',b:'<p>Ticks captured on a win. 15t × 100sh × $0.01 = <b>$15/win</b>.</p>'},
-  loss:{t:'Stop Loss',b:'<p>Ticks lost before closing a loser. R:R = profit ÷ stop.</p>'},
-  trades:{t:'Trades / Day',b:'<p>More trades = more edge exposure, more friction.</p>'},
-  cap:{t:'Daily Loss Cap',b:'<p>No more trades once tick losses hit this. Prevents revenge cycles.</p>'},
-  spread:{t:'Spread',b:'<p>Bid/ask gap. Every round trip costs at least 1 tick.</p>'},
-  slip:{t:'Slippage',b:'<p>Getting a worse fill than your limit price.</p>'},
-  comm:{t:'Commission',b:'<p>IBKR Pro: ~$0.005/share. 100sh = $0.50/trade.</p>'},
-  price:{t:'Share Price Range',b:'<p>Used for account size and share purchase cost.</p>'},
-  swing:{t:'Avg Swing',b:'<p>Tick range of a typical price move.</p>'},
-  pullback:{t:'Pullback',b:'<p>If pullback ≥ effective target, win becomes stop-out.</p>'},
-  eo:{t:'Entry Offset',b:'<p>Ticks lost entering late. Cuts your effective profit target.</p>'},
-  disc:{t:'Discipline Rate',b:'<p>Undisciplined days: WR drops 30%.</p>'},
-  buf:{t:'Cash Buffer',b:'<p>Surplus required before buying another share.</p>'},
-  bd:{t:'Bad Days',b:'<p>Blow-up sessions modelled as % loss of starting account.</p>'},
+  dist:{t:'Distribution',b:'<p>Shows the simulated split between winning, breakeven, and losing trades based on your Win Rate and Breakeven settings. The EV figure shows estimated net profit per day after friction.</p>'},
+  wr:{t:'Win Rate',b:'<p>% of trades hitting profit target before stop. Set a range to simulate daily variation.</p><ul><li>50% WR with 2:1 R:R is profitable</li><li>40% WR with 1.5:1 R:R can still be viable</li></ul>'},
+  be:{t:'Breakeven Rate',b:'<p>Trades closed at entry. Zero P&L before costs. Still costs you in friction.</p>'},
+  profit:{t:'Profit Target',b:'<p>Ticks captured on a win. 15t × 100sh × $0.01 = <b>$15/win</b>. Larger targets take longer to hit and are more exposed to pullbacks.</p>'},
+  loss:{t:'Stop Loss',b:'<p>Ticks lost before closing a loser. R:R = Profit Target ÷ Stop Loss.</p>'},
+  trades:{t:'Trades / Day',b:'<p>More trades = more edge exposure if EV is positive, more friction drag if EV is thin.</p>'},
+  cap:{t:'Daily Loss Cap',b:'<p>Hard limit on tick losses per day. Prevents revenge spirals from appearing in your results. 0 = disabled.</p>'},
+  spread:{t:'Bid/Ask Spread',b:'<p>Gap between buy and sell price. Every round trip costs at least 1 tick. For liquid US stocks: usually 1 tick.</p>'},
+  slip:{t:'Slippage',b:'<p>Difference between expected and actual fill price. 1 tick is a reasonable conservative estimate for retail scalpers.</p>'},
+  comm:{t:'Commission (Tiered)',b:'<p>Tiered commission model:</p><ul><li><b>Under 100 shares:</b> $0.35 flat per round trip</li><li><b>100 shares and above:</b> $0.0070/share × 2 legs</li></ul><p>This scales correctly as your position size grows through compounding — small positions pay the flat fee, larger positions pay the per-share rate.</p>'},
+  fees:{t:'Exchange + Clearing + Reg Fees',b:'<p>Toggleable overhead layer separate from commission:</p><ul><li><b>Exchange + clearing + regulatory:</b> $0.0067/share</li><li><b>Spread:</b> $0.01/share (set via Spread field above)</li></ul><p>These are real costs charged by exchanges and regulators on top of your broker commission. Toggle OFF to see strategy performance in isolation from these overheads.</p>'},
+  price:{t:'Share Price Range',b:'<p>Used for account size and share purchase cost. Set min/max to reflect daily price variation.</p>'},
+  sh:{t:'Starting Shares',b:'<p>How many shares you begin with. Starting account = shares × avg price, unless Starting Capital is set directly.</p>'},
+  goal:{t:'Share Goal',b:'<p>Target share count. Simulation runs until you reach this, hit the Volume Ceiling (if set), or the 5,000 day cap.</p>'},
+  startcap:{t:'Starting Capital',b:'<p>Override your account starting value directly in dollars instead of deriving it from shares × price. Useful when you know your actual account balance and want the simulation to start from there.</p><p>When set, this takes priority over the shares × price calculation for your starting account size.</p>'},
+  volceil:{t:'Volume Ceiling',b:'<p>A hard cap on share count growth, separate from your Share Goal. Prevents the simulation from over-compounding indefinitely — once shares reach this ceiling, compounding stops even if the Share Goal is higher.</p><p>Acts like the other overrides: when enabled, it constrains the simulation regardless of other settings. Set to 0 to disable.</p>'},
+  swing:{t:'Avg Swing',b:'<p>Tick range of a typical price move. Swing Capture % = your profit target as a percentage of the full swing.</p>'},
+  pullback:{t:'Pullback',b:'<p>If pullback ≥ effective target, win becomes stop-out (Pullback Kill).</p>'},
+  eo:{t:'Entry Offset',b:'<p>Ticks lost entering late. Cuts your effective profit target immediately.</p>'},
+  disc:{t:'Discipline Rate',b:'<p>Undisciplined days: simulated WR drops 30%. Set honestly — most traders overestimate this.</p>'},
+  buf:{t:'Cash Buffer',b:'<p>Surplus required before buying another share. Higher = slower but more stable compounding.</p>'},
+  bd:{t:'Bad Days',b:'<p>Blow-up sessions modelled as % loss of starting account. Frequency × size both matter.</p>'},
   gd:{t:'Good Days',b:'<p>Exceptional sessions. Cannot occur same day as bad day.</p>'},
-  bias:{t:'Skill Growth',b:'<p>WR drifts from min toward max over 365 days.</p>'},
-  rr:{t:'R:R Override',b:'<p>Forces a specific reward:risk. Overrides stop loss stepper.</p>'},
+  bias:{t:'Skill Growth',b:'<p>WR drifts from min toward max over 365 days. Curve shape controls the pace of improvement.</p>'},
+  rr:{t:'R:R Override',b:'<p>Forces a specific reward:risk. Stop loss = Profit Target ÷ R:R. 0 = disabled.</p>'},
   tick:{t:'Tick Value',b:'<p>Dollar value of one tick per share. US equities: $0.01.</p>'},
-  dp:{t:'Daily % Override',b:'<p>Bypasses tick math. Applies random % to equity each day.</p>'},
+  dp:{t:'Daily % Override',b:'<p>Bypasses tick math entirely. Applies a random % to account equity each day. Ignores friction, pullback, bad/good days.</p>'},
 };
 
-const SDEFS=[['minP',15,'t'],['maxP',30,'t'],['minL',5,'t'],['maxL',15,'t'],['minWR',55,'%'],['maxWR',65,'%'],['minBE',10,'%'],['maxBE',20,'%'],['minT',2,''],['maxT',5,''],['sh',100,''],['goal',500,''],['minPr',43,''],['maxPr',47,''],['spread',1,'t'],['slip',1,'t'],['comm',50,'¢'],['buf',1,''],['cap',0,'t'],['disc',85,'%'],['bf',3,'%'],['bs',2,'%'],['gf',3,'%'],['gs_',2,'%'],['minPB',3,'t'],['maxPB',8,'t'],['minEO',1,'t'],['maxEO',4,'t'],['minSw',15,'t'],['maxSw',40,'t'],['rrSlider',0,''],['tickSz',1,'¢'],['minDp',-2,'%'],['maxDp',3,'%'],['bias',50,'%'],['intv',5,'']];
+const SDEFS=[['minP',15,'t'],['maxP',30,'t'],['minL',5,'t'],['maxL',15,'t'],['minWR',55,'%'],['maxWR',65,'%'],['minBE',10,'%'],['maxBE',20,'%'],['minT',2,''],['maxT',5,''],['sh',100,''],['goal',500,''],['minPr',43,''],['maxPr',47,''],['spread',1,'t'],['slip',1,'t'],['buf',1,''],['cap',0,'t'],['disc',85,'%'],['bf',3,'%'],['bs',2,'%'],['gf',3,'%'],['gs_',2,'%'],['minPB',3,'t'],['maxPB',8,'t'],['minEO',1,'t'],['maxEO',4,'t'],['minSw',15,'t'],['maxSw',40,'t'],['rrSlider',0,''],['tickSz',1,'¢'],['minDp',-2,'%'],['maxDp',3,'%'],['bias',50,'%'],['intv',5,''],['startCap',0,'$'],['volCeil',0,'sh']];
 
 function buildPanes(){
   [0,1,2].forEach(n=>{
     const pane=$('sp'+n);if(!pane)return;
     const s=n===0?'':'_'+n;const L=['A','B','C'][n];
     function tog(id,checked=true){const tid='tog-'+id+s;return`<label class="tog-wrap"><input type="checkbox" class="tog" id="${tid}"${checked?' checked':''} onchange="onTog(this,'fc-${id}${s}',${n})"><span class="tog-lbl" id="${tid}-l">${checked?'ON':'OFF'}</span></label>`;}
-    function fc(id,lbl,bc,ik,body,hasTog=true,checked=true){const t=hasTog?tog(id,checked):'';const ib=ik?`<button class="ib" onclick="openInfo('${ik}')">?</button>`:'';return`<div class="fc" id="fc-${id}${s}" style="border-left-color:${bc};"><div class="fc-top"><span class="fc-lbl">${lbl}${ib?' '+ib:''}</span>${t}</div>${body}</div>`;}
+    function fc(id,lbl,bc,ik,body,hasTog=true,checked=true){
+      const t=hasTog?tog(id,checked):'';
+      const ib=ik?`<button class="ib" onclick="openInfo('${ik}')">?</button>`:'';
+      return `<div class="fc" id="fc-${id}${s}" style="border-left-color:${bc};"><div class="fc-top"><span class="fc-lbl">${lbl}${ib?' '+ib:''}</span>${t}</div>${body}</div>`;
+    }
     const ph=id=>`<div id="sph-${id}${s}"></div>`;
     const dph=(a,b)=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;"><div id="sph-${a}${s}"></div><div id="sph-${b}${s}"></div></div>`;
     const sel=(id,opts)=>`<select class="fc-sel" id="${id}${s}" onchange="onSlider(${n})">${opts}</select>`;
     const roLoss=`<div class="fc" style="border-left-color:#f87171;"><div class="fc-top"><span class="fc-lbl">Loss Rate — auto</span></div><div class="ro-pill"><span id="lr-disp${s}">—%</span></div></div>`;
 
-    const core=fc('wr','Win Rate %','#34d399','wr',dph('minWR','maxWR'))+fc('be','Breakeven %','#60a5fa','be',dph('minBE','maxBE'))+roLoss;
+    const distCard=`<div class="fc off" id="fc-dist${s}" style="border-left-color:#252d3d;">
+      <div class="fc-top"><span class="fc-lbl">Distribution <button class="ib" onclick="openInfo('dist')">?</button></span>${tog('dist',false)}</div>
+      <div style="margin-top:2px;">
+        <div class="dist-top" style="margin-bottom:5px;"><span class="dist-lbl">Win / BE / Loss split</span><span class="ev-tag" id="ev-tag${s}">EV —</span></div>
+        <div class="dist-bar"><div class="db-g" id="dbg${s}" style="width:60%"></div><div class="db-b" id="dbb${s}" style="width:20%"></div><div class="db-r" id="dbr${s}" style="width:20%"></div></div>
+        <div class="dist-labels" style="margin-top:4px;"><span style="color:#34d399" id="db-gl${s}">WIN 60%</span><span style="color:#60a5fa" id="db-bl${s}">BE 20%</span><span style="color:#f87171" id="db-rl${s}">LOSS 20%</span></div>
+      </div>
+    </div>`;
+
+    const core=fc('wr','Win Rate %','#34d399','wr',dph('minWR','maxWR'))+fc('be','Breakeven %','#60a5fa','be',dph('minBE','maxBE'))+roLoss+distCard;
     const risk=fc('p','Profit Target','#fbbf24','profit',dph('minP','maxP'))+fc('l','Stop Loss','#f87171','loss',dph('minL','maxL'))+fc('t','Trades / Day','#fb923c','trades',dph('minT','maxT'))+fc('cap','Daily Loss Cap','#f87171','cap',ph('cap'));
-    const ticker=fc('pr','Price Range','#4d5a6e','price',dph('minPr','maxPr'))+`<div class="fc" id="fc-sh${s}" style="border-left-color:#fbbf24"><div class="fc-top"><span class="fc-lbl">Starting Shares</span></div>${ph('sh')}</div><div class="fc" id="fc-goal${s}" style="border-left-color:#34d399"><div class="fc-top"><span class="fc-lbl">Share Goal</span></div>${ph('goal')}</div>`+fc('sp','Spread','#fb923c','spread',ph('spread'))+fc('co','Commission','#fbbf24','comm',ph('comm'))+fc('buf','Cash Buffer','#4d5a6e','buf',ph('buf'))+fc('tk','Tick Value','#4d5a6e','tick',ph('tickSz'))+fc('sl','Slippage','#f87171','slip',ph('slip'))+`<div class="fc" id="fc-swing${s}" style="border-left-color:#252d3d"><div class="fc-top"><span class="fc-lbl">Avg Swing <button class="ib" onclick="openInfo('swing')">?</button></span></div>${dph('minSw','maxSw')}</div>`+fc('pb','Pullback','#60a5fa','pullback',dph('minPB','maxPB'))+fc('eo','Entry Offset','#4d5a6e','eo',dph('minEO','maxEO'));
+
+    const startCapCard=`<div class="fc off" id="fc-startcap${s}" style="border-left-color:#34d399;"><div class="fc-top"><span class="fc-lbl">Starting Capital <button class="ib" onclick="openInfo('startcap')">?</button></span>${tog('startcap',false)}</div>${ph('startCap')}<div class="fc-note">When ON, overrides shares × price as your starting account value.</div></div>`;
+
+    const shGoalCard=`<div class="fc" id="fc-sh${s}" style="border-left-color:#fbbf24"><div class="fc-top"><span class="fc-lbl">Starting Shares <button class="ib" onclick="openInfo('sh')">?</button></span></div>${ph('sh')}</div><div class="fc" id="fc-goal${s}" style="border-left-color:#34d399"><div class="fc-top"><span class="fc-lbl">Share Goal <button class="ib" onclick="openInfo('goal')">?</button></span></div>${ph('goal')}</div>`;
+
+    const frictionCard=`<div class="fc" id="fc-comm${s}" style="border-left-color:#fbbf24;"><div class="fc-top"><span class="fc-lbl">Commission (Tiered) <button class="ib" onclick="openInfo('comm')">?</button></span></div><div class="fc-note">Auto-calculated: $0.35 flat round trip under 100 shares, or $0.0070/share × 2 legs at 100+ shares. Scales with your Starting Shares.</div></div><div class="fc" id="fc-fees${s}" style="border-left-color:#34d399;"><div class="fc-top"><span class="fc-lbl">Exchange + Clearing + Reg <button class="ib" onclick="openInfo('fees')">?</button></span>${tog('fees',true)}</div><div class="friction-breakdown" id="fb${s}"><div class="fb-row"><span class="fb-lbl">Commission</span><span class="fb-val" id="fb-comm${s}">—</span></div><div class="fb-row"><span class="fb-lbl">Exchange + Clearing + Reg (0.0067/sh)</span><span class="fb-val" id="fb-ex${s}">—</span></div><div class="fb-row"><span class="fb-lbl">Slippage (×2 legs)</span><span class="fb-val" id="fb-slip${s}">—</span></div><div class="fb-row"><span class="fb-lbl">Spread cost</span><span class="fb-val" id="fb-spr${s}">—</span></div><div class="fb-total"><span class="fb-lbl">Est. round trip</span><span class="fb-val" id="fb-rt${s}">—</span></div></div><div class="fb-tier" id="fb-tier${s}">—</div></div>`;
+
+    const swingCard=`<div class="fc" id="fc-swing${s}" style="border-left-color:#252d3d"><div class="fc-top"><span class="fc-lbl">Avg Swing <button class="ib" onclick="openInfo('swing')">?</button></span>${tog('swing',true)}</div>${dph('minSw','maxSw')}</div>`;
+    const ticker=fc('pr','Price Range','#4d5a6e','price',dph('minPr','maxPr'))+startCapCard+shGoalCard+frictionCard+fc('sp','Spread','#fb923c','spread',ph('spread'))+fc('buf','Cash Buffer','#4d5a6e','buf',ph('buf'))+fc('tk','Tick Value','#4d5a6e','tick',ph('tickSz'))+fc('sl','Slippage','#f87171','slip',ph('slip'))+swingCard+fc('pb','Pullback','#60a5fa','pullback',dph('minPB','maxPB'))+fc('eo','Entry Offset','#4d5a6e','eo',dph('minEO','maxEO'));
+
     const psych=fc('bd','Bad Days','#f87171','bd',dph('bf','bs'))+fc('gd','Good Days','#34d399','gd',dph('gf','gs_'))+fc('cs','Discipline %','#4d5a6e','disc',ph('disc'))+fc('bias','Skill Growth %','#252d3d','bias',ph('bias')+sel('curve','<option value="slow" selected>Slow Start</option><option value="linear">Linear</option><option value="fast">Fast Start</option><option value="scurve">S-Curve</option>'));
-    const ovr=`<div class="fc off" id="fc-rr${s}" style="border-left-color:#60a5fa"><div class="fc-top"><span class="fc-lbl">R:R Override <button class="ib" onclick="openInfo('rr')">?</button></span>${tog('rr',false)}</div>${ph('rrSlider')}<div class="fc-note">Overrides stop. Loss = profit ÷ R:R.</div></div><div class="fc off" id="fc-dp${s}" style="border-left-color:#fbbf24"><div class="fc-top"><span class="fc-lbl">Daily % Override <button class="ib" onclick="openInfo('dp')">?</button></span>${tog('dp',false)}</div>${dph('minDp','maxDp')}<div class="fc-note">Ignores tick math. Applies % directly to equity.</div></div>`;
+
+    const ovr=`<div class="fc off" id="fc-rr${s}" style="border-left-color:#60a5fa"><div class="fc-top"><span class="fc-lbl">R:R Override <button class="ib" onclick="openInfo('rr')">?</button></span>${tog('rr',false)}</div>${ph('rrSlider')}<div class="fc-note">Overrides stop. Loss = profit ÷ R:R.</div></div><div class="fc off" id="fc-dp${s}" style="border-left-color:#fbbf24"><div class="fc-top"><span class="fc-lbl">Daily % Override <button class="ib" onclick="openInfo('dp')">?</button></span>${tog('dp',false)}</div>${dph('minDp','maxDp')}<div class="fc-note">Ignores tick math. Applies % directly to equity.</div></div><div class="fc off" id="fc-volceil${s}" style="border-left-color:#f87171"><div class="fc-top"><span class="fc-lbl">Volume Ceiling <button class="ib" onclick="openInfo('volceil')">?</button></span>${tog('volceil',false)}</div>${ph('volCeil')}<div class="fc-note">Hard cap on share growth. Prevents over-compounding.</div></div>`;
 
     function grp(title,col,body,open=false,eid=''){return`<div class="dgrp"><div class="dgrp-hd" onclick="toggleGrp(this)"><span class="dgrp-title" style="color:${col}">${title}</span><div class="dgrp-r">${eid?`<span class="ovr-badge" id="${eid}">OVERRIDE</span>`:''}<span class="dgrp-arr${open?' open':''}">▲</span></div></div><div class="dgrp-body${open?' open':''}"><div class="dgrp-inner">${body}</div></div></div>`;}
 
     pane.innerHTML=`
-      <div class="dist-card">
-        <div class="dist-top"><span class="dist-lbl">Distribution</span><span class="ev-tag" id="ev-tag${s}">EV —</span></div>
-        <div class="dist-bar"><div class="db-g" id="dbg${s}" style="width:60%"></div><div class="db-b" id="dbb${s}" style="width:20%"></div><div class="db-r" id="dbr${s}" style="width:20%"></div></div>
-        <div class="dist-labels"><span style="color:#34d399" id="db-gl${s}">WIN 60%</span><span style="color:#60a5fa" id="db-bl${s}">BE 20%</span><span style="color:#f87171" id="db-rl${s}">LOSS 20%</span></div>
-      </div>
       ${grp('① Core','#34d399',core,true)}
       ${grp('② Risk Management','#f87171',risk)}
       ${grp('③ Ticker','#8892a4',ticker)}
@@ -1099,9 +1092,9 @@ function wirePanes(){
   ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet'].forEach(id=>mkScale(id,5));
 }
 
-const SK='ahm-v9';
+const SK='ahm-v12';
 function getStpIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;SDEFS.forEach(([id])=>ids.push(id+s));});return ids;}
-const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-co','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo'];
+const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-fees','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo','tog-swing','tog-dist','tog-startcap','tog-volceil'];
 function getTogIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;TOG_BASE.forEach(id=>ids.push(id+s));});return ids;}
 const SEL_BASE=['curve','mode'];
 const REAL_IDS=['rTrades','rDays','rWR','rBE','rTickW','rTickL','rCapS','rCapC','rDayPnl'];
@@ -1138,7 +1131,7 @@ async function load(){
 async function init(){
   buildPanes();wirePanes();
   const loaded=await load();
-  [0,1,2].forEach(n=>updateDist(n));
+  [0,1,2].forEach(n=>{updateDist(n);updateFrictionBreakdown(n);});
   onReal();
   if(loaded){if(sessionLog.length)$('log-info').textContent=sessionLog.length+' days logged';if(journalLog.length)renderJournal();}
 }
