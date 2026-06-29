@@ -254,7 +254,7 @@ canvas.spark{width:100%;height:34px;display:block;}
 <div class="topbar">
   <div class="brand">
     <span class="brand-name">Anti-Hope Machine</span>
-    <span class="brand-ver">v12</span>
+    <span class="brand-ver">v13</span>
   </div>
   <div class="top-r">
     <button class="guide-btn" onclick="openGuide()">Guide</button>
@@ -333,7 +333,11 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="jsec-hd">Sleep &amp; Recovery</div>
         <div class="jrow"><label>Hours slept</label><input class="ni" id="j-sleep" type="number" min="0" max="16" step="0.5" placeholder="7.5" style="width:68px;"></div>
         <div class="jrow"><label>Sleep quality (1–5)</label><div class="scale-row" id="jsc-sleepq"></div></div>
+        <div class="jrow"><label>Social plans night before</label><select class="jsel" id="j-social"><option value="">—</option><option>None — normal night</option><option>Yes — stayed on schedule</option><option>Yes — stayed up late</option></select></div>
         <div class="jrow"><label>Physical state</label><select class="jsel" id="j-phys"><option value="">—</option><option>Rested</option><option>Energised</option><option>Tired</option><option>Sick</option><option>Sore</option></select></div>
+        <div class="jrow"><label>Feeling sick today</label><select class="jsel" id="j-sick"><option value="">—</option><option>No</option><option>Mildly</option><option>Yes</option></select></div>
+        <div class="jrow"><label>Hydration (1–5)</label><div class="scale-row" id="jsc-hydration"></div></div>
+        <div class="jrow"><label>Felt temperature</label><select class="jsel" id="j-temp"><option value="">—</option><option>Cold</option><option>Comfortable</option><option>Warm/Hot</option></select></div>
         <div class="jrow"><label>Diet quality (1–5)</label><div class="scale-row" id="jsc-diet"></div></div>
         <div class="jrow"><label>Exercise</label><select class="jsel" id="j-exercise"><option value="">—</option><option>None</option><option>Light walk</option><option>Moderate</option><option>Intense</option></select></div>
       </div>
@@ -342,7 +346,38 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="jrow"><label>Stress level (1–5)</label><div class="scale-row" id="jsc-stress"></div></div>
         <div class="jrow"><label>Mental fatigue (1–5)</label><div class="scale-row" id="jsc-fatigue"></div></div>
         <div class="jrow"><label>Confidence (1–5)</label><div class="scale-row" id="jsc-conf"></div></div>
-        <div class="jrow"><label>Emotional state</label><select class="jsel" id="j-emo"><option value="">—</option><option>Calm</option><option>Focused</option><option>Anxious</option><option>Overconfident</option><option>Distracted</option><option>Numb</option><option>Motivated</option><option>Frustrated</option></select></div>
+        <div class="jrow"><label>Emotional state</label><select class="jsel" id="j-emo"><option value="">—</option><option>Happy</option><option>Content</option><option>Grateful</option><option>Calm</option><option>Focused</option><option>Motivated</option><option>Hopeful</option><option>Anxious</option><option>Overconfident</option><option>Distracted</option><option>Numb</option><option>Frustrated</option><option>Sad</option><option>Angry</option><option>Overwhelmed</option><option>Lonely</option></select></div>
+        <div class="jrow"><label>Emotional conflict/fight</label><select class="jsel" id="j-conflict"><option value="">—</option><option>None</option><option>Minor</option><option>Significant</option></select></div>
+        <div class="jrow"><label>News today</label><select class="jsel" id="j-news"><option value="">—</option><option>Neither</option><option>Good news</option><option>Bad news</option></select></div>
+      </div>
+      <div class="jsec">
+        <div class="jsec-hd">Prayer</div>
+        <div class="jrow"><label>Fajr</label><select class="jsel" id="j-fajr"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
+        <div class="jrow"><label>Dhuhr</label><select class="jsel" id="j-dhuhr"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
+        <div class="jrow"><label>Asr</label><select class="jsel" id="j-asr"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
+        <div class="jrow"><label>Maghreb</label><select class="jsel" id="j-maghreb"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
+        <div class="jrow"><label>Isha</label><select class="jsel" id="j-isha"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
+        <div class="jrow"><label>Sunnah prayers</label><select class="jsel" id="j-sunnah"><option value="">—</option><option>Yes</option><option>No</option></select></div>
+        <div class="jrow"><label>Qiyam al-layl</label><select class="jsel" id="j-qiyam"><option value="">—</option><option>Yes</option><option>No</option></select></div>
+        <div class="jrow"><label>Dhikr</label><select class="jsel" id="j-dhikr"><option value="">—</option><option>Yes</option><option>No</option></select></div>
+      </div>
+      <div class="jsec">
+        <div class="jsec-hd">Market Context</div>
+        <div class="jrow"><label>Price action character</label><select class="jsel" id="j-balance"><option value="">—</option><option>Balanced</option><option>Imbalanced</option></select></div>
+        <div class="jrow"><label>Control</label><select class="jsel" id="j-control"><option value="">—</option><option>Buyers in control</option><option>Sellers in control</option><option>Balanced/contested</option></select></div>
+        <div class="jrow"><label>Behavior</label><select class="jsel" id="j-behavior"><option value="">—</option><option>Normal</option><option>Unusual</option></select></div>
+        <div class="jrow"><label>News day</label><select class="jsel" id="j-newsday"><option value="">—</option><option>Yes</option><option>No</option></select></div>
+        <div class="jrow"><label>Location traded from</label><input class="ni" id="j-location" type="text" placeholder="Home, office..." style="width:120px;text-align:left;"></div>
+        <div class="jrow"><label>Ticker traded</label><input class="ni" id="j-ticker" type="text" placeholder="RGTI" style="width:90px;"></div>
+        <div class="jrow"><label>Software used</label><input class="ni" id="j-software" type="text" placeholder="TradingView..." style="width:120px;text-align:left;"></div>
+        <div class="jrow"><label>Order flow tool</label><select class="jsel" id="j-orderflow"><option value="">—</option><option>Bookmap</option><option>Volume Profile only</option><option>Neither</option></select></div>
+      </div>
+      <div class="jsec">
+        <div class="jsec-hd">Day Grade (Process, Not P&amp;L)</div>
+        <div class="jrow"><label>Overall day grade</label><select class="jsel" id="j-daygrade"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>F</option></select></div>
+        <div class="jrow"><label>Market favorability</label><select class="jsel" id="j-marketfav"><option value="">—</option><option>Favorable for my style</option><option>Neutral</option><option>Unfavorable for my style</option></select></div>
+        <div class="jnotes-wrap"><label style="font-size:9px;color:#4d5a6e;display:block;margin-bottom:4px;">One focus point for tomorrow</label><textarea class="jnote" id="j-focus" rows="2" placeholder="The one thing that would most improve tomorrow's trading."></textarea></div>
+        <div class="jnotes-wrap"><label style="font-size:9px;color:#4d5a6e;display:block;margin-bottom:4px;">Best opportunity (taken or missed)</label><textarea class="jnote" id="j-bestop" rows="2" placeholder="What was the best setup of the day, whether or not you took it?"></textarea></div>
       </div>
       <div class="jsec">
         <div class="jsec-hd">Trading Discipline</div>
@@ -351,37 +386,42 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="jnotes-wrap"><label style="font-size:9px;color:#4d5a6e;display:block;margin-bottom:4px;">Notes</label><textarea class="jnote" id="j-note" rows="3" placeholder="What happened today? What will you change?"></textarea></div>
       </div>
       <button class="j-save-btn" onclick="saveJournal()">Save Entry</button>
+      <button class="j-save-btn" onclick="exportLogCSV()" style="border-color:#60a5fa;color:#60a5fa;">Export Log + Journal CSV</button>
       <div class="spark-grid" id="spark-grid" style="display:none;"></div>
       <div class="jhist" id="jhist"><div class="jhist-hd">History</div><div class="jentry" style="color:#4d5a6e;font-size:10px;text-align:center;padding:14px;">No entries yet.</div></div>
     </div>
   </div>
 
   <div class="screen" id="scr-stats">
-    <div class="slbl">Real-World Stats</div>
+    <div class="slbl">Real-World Stats — Auto-Computed from Log</div>
     <div class="stats-body">
       <div class="vs-card">
         <div class="vs-hd"><span class="vs-title">Real vs Sim</span><span class="vs-badge nosim" id="vs-badge">No Sim</span></div>
         <div class="vs-rows" id="vs-rows"><div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run a simulation first.</div></div>
       </div>
-      <div class="stats-inp">
-        <div class="si"><label>Total Trades</label><input class="ni" id="rTrades" type="number" placeholder="—" oninput="onReal()"></div>
-        <div class="si"><label>Trading Days</label><input class="ni" id="rDays" type="number" placeholder="—" oninput="onReal()"></div>
-        <div class="si"><label>Win Rate %</label><input class="ni" id="rWR" type="number" step="0.1" placeholder="—" oninput="onReal()"></div>
-        <div class="si"><label>Breakeven %</label><input class="ni" id="rBE" type="number" step="0.1" placeholder="—" oninput="onReal()"></div>
-        <div class="si"><label>Avg Ticks Won</label><input class="ni" id="rTickW" type="number" placeholder="—" oninput="onReal()"></div>
-        <div class="si"><label>Avg Ticks Lost</label><input class="ni" id="rTickL" type="number" placeholder="—" oninput="onReal()"></div>
-        <div class="si"><label>Start Capital $</label><input class="ni" id="rCapS" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
-        <div class="si"><label>Current Capital $</label><input class="ni" id="rCapC" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
-        <div class="si"><label>Avg Daily P&L $</label><input class="ni" id="rDayPnl" type="number" step="0.01" placeholder="—" oninput="onReal()" style="width:88px;"></div>
-      </div>
       <div class="stats-grid">
+        <div class="sg"><div class="sgl">Total Trades</div><div class="sgv" id="rTrades">—</div></div>
+        <div class="sg"><div class="sgl">Trading Days</div><div class="sgv" id="rDays">—</div></div>
+        <div class="sg"><div class="sgl">Win Rate %</div><div class="sgv" id="rWR" style="color:#34d399">—</div></div>
+        <div class="sg"><div class="sgl">Breakeven %</div><div class="sgv" id="rBE" style="color:#60a5fa">—</div></div>
         <div class="sg"><div class="sgl">Loss Rate</div><div class="sgv" id="rLoss" style="color:#f87171">—</div></div>
         <div class="sg"><div class="sgl">Avg T/Day</div><div class="sgv" id="rAvgT" style="color:#fbbf24">—</div></div>
+        <div class="sg"><div class="sgl">Avg Win Ticks</div><div class="sgv" id="rTickW">—</div></div>
+        <div class="sg"><div class="sgl">Avg Loss Ticks</div><div class="sgv" id="rTickL">—</div></div>
         <div class="sg"><div class="sgl">R:R Ratio</div><div class="sgv" id="rRR" style="color:#34d399">—</div></div>
-        <div class="sg"><div class="sgl">YTD Return</div><div class="sgv" id="rYTD">—</div></div>
         <div class="sg"><div class="sgl">Total P&L</div><div class="sgv" id="rPnlTotal">—</div></div>
+        <div class="sg"><div class="sgl">Avg Daily P&L</div><div class="sgv" id="rDayPnl">—</div></div>
         <div class="sg"><div class="sgl">Days ±Pace</div><div class="sgv" id="rPace">—</div></div>
       </div>
+      <div class="fc-note" style="padding:0 4px 8px;">Win Rate, Avg Ticks, Total Trades, and P&amp;L are computed automatically from your Log entries — no manual entry needed. Log a day to update these.</div>
+      <div class="stats-inp">
+        <div class="si"><label>Start Capital $</label><input class="ni" id="rCapS" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
+        <div class="si"><label>Current Capital $</label><input class="ni" id="rCapC" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
+      </div>
+      <div class="stats-grid">
+        <div class="sg"><div class="sgl">YTD Return</div><div class="sgv" id="rYTD">—</div></div>
+      </div>
+      <button class="j-save-btn" onclick="exportLogCSV()" style="border-color:#60a5fa;color:#60a5fa;margin-top:4px;">Export Log + Journal CSV</button>
     </div>
   </div>
 
@@ -842,7 +882,7 @@ function renderTable(tab,rowsIn,acct0In,cIn,mspIn,cappedIn){
 function exportData(tab){
   const res=simResults[tab];if(!res||!res.rows.length){alert('Run a simulation first.');return;}
   const {rows,acct0,c,msp}=res;const names=['Strat-A','Strat-B','Strat-C'];
-  const L=['AHM v12 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,Trades,Ticks,Day%,P&L,Ret%,Surplus,+Sh,Cumul'];
+  const L=['AHM v13 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,Trades,Ticks,Day%,P&L,Ret%,Surplus,+Sh,Cumul'];
   const show=new Set([0,rows.length-1]);rows.forEach((r,i)=>{if(r.isMilestone||r.day%c.intv===0)show.add(i);});
   for(const idx of [...show].sort((a,b)=>a-b)){const r=rows[idx];const mo=r.cumPnl-((msp||{})[r.mIdx]||0);const dp=r.dayPct!=null?r.dayPct.toFixed(2)+'%':'—';let lbl='';if(r.isMilestone)lbl='Milestone '+r.msVal;else if(r.day===1)lbl='Start';else if(idx===rows.length-1)lbl='Goal';L.push([r.day,cal(r.calMo),mo.toFixed(2),lbl,r.shares,r.outcome,r.numTr||0,r.dayTicks,dp,r.dayPnl.toFixed(2),(r.cumPnl/acct0*100).toFixed(2)+'%',r.surplus.toFixed(2),r.newSh,r.cumPnl.toFixed(2)].join(','));}
   const blob=new Blob([L.join('\n')],{type:'text/csv'});const url=URL.createObjectURL(blob);
@@ -881,22 +921,37 @@ function logDay(){
   sessionLog.push({date:new Date().toISOString().slice(0,10),w,l,b,pnl:+$('dPnl').value||0,tw:+$('dTickW').value||0,tl:+$('dTickL').value||0});
   $('log-info').textContent=sessionLog.length+' days logged';
   ['dWins','dLoss','dBE','dTickW','dTickL','dPnl','dShares'].forEach(id=>{const e=$(id);if(e)e.value='';});
-  onDaily();save();
+  onDaily();onReal();save();
 }
-function clearLog(){if(!sessionLog.length)return;if(!confirm('Clear all session logs?'))return;sessionLog=[];$('log-info').textContent='0 days logged';onDaily();save();}
+function clearLog(){if(!sessionLog.length)return;if(!confirm('Clear all session logs?'))return;sessionLog=[];$('log-info').textContent='0 days logged';onDaily();onReal();save();}
 
 let journalLog=[];
 function mkScale(id,n){const c=$(id);if(!c)return;c.innerHTML='';for(let i=1;i<=n;i++){const b=document.createElement('button');b.className='scale-btn';b.dataset.v=i;b.textContent=i;b.type='button';b.addEventListener('click',()=>{c.querySelectorAll('.scale-btn').forEach(x=>x.classList.toggle('on',+x.dataset.v<=i));});c.appendChild(b);}}
 function getScale(id){const c=$(id);if(!c)return 0;return[...c.querySelectorAll('.scale-btn.on')].length;}
 function resetScale(id){const c=$(id);if(!c)return;c.querySelectorAll('.scale-btn').forEach(x=>x.classList.remove('on'));}
 function saveJournal(){
-  const entry={date:new Date().toISOString().slice(0,10),ts:Date.now(),sleep:parseFloat($('j-sleep').value)||0,sleepQ:getScale('jsc-sleepq'),stress:getScale('jsc-stress'),fatigue:getScale('jsc-fatigue'),conf:getScale('jsc-conf'),rules:getScale('jsc-rules'),diet:getScale('jsc-diet'),phys:$('j-phys').value,emo:$('j-emo').value,exercise:$('j-exercise').value,prep:$('j-prep').value,note:$('j-note').value.trim()};
+  const entry={
+    date:new Date().toISOString().slice(0,10),ts:Date.now(),
+    sleep:parseFloat($('j-sleep').value)||0,sleepQ:getScale('jsc-sleepq'),
+    social:$('j-social').value,
+    stress:getScale('jsc-stress'),fatigue:getScale('jsc-fatigue'),conf:getScale('jsc-conf'),
+    rules:getScale('jsc-rules'),diet:getScale('jsc-diet'),hydration:getScale('jsc-hydration'),
+    phys:$('j-phys').value,sick:$('j-sick').value,temp:$('j-temp').value,
+    emo:$('j-emo').value,conflict:$('j-conflict').value,news:$('j-news').value,
+    exercise:$('j-exercise').value,prep:$('j-prep').value,note:$('j-note').value.trim(),
+    fajr:$('j-fajr').value,dhuhr:$('j-dhuhr').value,asr:$('j-asr').value,maghreb:$('j-maghreb').value,isha:$('j-isha').value,
+    sunnah:$('j-sunnah').value,qiyam:$('j-qiyam').value,dhikr:$('j-dhikr').value,
+    balance:$('j-balance').value,control:$('j-control').value,behavior:$('j-behavior').value,newsday:$('j-newsday').value,
+    location:$('j-location').value.trim(),ticker:$('j-ticker').value.trim(),software:$('j-software').value.trim(),orderflow:$('j-orderflow').value,
+    daygrade:$('j-daygrade').value,marketfav:$('j-marketfav').value,focus:$('j-focus').value.trim(),bestop:$('j-bestop').value.trim(),
+  };
   const idx=journalLog.findIndex(e=>e.date===entry.date);
   if(idx>=0)journalLog[idx]=entry;else journalLog.unshift(entry);
   renderJournal();
-  $('j-sleep').value='';$('j-note').value='';
-  ['j-phys','j-emo','j-exercise','j-prep'].forEach(id=>{const e=$(id);if(e)e.value='';});
-  ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet'].forEach(resetScale);
+  $('j-sleep').value='';$('j-note').value='';$('j-focus').value='';$('j-bestop').value='';
+  $('j-location').value='';$('j-ticker').value='';$('j-software').value='';
+  ['j-phys','j-emo','j-exercise','j-prep','j-social','j-sick','j-temp','j-conflict','j-news','j-fajr','j-dhuhr','j-asr','j-maghreb','j-isha','j-sunnah','j-qiyam','j-dhikr','j-balance','j-control','j-behavior','j-newsday','j-orderflow','j-daygrade','j-marketfav'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet','jsc-hydration'].forEach(resetScale);
   const btn=document.querySelector('.j-save-btn');if(btn){btn.textContent='Saved';setTimeout(()=>btn.textContent='Save Entry',1500);}
   save();
 }
@@ -926,42 +981,105 @@ function renderJournal(){
   if(!journalLog.length){hist.innerHTML='<div class="jhist-hd">History</div><div class="jentry" style="color:#4d5a6e;font-size:10px;text-align:center;padding:14px;">No entries yet.</div>';return;}
   const lvl=(n,max=5)=>'█'.repeat(n)+'░'.repeat(max-n);
   hist.innerHTML='<div class="jhist-hd">History — '+journalLog.length+' entries</div>'+
-    journalLog.slice(0,10).map(e=>`<div class="jentry"><div class="jentry-date">${e.date}</div><div class="jentry-grid">
+    journalLog.slice(0,10).map(e=>{
+      const prayers=[e.fajr,e.dhuhr,e.asr,e.maghreb,e.isha].filter(Boolean);
+      const onTimeCt=prayers.filter(p=>p==='On Time').length;
+      const prayerSummary=prayers.length?`${onTimeCt}/${prayers.length} on time`:'';
+      return `<div class="jentry"><div class="jentry-date">${e.date}${e.daygrade?` · Grade ${e.daygrade}`:''}</div><div class="jentry-grid">
       ${e.sleep?`<div class="jentry-cell"><span class="jk">Sleep</span>${e.sleep}h · Q${e.sleepQ||'—'}</div>`:''}
+      ${e.social&&e.social!=='None — normal night'?`<div class="jentry-cell"><span class="jk">Social</span>${e.social}</div>`:''}
       ${e.stress?`<div class="jentry-cell"><span class="jk">Stress</span><span style="font-size:8px;letter-spacing:1px">${lvl(e.stress)}</span></div>`:''}
       ${e.fatigue?`<div class="jentry-cell"><span class="jk">Fatigue</span><span style="font-size:8px;letter-spacing:1px">${lvl(e.fatigue)}</span></div>`:''}
       ${e.conf?`<div class="jentry-cell"><span class="jk">Conf</span><span style="font-size:8px;letter-spacing:1px">${lvl(e.conf)}</span></div>`:''}
       ${e.diet?`<div class="jentry-cell"><span class="jk">Diet</span><span style="font-size:8px;letter-spacing:1px">${lvl(e.diet)}</span></div>`:''}
+      ${e.hydration?`<div class="jentry-cell"><span class="jk">Hydration</span><span style="font-size:8px;letter-spacing:1px">${lvl(e.hydration)}</span></div>`:''}
       ${e.rules?`<div class="jentry-cell"><span class="jk">Rule breaks</span>${e.rules}</div>`:''}
       ${e.emo?`<div class="jentry-cell"><span class="jk">State</span>${e.emo}</div>`:''}
+      ${e.conflict&&e.conflict!=='None'?`<div class="jentry-cell"><span class="jk">Conflict</span>${e.conflict}</div>`:''}
+      ${e.news&&e.news!=='Neither'?`<div class="jentry-cell"><span class="jk">News</span>${e.news}</div>`:''}
       ${e.exercise?`<div class="jentry-cell"><span class="jk">Exercise</span>${e.exercise}</div>`:''}
       ${e.phys?`<div class="jentry-cell"><span class="jk">Physical</span>${e.phys}</div>`:''}
+      ${prayerSummary?`<div class="jentry-cell"><span class="jk">Prayers</span>${prayerSummary}</div>`:''}
+      ${e.qiyam==='Yes'?`<div class="jentry-cell"><span class="jk">Qiyam</span>Yes</div>`:''}
+      ${e.ticker?`<div class="jentry-cell"><span class="jk">Ticker</span>${e.ticker}</div>`:''}
+      ${e.orderflow?`<div class="jentry-cell"><span class="jk">Order Flow</span>${e.orderflow}</div>`:''}
+      ${e.marketfav?`<div class="jentry-cell"><span class="jk">Mkt Favorability</span>${e.marketfav}</div>`:''}
       ${e.prep?`<div class="jentry-cell"><span class="jk">Prep</span>${e.prep}</div>`:''}
-    </div>${e.note?`<div class="jentry-note">${e.note.slice(0,100)}${e.note.length>100?'…':''}</div>`:''}</div>`).join('');
+    </div>${e.focus?`<div class="jentry-note">Focus: ${e.focus.slice(0,80)}${e.focus.length>80?'…':''}</div>`:''}${e.note?`<div class="jentry-note">${e.note.slice(0,100)}${e.note.length>100?'…':''}</div>`:''}</div>`;
+    }).join('');
 }
 
 function onReal(){
-  const tr=+$('rTrades').value||0,dy=+$('rDays').value||1;
-  const wr=+$('rWR').value||0,be=+$('rBE').value||0;
-  const tw=+$('rTickW').value||1,tl_=+$('rTickL').value||1;
-  const cs=+$('rCapS').value||1,cc=+$('rCapC').value||cs;
-  const rdp=+$('rDayPnl').value||0;
-  const loss=Math.max(0,100-wr-be);const ytd=((cc-cs)/cs)*100,tp=cc-cs;
+  const cs=+$('rCapS').value||0,cc=+$('rCapC').value||0;
+  if(!sessionLog.length){
+    ['rTrades','rDays','rWR','rBE','rLoss','rAvgT','rTickW','rTickL','rRR','rPnlTotal','rDayPnl'].forEach(id=>{const e=$(id);if(e)e.textContent='—';});
+    if(cs&&cc){const ytd=((cc-cs)/cs)*100,rytd=$('rYTD');if(rytd){rytd.textContent=pct(ytd);rytd.style.color=ytd>=0?'#34d399':'#f87171';}}
+    const vsB=$('vs-badge'),vsR=$('vs-rows');
+    if(vsB){vsB.textContent='No Sim';vsB.className='vs-badge nosim';}
+    if(vsR)vsR.innerHTML='<div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Log trading days to compute stats.</div>';
+    $('rPace').textContent='—';
+    return;
+  }
+  const dy=sessionLog.length;
+  const tr=sessionLog.reduce((a,e)=>a+e.w+e.l+e.b,0);
+  const totW=sessionLog.reduce((a,e)=>a+e.w,0),totL=sessionLog.reduce((a,e)=>a+e.l,0),totB=sessionLog.reduce((a,e)=>a+e.b,0);
+  const wr=tr>0?(totW/tr)*100:0,be=tr>0?(totB/tr)*100:0,loss=tr>0?(totL/tr)*100:0;
+  const twArr=sessionLog.filter(e=>e.tw>0).map(e=>e.tw),tlArr=sessionLog.filter(e=>e.tl>0).map(e=>e.tl);
+  const tw=twArr.length?twArr.reduce((a,b)=>a+b,0)/twArr.length:0;
+  const tl_=tlArr.length?tlArr.reduce((a,b)=>a+b,0)/tlArr.length:0;
+  const tp=sessionLog.reduce((a,e)=>a+e.pnl,0);
+  const rdp=tp/dy;
+  $('rTrades').textContent=tr;
+  $('rDays').textContent=dy;
+  $('rWR').textContent=wr.toFixed(1)+'%';
+  $('rBE').textContent=be.toFixed(1)+'%';
   $('rLoss').textContent=loss.toFixed(1)+'%';
   $('rAvgT').textContent=(tr/dy).toFixed(1)+'/d';
-  $('rRR').textContent=(tw/tl_).toFixed(2)+':1';
-  const rytd=$('rYTD');if(rytd){rytd.textContent=pct(ytd);rytd.style.color=ytd>=0?'#34d399':'#f87171';}
+  $('rTickW').textContent=tw.toFixed(1)+'t';
+  $('rTickL').textContent=tl_.toFixed(1)+'t';
+  $('rRR').textContent=tl_>0?(tw/tl_).toFixed(2)+':1':'—';
   const rpt=$('rPnlTotal');if(rpt){rpt.textContent=sgn(tp);rpt.style.color=tp>=0?'#34d399':'#f87171';}
+  const rdpEl=$('rDayPnl');if(rdpEl){rdpEl.textContent=sgn(rdp);rdpEl.style.color=rdp>=0?'#34d399':'#f87171';}
+  if(cs&&cc){const ytd=((cc-cs)/cs)*100;const rytd=$('rYTD');if(rytd){rytd.textContent=pct(ytd);rytd.style.color=ytd>=0?'#34d399':'#f87171';}}
   const res=simResults[activeStrat];const vsB=$('vs-badge'),vsR=$('vs-rows');
   if(!res){if(vsB){vsB.textContent='No Sim';vsB.className='vs-badge nosim';}if(vsR)vsR.innerHTML='<div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run a simulation first.</div>';$('rPace').textContent='—';return;}
-  const sc=res.c;const realRR=tw/tl_,simRR=sc.avgP/sc.avgL;
-  const vrows=[{lbl:'Win Rate',real:wr.toFixed(1)+'%',sim:(sc.wr*100).toFixed(1)+'%',d:wr-sc.wr*100,u:'%'},{lbl:'Breakeven',real:be.toFixed(1)+'%',sim:(sc.be*100).toFixed(1)+'%',d:be-sc.be*100,u:'%'},{lbl:'Avg Win t',real:tw,sim:sc.avgP.toFixed(1),d:tw-sc.avgP,u:'t'},{lbl:'R:R',real:realRR.toFixed(2)+':1',sim:simRR.toFixed(2)+':1',d:realRR-simRR,u:''},{lbl:'Daily P&L',real:'$'+fmt(Math.abs(rdp)),sim:'$'+fmt(Math.abs(sc.evNet)),d:rdp-sc.evNet,u:'$'}];
+  const sc=res.c;const realRR=tl_>0?tw/tl_:0,simRR=sc.avgP/sc.avgL;
+  const vrows=[{lbl:'Win Rate',real:wr.toFixed(1)+'%',sim:(sc.wr*100).toFixed(1)+'%',d:wr-sc.wr*100,u:'%'},{lbl:'Breakeven',real:be.toFixed(1)+'%',sim:(sc.be*100).toFixed(1)+'%',d:be-sc.be*100,u:'%'},{lbl:'Avg Win t',real:tw.toFixed(1),sim:sc.avgP.toFixed(1),d:tw-sc.avgP,u:'t'},{lbl:'R:R',real:realRR.toFixed(2)+':1',sim:simRR.toFixed(2)+':1',d:realRR-simRR,u:''},{lbl:'Daily P&L',real:'$'+fmt(Math.abs(rdp)),sim:'$'+fmt(Math.abs(sc.evNet)),d:rdp-sc.evNet,u:'$'}];
   let score=0;vrows.forEach(r=>{if(r.d>=0)score+=1;});
   const ahead=score>=5,onTrack=score>=3;
   if(vsB){vsB.textContent=ahead?'Ahead':onTrack?'On Track':'Behind';vsB.className='vs-badge '+(ahead?'ahead':onTrack?'on-track':'behind');}
   if(rdp&&sc.evNet){const adj=Math.round(res.rows.length*(1-rdp/sc.evNet));const rp=$('rPace');if(rp){rp.textContent=adj<=0?'+'+Math.abs(adj)+'d ahead':adj+'d behind';rp.style.color=adj<=0?'#34d399':'#f87171';}}
   if(vsR)vsR.innerHTML=vrows.map(r=>{const dc=r.d>=0?'pos':r.d<-2?'neg':'neu';const ds=(r.d>=0?'+':'')+r.d.toFixed(r.u==='%'?1:2)+r.u;return`<div class="vs-row"><span class="vs-rl">${r.lbl}</span><div class="vs-rv"><span class="vs-real">${r.real}</span><span class="vs-sim">sim ${r.sim}</span><span class="vd ${dc}">${ds}</span></div></div>`;}).join('');
   save();
+}
+
+function exportLogCSV(){
+  if(!sessionLog.length&&!journalLog.length){alert('No log or journal data to export yet.');return;}
+  const allDates=new Set([...sessionLog.map(e=>e.date),...journalLog.map(e=>e.date)]);
+  const dates=[...allDates].sort();
+  const sessByDate={};sessionLog.forEach(e=>sessByDate[e.date]=e);
+  const jByDate={};journalLog.forEach(e=>jByDate[e.date]=e);
+  const headers=['Date','Wins','Losses','Breakevens','AvgWinTicks','AvgLossTicks','PnL',
+    'SleepHrs','SleepQ','SocialNightBefore','Physical','Sick','Hydration','Temp','Diet','Exercise',
+    'Stress','Fatigue','Confidence','Emotion','Conflict','News',
+    'Fajr','Dhuhr','Asr','Maghreb','Isha','Sunnah','Qiyam','Dhikr',
+    'Balance','Control','Behavior','NewsDay','Location','Ticker','Software','OrderFlow',
+    'DayGrade','MarketFav','FocusPoint','BestOpportunity','RuleBreaks','PrepLevel','Notes'];
+  const rows=[headers.join(',')];
+  for(const d of dates){
+    const s=sessByDate[d]||{},j=jByDate[d]||{};
+    const esc=v=>{if(v===undefined||v===null)return'';const str=String(v).replace(/"/g,'""');return str.includes(',')||str.includes('\n')?`"${str}"`:str;};
+    rows.push([d,s.w||'',s.l||'',s.b||'',s.tw||'',s.tl||'',s.pnl||'',
+      j.sleep||'',j.sleepQ||'',esc(j.social),esc(j.phys),esc(j.sick),j.hydration||'',esc(j.temp),j.diet||'',esc(j.exercise),
+      j.stress||'',j.fatigue||'',j.conf||'',esc(j.emo),esc(j.conflict),esc(j.news),
+      esc(j.fajr),esc(j.dhuhr),esc(j.asr),esc(j.maghreb),esc(j.isha),esc(j.sunnah),esc(j.qiyam),esc(j.dhikr),
+      esc(j.balance),esc(j.control),esc(j.behavior),esc(j.newsday),esc(j.location),esc(j.ticker),esc(j.software),esc(j.orderflow),
+      esc(j.daygrade),esc(j.marketfav),esc(j.focus),esc(j.bestop),j.rules||'',esc(j.prep),esc(j.note)
+    ].join(','));
+  }
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='AHM-Log-Journal-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
 }
 
 const INFO={
@@ -1089,15 +1207,15 @@ function wirePanes(){
     if(inp){inp.addEventListener('change',()=>renderTable(activeTblStrat));inp.addEventListener('blur',()=>renderTable(activeTblStrat));}
     el.querySelectorAll('.stp-btn').forEach(b=>b.addEventListener('pointerup',()=>setTimeout(()=>renderTable(activeTblStrat),60)));
   }
-  ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet'].forEach(id=>mkScale(id,5));
+  ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet','jsc-hydration'].forEach(id=>mkScale(id,5));
 }
 
-const SK='ahm-v12';
+const SK='ahm-v13';
 function getStpIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;SDEFS.forEach(([id])=>ids.push(id+s));});return ids;}
 const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-fees','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo','tog-swing','tog-dist','tog-startcap','tog-volceil'];
 function getTogIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;TOG_BASE.forEach(id=>ids.push(id+s));});return ids;}
 const SEL_BASE=['curve','mode'];
-const REAL_IDS=['rTrades','rDays','rWR','rBE','rTickW','rTickL','rCapS','rCapC','rDayPnl'];
+const REAL_IDS=['rCapS','rCapC'];
 
 function save(){
   try{
