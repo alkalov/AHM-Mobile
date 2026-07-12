@@ -224,6 +224,14 @@ canvas.spark{width:100%;height:34px;display:block;}
 .sg{background:#131720;padding:7px 9px;border-radius:3px;border:1px solid #252d3d;}
 .sgl{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
 .sgv{font-size:13px;font-weight:600;color:#e2e6ed;}
+.gauge-row{background:#131720;border:1px solid #252d3d;border-radius:3px;padding:8px 10px;margin-bottom:6px;}
+.gauge-lbl{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.gauge-lbl span:first-child{font-size:10px;color:#8892a4;font-weight:500;}
+.gauge-r{font-size:8px;font-weight:700;letter-spacing:.08em;}
+.gauge-track{position:relative;height:10px;background:#1a2030;border-radius:2px;overflow:hidden;border:1px solid #252d3d;}
+.gauge-zero{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#4d5a6e;z-index:2;}
+.gauge-bar{position:absolute;top:0;bottom:0;border-radius:2px;opacity:.85;}
+.gauge-sub{font-size:8px;color:#4d5a6e;margin-top:5px;}
 .modal,.imodal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:flex-end;justify-content:center;}
 .modal.open,.imodal.open{display:flex;}
 .mbox,.ibox{background:#131720;border-top:1px solid #34d399;max-width:600px;width:100%;padding:14px 16px 32px;max-height:80vh;overflow-y:auto;border-radius:8px 8px 0 0;position:relative;}
@@ -254,7 +262,7 @@ canvas.spark{width:100%;height:34px;display:block;}
 <div class="topbar">
   <div class="brand">
     <span class="brand-name">Anti-Hope Machine</span>
-    <span class="brand-ver">v13</span>
+    <span class="brand-ver">v17</span>
   </div>
   <div class="top-r">
     <button class="guide-btn" onclick="openGuide()">Guide</button>
@@ -307,6 +315,13 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="inp-row"><label>Net P&amp;L $</label><input class="ni" id="dPnl" type="number" step="0.01" placeholder="0.00" oninput="onDaily()" style="width:86px;"></div>
         <div class="inp-row"><label>Shares held</label><input class="ni" id="dShares" type="number" min="1" placeholder="100" oninput="onDaily()"></div>
       </div>
+      <div style="background:#131720;border:1px solid #252d3d;border-radius:3px;padding:7px 10px;margin-bottom:7px;">
+        <div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;margin-bottom:6px;">Trade Breakdown</div>
+        <div class="inp-row" style="border-bottom:1px solid #1e2535;padding:5px 0;"><label style="font-size:9px;color:#34d399;">Profitable</label><div style="display:flex;gap:5px;"><input class="ni" id="dTotW" type="number" min="0" placeholder="0" oninput="onDaily()" style="width:50px;" title="Count"><input class="ni" id="dCapW" type="number" min="0" max="100" step="0.1" placeholder="%" oninput="onDaily()" style="width:56px;" title="% capture"></div></div>
+        <div class="inp-row" style="border-bottom:1px solid #1e2535;padding:5px 0;"><label style="font-size:9px;color:#60a5fa;">Breakeven</label><div style="display:flex;gap:5px;"><input class="ni" id="dTotBE" type="number" min="0" placeholder="0" oninput="onDaily()" style="width:50px;" title="Count"><input class="ni" id="dCapBE" type="number" min="0" max="100" step="0.1" placeholder="%" oninput="onDaily()" style="width:56px;" title="% capture"></div></div>
+        <div class="inp-row" style="padding:5px 0;"><label style="font-size:9px;color:#f87171;">Losers</label><div style="display:flex;gap:5px;"><input class="ni" id="dTotL" type="number" min="0" placeholder="0" oninput="onDaily()" style="width:50px;" title="Count"><input class="ni" id="dCapL" type="number" min="0" max="100" step="0.1" placeholder="%" oninput="onDaily()" style="width:56px;" title="% capture"></div></div>
+        <div style="font-size:8px;color:#4d5a6e;margin-top:5px;letter-spacing:.04em;">Count · % capture each</div>
+      </div>
       <div class="g3">
         <div class="sc-s"><div class="scl">Win Rate</div><div class="scv" id="dd-wr" style="color:#34d399">—</div></div>
         <div class="sc-s"><div class="scl">Exp/Trade</div><div class="scv" id="dd-ev">—</div></div>
@@ -331,7 +346,9 @@ canvas.spark{width:100%;height:34px;display:block;}
       <div class="jdate" id="jdate">—</div>
       <div class="jsec">
         <div class="jsec-hd">Sleep &amp; Recovery</div>
-        <div class="jrow"><label>Hours slept</label><input class="ni" id="j-sleep" type="number" min="0" max="16" step="0.5" placeholder="7.5" style="width:68px;"></div>
+        <div class="jrow"><label>Time slept</label><select class="jsel" id="j-timeslept" style="min-width:90px;"><option value="">—</option></select></div>
+        <div class="jrow"><label>Time woke up</label><select class="jsel" id="j-timewoke" style="min-width:90px;"><option value="">—</option></select></div>
+        <div class="jrow"><label>Emotion before sleep</label><select class="jsel" id="j-presleep-emo"><option value="">—</option><option>Calm</option><option>Content</option><option>Excited</option><option>Happy</option><option>Grateful</option><option>Hopeful</option><option>Anxious</option><option>Stressed</option><option>Overwhelmed</option><option>Sad</option><option>Angry</option><option>Frustrated</option><option>Restless</option><option>Numb</option><option>Lonely</option></select></div>
         <div class="jrow"><label>Sleep quality (1–5)</label><div class="scale-row" id="jsc-sleepq"></div></div>
         <div class="jrow"><label>Social plans night before</label><select class="jsel" id="j-social"><option value="">—</option><option>None — normal night</option><option>Yes — stayed on schedule</option><option>Yes — stayed up late</option></select></div>
         <div class="jrow"><label>Physical state</label><select class="jsel" id="j-phys"><option value="">—</option><option>Rested</option><option>Energised</option><option>Tired</option><option>Sick</option><option>Sore</option></select></div>
@@ -414,6 +431,26 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="sg"><div class="sgl">Days ±Pace</div><div class="sgv" id="rPace">—</div></div>
       </div>
       <div class="fc-note" style="padding:0 4px 8px;">Win Rate, Avg Ticks, Total Trades, and P&amp;L are computed automatically from your Log entries — no manual entry needed. Log a day to update these.</div>
+
+      <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Variable Gauges — Since Earliest Data</div>
+      <div id="gauge-wrap" style="padding-top:8px;"></div>
+
+      <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Real Equity — All Time</div>
+      <div class="chart-panel" style="margin:8px 0;">
+        <div class="chart-hd"><span class="chart-lbl">Cumulative P&amp;L (Real)</span><span class="chart-tt" id="real-ct-all"></span></div>
+        <div class="chart-wrap"><canvas class="eqcv" id="real-cv-all"></canvas></div>
+      </div>
+      <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Real Equity — Weekly Rollup</div>
+      <div class="chart-panel" style="margin:8px 0;">
+        <div class="chart-hd"><span class="chart-lbl">P&amp;L by Week</span><span class="chart-tt" id="real-ct-week"></span></div>
+        <div class="chart-wrap"><canvas class="eqcv" id="real-cv-week"></canvas></div>
+      </div>
+      <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Real Equity — Monthly Rollup</div>
+      <div class="chart-panel" style="margin:8px 0;">
+        <div class="chart-hd"><span class="chart-lbl">P&amp;L by Month</span><span class="chart-tt" id="real-ct-month"></span></div>
+        <div class="chart-wrap"><canvas class="eqcv" id="real-cv-month"></canvas></div>
+      </div>
+
       <div class="stats-inp">
         <div class="si"><label>Start Capital $</label><input class="ni" id="rCapS" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
         <div class="si"><label>Current Capital $</label><input class="ni" id="rCapC" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
@@ -729,6 +766,10 @@ function _sim(tab){
   simResults[tab]={rows:[...rows],equity,acct0,c:{...c,effectiveGoal},msp};
   const retPct=(cumPnl/acct0)*100,annPct=day>0?(retPct/day)*252:0;
   const sp=sharpe(pnlArr,acct0);const capped=day>=MAX,calMoT=(day/252)*12;
+  // Max drawdown: largest peak-to-trough drop in cumulative P&L during the run
+  let peak=0,simMDD=0;
+  for(const pt of equity){if(pt.cumPnl>peak)peak=pt.cumPnl;const dd=peak-pt.cumPnl;if(dd>simMDD)simMDD=dd;}
+  const simMDDpct=acct0>0?(simMDD/acct0)*100:0;
   const s=tab===0?'':'_'+tab;
   drawChart(equity,acct0,tab);
   function setEl(id,v,cls){const e=$(id+s);if(!e)return;e.textContent=v;if(cls)e.className='cmv '+cls;}
@@ -736,7 +777,7 @@ function _sim(tab){
   setEl('cm-cap','$'+fmt(acct0+cumPnl),'amb');setEl('cm-caps',pct(retPct)+' total','');
   setEl('cm-ret',pct(retPct),retPct>=0?'go':'stop');setEl('cm-rets',pct(annPct)+' ann.','');
   setEl('cm-ann',pct(annPct)+' p.a.',annPct>=0?'go':'stop');
-  buildDiag(c,cumPnl,day,acct0,capped,retPct,annPct,sp,tab);
+  buildDiag(c,cumPnl,day,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,tab);
   $('tbl-pip').classList.add('on');
   renderTable(tab,rows,acct0,c,msp,capped);
   save();
@@ -803,7 +844,7 @@ function wireChart(cv,tt){
   cv.addEventListener('touchend',()=>{tt.textContent='';_drawChart(cv,cv._cs?.equity,cv._cs?.acct0);});
 }
 
-function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,tab){
+function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,tab){
   const s=tab===0?'':'_'+tab;const box=$('diag'+s);if(!box)return;
   const calMo=(days/252)*12;
   const frTot=c.frDay*days;
@@ -812,28 +853,96 @@ function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,tab){
   const actRR=c.avgL>0?c.avgP/c.avgL:0;
   const mo=c.evNet*21,evTr=c.evDol-c.frTr;
   const dts=c.evNet>0?Math.ceil(c.avgPr/c.evNet):null;const wrOk=c.wr>=minWR;
-  function row(lbl,val,cls,note=''){
-    const vc=cls==='pos'?'dpos':cls==='neg'?'dneg':cls==='neu'?'dneu':'dval';
-    return`<div class="diag-row">${lbl}: <span class="${vc}">${val}</span>${note?` <span class="dnote">${note}</span>`:''}</div>`;
+  const rCapS=+$('rCapS').value||0;
+
+  // ── Real metrics from sessionLog ──
+  const sortedLog=[...sessionLog].sort((a,b)=>a.date.localeCompare(b.date));
+  const hasReal=sortedLog.length>=5;
+  let realEV=null,realMo=null,realRR=null,realWR=null,realBE=null,realWRbuf=null;
+  let realMDD=0,realMDDpct=0,realDTS=null,realTTG=null,realAvgSh=null;
+  let realSharpe=null;
+  if(hasReal){
+    const totTr=sortedLog.reduce((a,e)=>a+e.w+e.l+e.b,0);
+    const totW=sortedLog.reduce((a,e)=>a+e.w,0);
+    const totBE=sortedLog.reduce((a,e)=>a+e.b,0);
+    const totPnl=sortedLog.reduce((a,e)=>a+e.pnl,0);
+    const dy=sortedLog.length;
+    realEV=totPnl/dy;
+    realMo=realEV*21;
+    realWR=totTr>0?totW/totTr:0;
+    realBE=totTr>0?totBE/totTr:0;
+    const twArr=sortedLog.filter(e=>e.tw>0).map(e=>e.tw);
+    const tlArr=sortedLog.filter(e=>e.tl>0).map(e=>e.tl);
+    const avgTW=twArr.length?twArr.reduce((a,b)=>a+b,0)/twArr.length:0;
+    const avgTL=tlArr.length?tlArr.reduce((a,b)=>a+b,0)/tlArr.length:0;
+    realRR=avgTL>0?avgTW/avgTL:null;
+    const realWRbufVal=((realWR-minWR)*100);
+    realWRbuf=realWRbufVal;
+    // Real max drawdown
+    let rPeak=0,rCum=0;
+    for(const e of sortedLog){rCum+=e.pnl;if(rCum>rPeak)rPeak=rCum;const dd=rPeak-rCum;if(dd>realMDD)realMDD=dd;}
+    realMDDpct=rCapS>0?(realMDD/rCapS)*100:0;
+    // Real days/share: avg share price / avg daily PnL (same formula as sim)
+    if(realEV>0)realDTS=Math.ceil(c.avgPr/realEV);
+    // Real time to goal: remaining shares / avg shares added per week (from dShares growth)
+    const shArr=sortedLog.filter(e=>e.sh>0).map(e=>e.sh);
+    if(shArr.length>=2){
+      realAvgSh=shArr[shArr.length-1]; // most recent share count logged
+      const shGrowthPerDay=(shArr[shArr.length-1]-shArr[0])/Math.max(shArr.length-1,1);
+      const remaining=Math.max(0,(c.volCeil>0?Math.min(c.goal,c.volCeil):c.goal)-(realAvgSh||0));
+      if(shGrowthPerDay>0)realTTG=cal((remaining/shGrowthPerDay/252)*12);
+    }
+    // Real Sharpe from daily PnL
+    const pnls=sortedLog.map(e=>e.pnl);
+    realSharpe=sharpe(pnls,rCapS||acct0);
   }
+
+  // ── Row builder: sim value + optional real suffix ──
+  // realVal: the real numeric value to compare | simVal: the sim numeric (for % comparison)
+  // betterDir: 'higher'|'lower' (is higher real better?)
+  function row(lbl,val,cls,note='',realDisplay=null,simNumeric=null,betterDir='higher'){
+    const vc=cls==='pos'?'dpos':cls==='neg'?'dneg':cls==='neu'?'dneu':'dval';
+    let realHtml='';
+    if(realDisplay!==null&&hasReal){
+      let realCls='dneu';
+      if(simNumeric!==null&&simNumeric!==0){
+        const pctDiff=Math.abs((realDisplay._num-simNumeric)/Math.abs(simNumeric))*100;
+        if(pctDiff<=3){realCls='dneu';}
+        else{
+          const realBetter=betterDir==='higher'?(realDisplay._num>simNumeric):(realDisplay._num<simNumeric);
+          realCls=realBetter?'dpos':'dneg';
+        }
+      }
+      realHtml=` <span style="font-size:8px;color:#4d5a6e;margin-left:2px;">real</span> <span class="${realCls}">${realDisplay._str}</span>`;
+    }
+    return`<div class="diag-row">${lbl}: <span class="${vc}">${val}</span>${note?` <span class="dnote">${note}</span>`:''}${realHtml}</div>`;
+  }
+  function rv(num,str){return{_num:num,_str:str};}
+
   const rows=[];
   if(capped||c.evNet<0){
-    rows.push(row('EV/day',sgn(c.evNet),'neg','after all costs'));
+    rows.push(row('EV/day',sgn(c.evNet),'neg','after all costs',hasReal&&realEV!==null?rv(realEV,sgn(realEV)):null,c.evNet,'higher'));
     rows.push(row('Status','TARGET UNREACHABLE','neg','adjust settings'));
   }else{
-    rows.push(row('EV/day',sgn(c.evNet),'pos','net of all costs'));
+    rows.push(row('EV/day',sgn(c.evNet),'pos','net of all costs',hasReal&&realEV!==null?rv(realEV,sgn(realEV)):null,c.evNet,'higher'));
     rows.push(row('EV/trade',evTr>=0?'+$'+fmt(evTr):'−$'+fmt(Math.abs(evTr)),evTr>0?'pos':'neg'));
-    rows.push(row('Monthly est',sgn(mo),mo>0?'pos':'neg'));
-    rows.push(row('Time to goal',cal(calMo),'neu',days.toLocaleString()+' trading days'));
-    rows.push(row('R:R',actRR.toFixed(2)+':1',actRR>=1.5?'pos':actRR>=1?'neu':'neg'));
+    rows.push(row('Monthly est',sgn(mo),mo>0?'pos':'neg',  '',hasReal&&realMo!==null?rv(realMo,sgn(realMo)):null,mo,'higher'));
+    rows.push(row('Time to goal',cal(calMo),'neu',days.toLocaleString()+' trading days',hasReal&&realTTG?rv(0,realTTG):null,null,null));
+    rows.push(row('R:R',actRR.toFixed(2)+':1',actRR>=1.5?'pos':actRR>=1?'neu':'neg','',hasReal&&realRR!==null?rv(realRR,realRR.toFixed(2)+':1'):null,actRR,'higher'));
     rows.push(row('Min WR to BE',(minWR*100).toFixed(1)+'%',wrOk?'pos':'neg'));
-    rows.push(row('WR buffer',+wrB>=0?'+'+wrB+'%':wrB+'%',+wrB>=10?'pos':+wrB>=0?'neu':'neg',+wrB>=10?'solid':'thin'));
+    rows.push(row('WR',         (c.wr*100).toFixed(1)+'%',wrOk?'pos':'neg','',hasReal&&realWR!==null?rv(realWR*100,(realWR*100).toFixed(1)+'%'):null,c.wr*100,'higher'));
+    rows.push(row('BE',         (c.be*100).toFixed(1)+'%','neu','',hasReal&&realBE!==null?rv(realBE*100,(realBE*100).toFixed(1)+'%'):null,c.be*100,'lower'));
+    rows.push(row('WR buffer',+wrB>=0?'+'+wrB+'%':wrB+'%',+wrB>=10?'pos':+wrB>=0?'neu':'neg',+wrB>=10?'solid':'thin',hasReal&&realWRbuf!==null?rv(realWRbuf,(realWRbuf>=0?'+':'')+realWRbuf.toFixed(1)+'%'):null,+wrB,'higher'));
     rows.push(row('Friction/day','$'+fmt(c.frDay),'neu',frPct.toFixed(0)+'% of gross'));
     if(!c.dpct&&frTot>0)rows.push(row('Friction total',sgn(frTot),frPct>40?'neg':'neu'));
-    rows.push(row('Days/share',dts?'~'+dts+'d':'∞',dts&&dts<30?'pos':dts&&dts<100?'neu':'neg'));
+    rows.push(row('Days/share',dts?'~'+dts+'d':'∞',dts&&dts<30?'pos':dts&&dts<100?'neu':'neg','',hasReal&&realDTS?rv(realDTS,'~'+realDTS+'d'):null,dts,'lower'));
     rows.push(row('Swing capture',c.swUtil.toFixed(0)+'%',c.swUtil>=60?'pos':c.swUtil>=35?'neu':'neg'));
-    rows.push(row('Sharpe',sp!==null&&!isNaN(sp)?sharpeStr(sp):'—',sp===null?'neu':sp>=1?'pos':sp>=.5?'neu':'neg'));
-    if(c.volCeil>0)rows.push(row('Volume ceiling','CAPPED at '+c.volCeil.toLocaleString()+' sh','neu','growth stops here'));
+    rows.push(row('Sharpe',sp!==null&&!isNaN(sp)?sharpeStr(sp):'—',sp===null?'neu':sp>=1?'pos':sp>=.5?'neu':'neg','',hasReal&&realSharpe!==null?rv(realSharpe,sharpeStr(realSharpe)):null,sp,'higher'));
+    rows.push(row('Max drawdown','$'+fmt(simMDD)+' ('+simMDDpct.toFixed(1)+'%)',simMDDpct>20?'neg':simMDDpct>10?'neu':'pos','sim',hasReal&&realMDD>0?rv(realMDD,'$'+fmt(realMDD)+(realMDDpct>0?' ('+realMDDpct.toFixed(1)+'%)':'')):null,simMDD,'lower'));
+    if(c.volCeil>0){
+      const avgShDisp=hasReal&&realAvgSh?rv(realAvgSh,realAvgSh.toLocaleString()+' sh'):null;
+      rows.push(row('Volume ceiling','CAPPED at '+c.volCeil.toLocaleString()+' sh','neu','growth stops here',avgShDisp,c.volCeil,'lower'));
+    }
     rows.push(row('Status',wrOk&&c.evNet>0?'PROFITABLE':c.evNet>0?'MARGINAL':'NEGATIVE',wrOk&&c.evNet>0?'pos':c.evNet>0?'neu':'neg'));
   }
   let cls;
@@ -882,7 +991,7 @@ function renderTable(tab,rowsIn,acct0In,cIn,mspIn,cappedIn){
 function exportData(tab){
   const res=simResults[tab];if(!res||!res.rows.length){alert('Run a simulation first.');return;}
   const {rows,acct0,c,msp}=res;const names=['Strat-A','Strat-B','Strat-C'];
-  const L=['AHM v13 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,Trades,Ticks,Day%,P&L,Ret%,Surplus,+Sh,Cumul'];
+  const L=['AHM v17 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,Trades,Ticks,Day%,P&L,Ret%,Surplus,+Sh,Cumul'];
   const show=new Set([0,rows.length-1]);rows.forEach((r,i)=>{if(r.isMilestone||r.day%c.intv===0)show.add(i);});
   for(const idx of [...show].sort((a,b)=>a-b)){const r=rows[idx];const mo=r.cumPnl-((msp||{})[r.mIdx]||0);const dp=r.dayPct!=null?r.dayPct.toFixed(2)+'%':'—';let lbl='';if(r.isMilestone)lbl='Milestone '+r.msVal;else if(r.day===1)lbl='Start';else if(idx===rows.length-1)lbl='Goal';L.push([r.day,cal(r.calMo),mo.toFixed(2),lbl,r.shares,r.outcome,r.numTr||0,r.dayTicks,dp,r.dayPnl.toFixed(2),(r.cumPnl/acct0*100).toFixed(2)+'%',r.surplus.toFixed(2),r.newSh,r.cumPnl.toFixed(2)].join(','));}
   const blob=new Blob([L.join('\n')],{type:'text/csv'});const url=URL.createObjectURL(blob);
@@ -918,9 +1027,12 @@ function bline(){const tT=sessionLog.reduce((a,e)=>a+(e.w+e.l+e.b),0);return{wr:
 function logDay(){
   const w=+$('dWins').value||0,l=+$('dLoss').value||0,b=+$('dBE').value||0;
   if(w+l+b===0){const li=$('log-info');li.textContent='Enter trades first';li.style.color='#f87171';setTimeout(()=>{li.textContent=sessionLog.length+' days logged';li.style.color='';},2000);return;}
-  sessionLog.push({date:new Date().toISOString().slice(0,10),w,l,b,pnl:+$('dPnl').value||0,tw:+$('dTickW').value||0,tl:+$('dTickL').value||0});
+  sessionLog.push({date:new Date().toISOString().slice(0,10),w,l,b,pnl:+$('dPnl').value||0,tw:+$('dTickW').value||0,tl:+$('dTickL').value||0,sh:+$('dShares').value||0,
+    totW:+$('dTotW').value||0,capW:+$('dCapW').value||0,
+    totBE:+$('dTotBE').value||0,capBE:+$('dCapBE').value||0,
+    totL:+$('dTotL').value||0,capL:+$('dCapL').value||0});
   $('log-info').textContent=sessionLog.length+' days logged';
-  ['dWins','dLoss','dBE','dTickW','dTickL','dPnl','dShares'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  ['dWins','dLoss','dBE','dTickW','dTickL','dPnl','dShares','dTotW','dCapW','dTotBE','dCapBE','dTotL','dCapL'].forEach(id=>{const e=$(id);if(e)e.value='';});
   onDaily();onReal();save();
 }
 function clearLog(){if(!sessionLog.length)return;if(!confirm('Clear all session logs?'))return;sessionLog=[];$('log-info').textContent='0 days logged';onDaily();onReal();save();}
@@ -929,10 +1041,29 @@ let journalLog=[];
 function mkScale(id,n){const c=$(id);if(!c)return;c.innerHTML='';for(let i=1;i<=n;i++){const b=document.createElement('button');b.className='scale-btn';b.dataset.v=i;b.textContent=i;b.type='button';b.addEventListener('click',()=>{c.querySelectorAll('.scale-btn').forEach(x=>x.classList.toggle('on',+x.dataset.v<=i));});c.appendChild(b);}}
 function getScale(id){const c=$(id);if(!c)return 0;return[...c.querySelectorAll('.scale-btn.on')].length;}
 function resetScale(id){const c=$(id);if(!c)return;c.querySelectorAll('.scale-btn').forEach(x=>x.classList.remove('on'));}
+
+/* HOUR DROPDOWNS — 24hr options, hour-only granularity */
+const HOUR_LABELS=['12 AM','1 AM','2 AM','3 AM','4 AM','5 AM','6 AM','7 AM','8 AM','9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM','4 PM','5 PM','6 PM','7 PM','8 PM','9 PM','10 PM','11 PM'];
+function populateHourSelect(id){
+  const el=$(id);if(!el)return;
+  el.innerHTML='<option value="">—</option>'+HOUR_LABELS.map((lbl,h)=>`<option value="${h}">${lbl}</option>`).join('');
+}
+function sleepHoursFromTimes(sleptH,wokeH){
+  if(sleptH===''||wokeH===''||sleptH==null||wokeH==null)return 0;
+  const s=+sleptH,w=+wokeH;
+  if(isNaN(s)||isNaN(w))return 0;
+  let diff=w-s;
+  if(diff<=0)diff+=24; // overnight wraparound
+  return diff;
+}
+
 function saveJournal(){
   const entry={
     date:new Date().toISOString().slice(0,10),ts:Date.now(),
-    sleep:parseFloat($('j-sleep').value)||0,sleepQ:getScale('jsc-sleepq'),
+    timeSlept:$('j-timeslept').value,timeWoke:$('j-timewoke').value,
+    sleep:sleepHoursFromTimes($('j-timeslept').value,$('j-timewoke').value),
+    preSleepEmo:$('j-presleep-emo').value,
+    sleepQ:getScale('jsc-sleepq'),
     social:$('j-social').value,
     stress:getScale('jsc-stress'),fatigue:getScale('jsc-fatigue'),conf:getScale('jsc-conf'),
     rules:getScale('jsc-rules'),diet:getScale('jsc-diet'),hydration:getScale('jsc-hydration'),
@@ -948,9 +1079,9 @@ function saveJournal(){
   const idx=journalLog.findIndex(e=>e.date===entry.date);
   if(idx>=0)journalLog[idx]=entry;else journalLog.unshift(entry);
   renderJournal();
-  $('j-sleep').value='';$('j-note').value='';$('j-focus').value='';$('j-bestop').value='';
+  $('j-timeslept').value='';$('j-timewoke').value='';$('j-note').value='';$('j-focus').value='';$('j-bestop').value='';
   $('j-location').value='';$('j-ticker').value='';$('j-software').value='';
-  ['j-phys','j-emo','j-exercise','j-prep','j-social','j-sick','j-temp','j-conflict','j-news','j-fajr','j-dhuhr','j-asr','j-maghreb','j-isha','j-sunnah','j-qiyam','j-dhikr','j-balance','j-control','j-behavior','j-newsday','j-orderflow','j-daygrade','j-marketfav'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  ['j-phys','j-emo','j-exercise','j-prep','j-social','j-sick','j-temp','j-conflict','j-news','j-fajr','j-dhuhr','j-asr','j-maghreb','j-isha','j-sunnah','j-qiyam','j-dhikr','j-balance','j-control','j-behavior','j-newsday','j-orderflow','j-daygrade','j-marketfav','j-presleep-emo'].forEach(id=>{const e=$(id);if(e)e.value='';});
   ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet','jsc-hydration'].forEach(resetScale);
   const btn=document.querySelector('.j-save-btn');if(btn){btn.textContent='Saved';setTimeout(()=>btn.textContent='Save Entry',1500);}
   save();
@@ -986,7 +1117,8 @@ function renderJournal(){
       const onTimeCt=prayers.filter(p=>p==='On Time').length;
       const prayerSummary=prayers.length?`${onTimeCt}/${prayers.length} on time`:'';
       return `<div class="jentry"><div class="jentry-date">${e.date}${e.daygrade?` · Grade ${e.daygrade}`:''}</div><div class="jentry-grid">
-      ${e.sleep?`<div class="jentry-cell"><span class="jk">Sleep</span>${e.sleep}h · Q${e.sleepQ||'—'}</div>`:''}
+      ${e.sleep?`<div class="jentry-cell"><span class="jk">Sleep</span>${e.sleep}h${e.timeSlept!==''&&e.timeWoke!==''?` (${HOUR_LABELS[e.timeSlept]}–${HOUR_LABELS[e.timeWoke]})`:''} · Q${e.sleepQ||'—'}</div>`:''}
+      ${e.preSleepEmo?`<div class="jentry-cell"><span class="jk">Pre-Sleep</span>${e.preSleepEmo}</div>`:''}
       ${e.social&&e.social!=='None — normal night'?`<div class="jentry-cell"><span class="jk">Social</span>${e.social}</div>`:''}
       ${e.stress?`<div class="jentry-cell"><span class="jk">Stress</span><span style="font-size:8px;letter-spacing:1px">${lvl(e.stress)}</span></div>`:''}
       ${e.fatigue?`<div class="jentry-cell"><span class="jk">Fatigue</span><span style="font-size:8px;letter-spacing:1px">${lvl(e.fatigue)}</span></div>`:''}
@@ -1009,7 +1141,207 @@ function renderJournal(){
     }).join('');
 }
 
+/* ════════════════════════════════════════════════════════════
+   CORRELATION GAUGE ENGINE
+   Recency-weighted Pearson correlation between journal variables
+   and trading outcome (daily P&L, normalized). No assumed direction.
+   Gauges render only when there's a meaningful, sufficiently-sized signal.
+   ════════════════════════════════════════════════════════════ */
+
+// Registry: how to extract a numeric value from a journal entry for each trackable variable.
+// Categorical fields are mapped to an ordinal scale so correlation math can run on them.
+const GAUGE_VARS=[
+  {key:'sleep',label:'Sleep Duration',unit:'h',extract:e=>e.sleep>0?e.sleep:null},
+  {key:'sleepQ',label:'Sleep Quality',unit:'/5',extract:e=>e.sleepQ>0?e.sleepQ:null},
+  {key:'stress',label:'Stress Level',unit:'/5',extract:e=>e.stress>0?e.stress:null},
+  {key:'fatigue',label:'Mental Fatigue',unit:'/5',extract:e=>e.fatigue>0?e.fatigue:null},
+  {key:'conf',label:'Confidence',unit:'/5',extract:e=>e.conf>0?e.conf:null},
+  {key:'diet',label:'Diet Quality',unit:'/5',extract:e=>e.diet>0?e.diet:null},
+  {key:'hydration',label:'Hydration',unit:'/5',extract:e=>e.hydration>0?e.hydration:null},
+  {key:'rules',label:'Rule Breaks',unit:'',extract:e=>e.rules!==undefined&&e.rules!==null?e.rules:null},
+  {key:'social',label:'Social Night Before',unit:'',extract:e=>{
+    if(!e.social)return null;
+    if(e.social==='None — normal night')return 0;
+    if(e.social==='Yes — stayed on schedule')return 1;
+    if(e.social==='Yes — stayed up late')return 2;
+    return null;
+  }},
+  {key:'prep',label:'Pre-Market Prep',unit:'',extract:e=>{
+    if(!e.prep)return null;
+    return{'None':0,'Brief':1,'Thorough':2}[e.prep]??null;
+  }},
+  {key:'exercise',label:'Exercise',unit:'',extract:e=>{
+    if(!e.exercise)return null;
+    return{'None':0,'Light walk':1,'Moderate':2,'Intense':3}[e.exercise]??null;
+  }},
+  {key:'prayerOnTime',label:'Prayer On-Time Rate',unit:'%',extract:e=>{
+    const ps=[e.fajr,e.dhuhr,e.asr,e.maghreb,e.isha].filter(Boolean);
+    if(!ps.length)return null;
+    const score=ps.reduce((a,p)=>a+(p==='On Time'?1:p==='Late'?0.5:0),0);
+    return (score/ps.length)*100;
+  }},
+  {key:'qiyam',label:'Qiyam al-Layl',unit:'',extract:e=>e.qiyam?(e.qiyam==='Yes'?1:0):null},
+  {key:'dhikr',label:'Dhikr',unit:'',extract:e=>e.dhikr?(e.dhikr==='Yes'?1:0):null},
+  {key:'sh',label:'Position Size',unit:' sh',extract:e=>e.sh>0?e.sh:null},
+];
+
+const GAUGE_HALF_LIFE_DAYS=21; // weight halves every 21 days — tunable recency decay
+const GAUGE_MIN_WEIGHTED_N=8; // minimum effective sample size before a gauge can show
+const GAUGE_MIN_ABS_R=0.25;   // minimum |correlation| before a gauge can show
+
+function daysAgo(dateStr){
+  const d=new Date(dateStr+'T00:00:00');
+  const now=new Date();now.setHours(0,0,0,0);
+  return Math.max(0,Math.round((now-d)/86400000));
+}
+function recencyWeight(dateStr){
+  return Math.pow(0.5,daysAgo(dateStr)/GAUGE_HALF_LIFE_DAYS);
+}
+
+// Weighted Pearson correlation between paired (value, outcome) samples with weights.
+function weightedCorrelation(pairs){
+  // pairs: [{x, y, w}]
+  const W=pairs.reduce((a,p)=>a+p.w,0);
+  if(W<=0)return{r:0,n:0};
+  const mx=pairs.reduce((a,p)=>a+p.w*p.x,0)/W;
+  const my=pairs.reduce((a,p)=>a+p.w*p.y,0)/W;
+  let sxy=0,sxx=0,syy=0;
+  for(const p of pairs){
+    const dx=p.x-mx,dy=p.y-my;
+    sxy+=p.w*dx*dy;sxx+=p.w*dx*dx;syy+=p.w*dy*dy;
+  }
+  if(sxx<=0||syy<=0)return{r:0,n:W};
+  const r=sxy/Math.sqrt(sxx*syy);
+  return{r,n:W};
+}
+
+// Build (value, outcome, weight) triples for one variable across all journal+session days.
+function buildGaugeSamples(varDef){
+  const pairs=[];
+  for(const j of journalLog){
+    const val=varDef.extract(j);
+    if(val===null||val===undefined||isNaN(val))continue;
+    const sess=sessionLog.find(s=>s.date===j.date);
+    if(!sess)continue; // need a trading outcome for that same day
+    const tot=sess.w+sess.l+sess.b;
+    if(tot<=0)continue;
+    // Outcome proxy: net P&L for the day. Using raw pnl keeps it in real units;
+    // sign and relative magnitude are what matter for correlation direction/strength.
+    const outcome=sess.pnl;
+    const w=recencyWeight(j.date);
+    pairs.push({x:val,y:outcome,w});
+  }
+  return pairs;
+}
+
+function weightedAvg(items,getVal,getWeight){
+  const W=items.reduce((a,i)=>a+getWeight(i),0);
+  if(W<=0)return null;
+  return items.reduce((a,i)=>a+getWeight(i)*getVal(i),0)/W;
+}
+
+function computeGauge(varDef){
+  const pairs=buildGaugeSamples(varDef);
+  const {r,n}=weightedCorrelation(pairs);
+  if(n<GAUGE_MIN_WEIGHTED_N||Math.abs(r)<GAUGE_MIN_ABS_R||pairs.length<5){
+    return{show:false};
+  }
+  // All-time weighted average of the variable's value
+  const allTimeAvg=weightedAvg(pairs,p=>p.x,p=>p.w);
+  // This week's average (last 7 calendar days) of the variable's value
+  const thisWeek=journalLog.filter(j=>daysAgo(j.date)<7);
+  const weekVals=thisWeek.map(j=>varDef.extract(j)).filter(v=>v!==null&&v!==undefined&&!isNaN(v));
+  if(!weekVals.length)return{show:false,noRecent:true,r,n};
+  const weekAvg=weekVals.reduce((a,b)=>a+b,0)/weekVals.length;
+  const deviation=weekAvg-allTimeAvg;
+  if(Math.abs(deviation)<1e-9)return{show:false};
+  // direction: does higher value correlate with better (positive) outcome?
+  const higherIsBetter=r>0;
+  const deviationIsUp=deviation>0;
+  const isGood=(deviationIsUp&&higherIsBetter)||(!deviationIsUp&&!higherIsBetter);
+  return{show:true,r,n,allTimeAvg,weekAvg,deviation,isGood,higherIsBetter};
+}
+
+function renderGauges(){
+  const wrap=$('gauge-wrap');if(!wrap)return;
+  if(sessionLog.length<5||journalLog.length<5){
+    wrap.innerHTML='<div class="fc-note" style="padding:8px 4px;">Gauges unlock once you have at least 5 days of combined Log + Journal entries. Keep logging — patterns will appear here as they emerge.</div>';
+    return;
+  }
+  const results=GAUGE_VARS.map(v=>({v,g:computeGauge(v)})).filter(r=>r.g.show);
+  if(!results.length){
+    wrap.innerHTML='<div class="fc-note" style="padding:8px 4px;">No strong, reliable associations yet between your logged variables and trading outcome. This is normal — gauges will appear as patterns become statistically clear, and may never appear for variables that genuinely do not matter for you.</div>';
+    return;
+  }
+  // Sort strongest signal first
+  results.sort((a,b)=>Math.abs(b.g.r)-Math.abs(a.g.r));
+  wrap.innerHTML=results.map(({v,g})=>{
+    const maxDev=Math.max(Math.abs(g.deviation),0.0001);
+    const scale=g.allTimeAvg?Math.abs(g.deviation/Math.max(Math.abs(g.allTimeAvg),0.5)):0.5;
+    const pct=Math.min(50,Math.max(6,scale*50));
+    const isRight=g.deviation>0;
+    const color=g.isGood?'#34d399':'#f87171';
+    const dirNote=g.higherIsBetter?'more historically → better':'less historically → better';
+    return `<div class="gauge-row">
+      <div class="gauge-lbl"><span>${v.label}</span><span class="gauge-r" style="color:${color}">${g.isGood?'GOOD':'WATCH'}</span></div>
+      <div class="gauge-track">
+        <div class="gauge-zero"></div>
+        ${isRight?`<div class="gauge-bar" style="left:50%;width:${pct}%;background:${color};"></div>`:`<div class="gauge-bar" style="right:50%;width:${pct}%;background:${color};"></div>`}
+      </div>
+      <div class="gauge-sub">This week ${v.unit==='%'?g.weekAvg.toFixed(0)+'%':g.weekAvg.toFixed(1)+v.unit} vs avg ${v.unit==='%'?g.allTimeAvg.toFixed(0)+'%':g.allTimeAvg.toFixed(1)+v.unit} · r=${g.r.toFixed(2)} · ${dirNote}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderEquityCurves(){
+  if(!sessionLog.length){
+    ['real-cv-all','real-cv-week','real-cv-month'].forEach(id=>{
+      const cv=$(id);if(cv&&cv.getContext){const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);}
+    });
+    return;
+  }
+  const sorted=[...sessionLog].sort((a,b)=>a.date.localeCompare(b.date));
+
+  // ALL-TIME: cumulative P&L per logged day, in chronological order
+  let cum=0;
+  const allEquity=sorted.map((e,i)=>{cum+=e.pnl;return{day:i+1,cumPnl:cum};});
+  const cvAll=$('real-cv-all');
+  if(cvAll)_drawChart(cvAll,allEquity,0);
+  const ttAll=$('real-ct-all');if(ttAll)ttAll.textContent=sorted.length+' days · '+sgn(cum)+' total';
+
+  // WEEKLY ROLLUP: sum P&L per ISO week, plotted as cumulative across weeks
+  const weekMap={};
+  for(const e of sorted){
+    const d=new Date(e.date+'T00:00:00');
+    const onejan=new Date(d.getFullYear(),0,1);
+    const week=Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7);
+    const wk=d.getFullYear()+'-W'+String(week).padStart(2,'0');
+    weekMap[wk]=(weekMap[wk]||0)+e.pnl;
+  }
+  const weekKeys=Object.keys(weekMap).sort();
+  let wcum=0;
+  const weekEquity=weekKeys.map((k,i)=>{wcum+=weekMap[k];return{day:i+1,cumPnl:wcum};});
+  const cvWeek=$('real-cv-week');
+  if(cvWeek)_drawChart(cvWeek,weekEquity,0);
+  const ttWeek=$('real-ct-week');if(ttWeek)ttWeek.textContent=weekKeys.length+' weeks · '+sgn(wcum)+' total';
+
+  // MONTHLY ROLLUP: sum P&L per calendar month, plotted as cumulative across months
+  const monMap={};
+  for(const e of sorted){
+    const mk=e.date.slice(0,7); // YYYY-MM
+    monMap[mk]=(monMap[mk]||0)+e.pnl;
+  }
+  const monKeys=Object.keys(monMap).sort();
+  let mcum=0;
+  const monEquity=monKeys.map((k,i)=>{mcum+=monMap[k];return{day:i+1,cumPnl:mcum};});
+  const cvMon=$('real-cv-month');
+  if(cvMon)_drawChart(cvMon,monEquity,0);
+  const ttMon=$('real-ct-month');if(ttMon)ttMon.textContent=monKeys.length+' months · '+sgn(mcum)+' total';
+}
+
 function onReal(){
+  renderGauges();
+  renderEquityCurves();
   const cs=+$('rCapS').value||0,cc=+$('rCapC').value||0;
   if(!sessionLog.length){
     ['rTrades','rDays','rWR','rBE','rLoss','rAvgT','rTickW','rTickL','rRR','rPnlTotal','rDayPnl'].forEach(id=>{const e=$(id);if(e)e.textContent='—';});
@@ -1060,7 +1392,8 @@ function exportLogCSV(){
   const sessByDate={};sessionLog.forEach(e=>sessByDate[e.date]=e);
   const jByDate={};journalLog.forEach(e=>jByDate[e.date]=e);
   const headers=['Date','Wins','Losses','Breakevens','AvgWinTicks','AvgLossTicks','PnL',
-    'SleepHrs','SleepQ','SocialNightBefore','Physical','Sick','Hydration','Temp','Diet','Exercise',
+    'ProfitableCount','ProfitableCapture%','BreakevenCount','BreakevenCapture%','LoserCount','LoserCapture%',
+    'TimeSlept','TimeWoke','PreSleepEmotion','SleepHrs','SleepQ','SocialNightBefore','Physical','Sick','Hydration','Temp','Diet','Exercise',
     'Stress','Fatigue','Confidence','Emotion','Conflict','News',
     'Fajr','Dhuhr','Asr','Maghreb','Isha','Sunnah','Qiyam','Dhikr',
     'Balance','Control','Behavior','NewsDay','Location','Ticker','Software','OrderFlow',
@@ -1069,8 +1402,11 @@ function exportLogCSV(){
   for(const d of dates){
     const s=sessByDate[d]||{},j=jByDate[d]||{};
     const esc=v=>{if(v===undefined||v===null)return'';const str=String(v).replace(/"/g,'""');return str.includes(',')||str.includes('\n')?`"${str}"`:str;};
+    const tSlept=j.timeSlept!==undefined&&j.timeSlept!==''?HOUR_LABELS[j.timeSlept]:'';
+    const tWoke=j.timeWoke!==undefined&&j.timeWoke!==''?HOUR_LABELS[j.timeWoke]:'';
     rows.push([d,s.w||'',s.l||'',s.b||'',s.tw||'',s.tl||'',s.pnl||'',
-      j.sleep||'',j.sleepQ||'',esc(j.social),esc(j.phys),esc(j.sick),j.hydration||'',esc(j.temp),j.diet||'',esc(j.exercise),
+      s.totW||'',s.capW||'',s.totBE||'',s.capBE||'',s.totL||'',s.capL||'',
+      esc(tSlept),esc(tWoke),esc(j.preSleepEmo),j.sleep||'',j.sleepQ||'',esc(j.social),esc(j.phys),esc(j.sick),j.hydration||'',esc(j.temp),j.diet||'',esc(j.exercise),
       j.stress||'',j.fatigue||'',j.conf||'',esc(j.emo),esc(j.conflict),esc(j.news),
       esc(j.fajr),esc(j.dhuhr),esc(j.asr),esc(j.maghreb),esc(j.isha),esc(j.sunnah),esc(j.qiyam),esc(j.dhikr),
       esc(j.balance),esc(j.control),esc(j.behavior),esc(j.newsday),esc(j.location),esc(j.ticker),esc(j.software),esc(j.orderflow),
@@ -1208,9 +1544,10 @@ function wirePanes(){
     el.querySelectorAll('.stp-btn').forEach(b=>b.addEventListener('pointerup',()=>setTimeout(()=>renderTable(activeTblStrat),60)));
   }
   ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet','jsc-hydration'].forEach(id=>mkScale(id,5));
+  populateHourSelect('j-timeslept');populateHourSelect('j-timewoke');
 }
 
-const SK='ahm-v13';
+const SK='ahm-v17';
 function getStpIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;SDEFS.forEach(([id])=>ids.push(id+s));});return ids;}
 const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-fees','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo','tog-swing','tog-dist','tog-startcap','tog-volceil'];
 function getTogIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;TOG_BASE.forEach(id=>ids.push(id+s));});return ids;}
@@ -1250,6 +1587,9 @@ async function init(){
   buildPanes();wirePanes();
   const loaded=await load();
   [0,1,2].forEach(n=>{updateDist(n);updateFrictionBreakdown(n);});
+  const allCv=$('real-cv-all'),allTt=$('real-ct-all');if(allCv&&allTt)wireChart(allCv,allTt);
+  const wkCv=$('real-cv-week'),wkTt=$('real-ct-week');if(wkCv&&wkTt)wireChart(wkCv,wkTt);
+  const moCv=$('real-cv-month'),moTt=$('real-ct-month');if(moCv&&moTt)wireChart(moCv,moTt);
   onReal();
   if(loaded){if(sessionLog.length)$('log-info').textContent=sessionLog.length+' days logged';if(journalLog.length)renderJournal();}
 }
