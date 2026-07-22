@@ -38,6 +38,8 @@ html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mon
 .sbar{display:flex;border-bottom:1px solid #252d3d;background:#131720;}
 .sbtn{flex:1;height:34px;background:none;border:none;border-bottom:1px solid transparent;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#4d5a6e;cursor:pointer;transition:color .12s,border-color .12s;}
 .sbtn.on{color:#34d399;border-color:#34d399;}
+.sbtn.on.sc-b{color:#f87171;border-color:#f87171;}
+.sbtn.on.sc-c{color:#fbbf24;border-color:#fbbf24;}
 .dgrp{border-bottom:1px solid #252d3d;}
 .dgrp-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;user-select:none;background:#131720;transition:background .08s;}
 .dgrp-hd:active{background:#1a2030;}
@@ -81,8 +83,10 @@ html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mon
 .dist-labels{display:flex;justify-content:space-between;margin-top:5px;}
 .dist-labels span{font-size:8px;}
 .sim-row{padding:9px 16px;border-bottom:1px solid #252d3d;display:flex;gap:7px;}
-.sim-btn{flex:1;height:42px;background:transparent;color:#34d399;font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:10px;letter-spacing:.2em;text-transform:uppercase;border:1px solid #34d399;cursor:pointer;border-radius:3px;touch-action:manipulation;transition:background .1s;}
-.sim-btn:active{background:rgba(52,211,153,.08);}
+.sim-btn{flex:1;height:48px;background:#34d399;color:#0d0f12;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.15em;text-transform:uppercase;border:none;cursor:pointer;border-radius:3px;touch-action:manipulation;transition:opacity .1s;}
+.sim-btn:active{opacity:.82;}
+.sim-btn.sc-b{background:#f87171;color:#0d0f12;}
+.sim-btn.sc-c{background:#fbbf24;color:#0d0f12;}
 .exp-btn{height:42px;padding:0 12px;background:transparent;border:1px solid #252d3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;touch-action:manipulation;}
 .exp-btn:active{border-color:#60a5fa;color:#60a5fa;}
 .mode-row{padding:5px 16px 7px;border-bottom:1px solid #252d3d;display:flex;align-items:center;gap:8px;background:#131720;}
@@ -225,6 +229,16 @@ canvas.spark{width:100%;height:34px;display:block;}
 .sgl{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
 .sgv{font-size:13px;font-weight:600;color:#e2e6ed;}
 .gauge-row{background:#131720;border:1px solid #252d3d;border-radius:3px;padding:8px 10px;margin-bottom:6px;}
+.wrc{background:#131720;border:1px solid #252d3d;border-radius:3px;overflow:hidden;margin-bottom:5px;}
+.wrc-hd{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #252d3d;background:#1a2030;}
+.wrc-title{font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#e2e6ed;}
+.wrc-grade{font-family:'Cabinet Grotesk',sans-serif;font-size:24px;font-weight:800;line-height:1;}
+.wrc-body{padding:8px 12px;}
+.wrc-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #1e2535;font-size:10px;}
+.wrc-row:last-child{border:none;}
+.wrc-lbl{color:#8892a4;}
+.wrc-val{font-weight:600;}
+.wrc-insight{font-size:9px;color:#4d5a6e;margin-top:6px;line-height:1.6;border-top:1px solid #252d3d;padding-top:6px;}
 .gauge-lbl{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .gauge-lbl span:first-child{font-size:10px;color:#8892a4;font-weight:500;}
 .gauge-r{font-size:8px;font-weight:700;letter-spacing:.08em;}
@@ -262,7 +276,7 @@ canvas.spark{width:100%;height:34px;display:block;}
 <div class="topbar">
   <div class="brand">
     <span class="brand-name">Anti-Hope Machine</span>
-    <span class="brand-ver">v17</span>
+    <span class="brand-ver">v18</span>
   </div>
   <div class="top-r">
     <button class="guide-btn" onclick="openGuide()">Guide</button>
@@ -274,9 +288,9 @@ canvas.spark{width:100%;height:34px;display:block;}
 
   <div class="screen active" id="scr-sim">
     <div class="sbar">
-      <button class="sbtn on" id="stb0" onclick="switchStrat(0)">Strat A</button>
-      <button class="sbtn" id="stb1" onclick="switchStrat(1)">Strat B</button>
-      <button class="sbtn" id="stb2" onclick="switchStrat(2)">Strat C</button>
+      <button class="sbtn on" id="stb0" onclick="switchStrat(0)">A</button>
+      <button class="sbtn sc-b" id="stb1" onclick="switchStrat(1)">B</button>
+      <button class="sbtn sc-c" id="stb2" onclick="switchStrat(2)">C</button>
     </div>
     <div id="sp0"></div>
     <div id="sp1" style="display:none;"></div>
@@ -285,9 +299,9 @@ canvas.spark{width:100%;height:34px;display:block;}
 
   <div class="screen" id="scr-tbl">
     <div class="sbar">
-      <button class="sbtn on" id="tsb0" onclick="switchTblStrat(0)">Strat A</button>
-      <button class="sbtn" id="tsb1" onclick="switchTblStrat(1)">Strat B</button>
-      <button class="sbtn" id="tsb2" onclick="switchTblStrat(2)">Strat C</button>
+      <button class="sbtn on" id="tsb0" onclick="switchTblStrat(0)">A</button>
+      <button class="sbtn sc-b" id="tsb1" onclick="switchTblStrat(1)">B</button>
+      <button class="sbtn sc-c" id="tsb2" onclick="switchTblStrat(2)">C</button>
     </div>
     <div class="tbl-controls">
       <span class="tc-lbl">Every</span>
@@ -416,21 +430,35 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="vs-hd"><span class="vs-title">Real vs Sim</span><span class="vs-badge nosim" id="vs-badge">No Sim</span></div>
         <div class="vs-rows" id="vs-rows"><div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run a simulation first.</div></div>
       </div>
-      <div class="stats-grid">
-        <div class="sg"><div class="sgl">Total Trades</div><div class="sgv" id="rTrades">—</div></div>
-        <div class="sg"><div class="sgl">Trading Days</div><div class="sgv" id="rDays">—</div></div>
-        <div class="sg"><div class="sgl">Win Rate %</div><div class="sgv" id="rWR" style="color:#34d399">—</div></div>
-        <div class="sg"><div class="sgl">Breakeven %</div><div class="sgv" id="rBE" style="color:#60a5fa">—</div></div>
+
+      <div class="vs-card" id="strat-cmp-card">
+        <div class="vs-hd"><span class="vs-title">Strategy Comparison</span><span class="vs-badge nosim" id="strat-cmp-badge">No Sims Run</span></div>
+        <div id="strat-cmp-body" style="padding:4px 12px 8px;"><div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run simulations on 2 or more strategies to compare.</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;padding:0 2px;">
+        <span style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;">Real Trading Data</span>
+        <button onclick="resetRealStats()" style="background:transparent;border:1px solid #252d3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:8px;padding:2px 8px;border-radius:2px;cursor:pointer;letter-spacing:.08em;">↺ Auto-fill from Log</button>
+      </div>
+      <div class="stats-inp">
+        <div class="si"><label>Total Trades</label><input class="ni" id="rTrades" type="number" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+        <div class="si"><label>Trading Days</label><input class="ni" id="rDays" type="number" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+        <div class="si"><label>Win Rate %</label><input class="ni" id="rWR" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+        <div class="si"><label>Breakeven %</label><input class="ni" id="rBE" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+        <div class="si"><label>Avg Win Ticks</label><input class="ni" id="rTickW" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+        <div class="si"><label>Avg Loss Ticks</label><input class="ni" id="rTickL" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+        <div class="si"><label>Total P&amp;L $</label><input class="ni" id="rPnlTotal" type="number" step="0.01" placeholder="—" oninput="onReal()" style="width:88px;"></div>
+        <div class="si"><label>Avg Daily P&amp;L $</label><input class="ni" id="rDayPnl" type="number" step="0.01" placeholder="—" oninput="onReal()" style="width:88px;"></div>
+      </div>
+      <div class="stats-grid" style="margin-top:2px;">
         <div class="sg"><div class="sgl">Loss Rate</div><div class="sgv" id="rLoss" style="color:#f87171">—</div></div>
         <div class="sg"><div class="sgl">Avg T/Day</div><div class="sgv" id="rAvgT" style="color:#fbbf24">—</div></div>
-        <div class="sg"><div class="sgl">Avg Win Ticks</div><div class="sgv" id="rTickW">—</div></div>
-        <div class="sg"><div class="sgl">Avg Loss Ticks</div><div class="sgv" id="rTickL">—</div></div>
         <div class="sg"><div class="sgl">R:R Ratio</div><div class="sgv" id="rRR" style="color:#34d399">—</div></div>
-        <div class="sg"><div class="sgl">Total P&L</div><div class="sgv" id="rPnlTotal">—</div></div>
-        <div class="sg"><div class="sgl">Avg Daily P&L</div><div class="sgv" id="rDayPnl">—</div></div>
         <div class="sg"><div class="sgl">Days ±Pace</div><div class="sgv" id="rPace">—</div></div>
       </div>
-      <div class="fc-note" style="padding:0 4px 8px;">Win Rate, Avg Ticks, Total Trades, and P&amp;L are computed automatically from your Log entries — no manual entry needed. Log a day to update these.</div>
+      <div class="fc-note" style="padding:0 4px 8px;">Fields auto-fill from your Log. Edit any value to override. Hit ↺ to revert to auto-computed.</div>
+
+      <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Weekly Report Card</div>
+      <div id="weekly-report" style="padding-top:8px;margin-bottom:4px;"></div>
 
       <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Variable Gauges — Since Earliest Data</div>
       <div id="gauge-wrap" style="padding-top:8px;"></div>
@@ -592,7 +620,11 @@ let activeStrat=0,activeTblStrat=0;
 const simResults=[null,null,null];
 function switchStrat(n){
   activeStrat=n;
-  [0,1,2].forEach(i=>{$('stb'+i).classList.toggle('on',i===n);$('sp'+i).style.display=i===n?'block':'none';});
+  [0,1,2].forEach(i=>{
+    const b=$('stb'+i);if(!b)return;
+    b.classList.toggle('on',i===n);
+    $('sp'+i).style.display=i===n?'block':'none';
+  });
   updateDist(n);
 }
 function switchTblStrat(n){activeTblStrat=n;[0,1,2].forEach(i=>$('tsb'+i).classList.toggle('on',i===n));renderTable(n);}
@@ -677,7 +709,9 @@ function cfg(tab){
   const effWR=wr*(1-pbKill),effLoss=loss+wr*pbKill;
   const evTick=effWR*effTgt-effLoss*avgL;
   const evDol=evTick*c.tick*c.sh,evGross=evDol*avgT;
-  const evNet=c.dpct?(c.minDp+c.maxDp)/2/100*acct0:evGross-frDay;
+  // In dpct mode: EV is based on deployed capital (shares × avgPr), not total equity
+  const deployedCapAvg=c.sh*avgPr;
+  const evNet=c.dpct?(c.minDp+c.maxDp)/2/100*deployedCapAvg:evGross-frDay;
   const avgSw=(c.minSw+c.maxSw)/2,swUtil=avgSw>0?Math.min(100,(effTgt/avgSw)*100):0;
   return{...c,wr,be,loss,avgP,avgL,avgT,avgPr,acct0,frTr,frDay,effTgt,pbKill,effWR,effLoss,evTick,evDol,evGross,evNet,avgSw,swUtil,commCost,exCost};
 }
@@ -712,7 +746,7 @@ function updateFrictionBreakdown(tab){
 function simulate(tab){try{_sim(tab);}catch(e){console.error(e);}}
 
 function _sim(tab){
-  const c=cfg(tab);const MAX=5000,HOR=365;
+  const c=cfg(tab);const MAX=10000,HOR=365;
   const acct0=c.startCap>0?c.startCap:c.sh*c.avgPr;
   let shares=c.sh,surplus=0,cumPnl=0,day=0;
   const rows=[],pnlArr=[],equity=[];
@@ -733,10 +767,14 @@ function _sim(tab){
     const frTr=commissionForShares(shares)+exCost+(c.slip*c.tick*shares*2)+(c.spread*c.tick*shares);
     const effWR=Math.random()>c.disc?wr*.7:wr;const effBE=Math.random()>c.disc?be*.7:be;
     let dayPnl=0,dayTicks=0,numTr=0,dayPct=null,isBlowup=false,isGood=false;
-    if(c.dpct){const pv=rf(c.minDp,c.maxDp);dayPct=pv;dayPnl=(acct0+cumPnl)*(pv/100);numTr=0;}
+    // deployedCap: capital actually at work through shares today — P&L can only be
+    // generated by shares held, not by idle surplus sitting in cash waiting for the
+    // next share purchase threshold. This is the correct base for all % calculations.
+    const deployedCap=shares*dayPr;
+    if(c.dpct){const pv=rf(c.minDp,c.maxDp);dayPct=pv;dayPnl=deployedCap*(pv/100);numTr=0;}
     else{
       isBlowup=c.bf>0&&Math.random()<c.bf;isGood=!isBlowup&&c.gf>0&&Math.random()<c.gf;
-      if(isBlowup)dayPnl-=acct0*c.bs;if(isGood)dayPnl+=acct0*c.gs_;
+      if(isBlowup)dayPnl-=deployedCap*c.bs;if(isGood)dayPnl+=deployedCap*c.gs_;
       numTr=c.mode==='rand'?ri(c.minT,c.maxT):Math.round(c.avgT);
       let lossT=0;
       for(let i=0;i<numTr;i++){
@@ -780,6 +818,7 @@ function _sim(tab){
   buildDiag(c,cumPnl,day,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,tab);
   $('tbl-pip').classList.add('on');
   renderTable(tab,rows,acct0,c,msp,capped);
+  renderStratComparison();
   save();
 }
 
@@ -985,13 +1024,13 @@ function renderTable(tab,rowsIn,acct0In,cIn,mspIn,cappedIn){
     tr.innerHTML=`<td>${r.day}</td><td>${cal(r.calMo)}</td><td style="color:${moPnl>=0?'#34d399':'#f87171'}">${(moPnl>=0?'+$':'−$')+fmt(Math.abs(moPnl))}</td><td>${label}</td><td style="color:#fbbf24;font-weight:600">${r.shares.toLocaleString()}</td><td style="color:${oC};font-size:9px">${r.outcome}</td><td style="font-size:9px;color:#8892a4">${r.numTr||'—'}</td><td style="color:${r.dayTicks>0?'#34d399':r.dayTicks<0?'#f87171':'#4d5a6e'}">${r.dayTicks!==0?(r.dayTicks>0?'+':'')+r.dayTicks+'t':'—'}</td><td style="color:${dpC};font-size:9px">${dpS}</td><td class="bw"><div class="bf ${bC}" style="width:${bP}%"></div><span style="color:${pC}">${sgn(r.dayPnl)}</span></td><td style="color:${(r.cumPnl/acct0*100)>=0?'#34d399':'#f87171'};font-size:9px">${pct(r.cumPnl/acct0*100,1)}</td><td style="color:#4d5a6e;font-size:9px">${(r.surplus>=0?'$':'−$')+fmt(Math.abs(r.surplus))}</td><td style="color:#fbbf24;font-size:9px">${r.newSh>0?'+'+r.newSh:'—'}</td><td style="color:${r.cumPnl>=0?'#34d399':'#f87171'};font-weight:600">${(r.cumPnl>=0?'$':'−$')+fmt(Math.abs(r.cumPnl))}</td>`;
     tbody.appendChild(tr);
   }
-  if(capped){const w=document.createElement('tr');w.innerHTML=`<td colspan="14" style="text-align:center;color:#f87171;padding:8px;font-size:9px;">CAPPED AT 5,000 DAYS</td>`;tbody.appendChild(w);}
+  if(capped){const w=document.createElement('tr');w.innerHTML=`<td colspan="14" style="text-align:center;color:#f87171;padding:8px;font-size:9px;">CAPPED AT 10,000 DAYS</td>`;tbody.appendChild(w);}
 }
 
 function exportData(tab){
   const res=simResults[tab];if(!res||!res.rows.length){alert('Run a simulation first.');return;}
   const {rows,acct0,c,msp}=res;const names=['Strat-A','Strat-B','Strat-C'];
-  const L=['AHM v17 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,Trades,Ticks,Day%,P&L,Ret%,Surplus,+Sh,Cumul'];
+  const L=['AHM v18 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,Trades,Ticks,Day%,P&L,Ret%,Surplus,+Sh,Cumul'];
   const show=new Set([0,rows.length-1]);rows.forEach((r,i)=>{if(r.isMilestone||r.day%c.intv===0)show.add(i);});
   for(const idx of [...show].sort((a,b)=>a-b)){const r=rows[idx];const mo=r.cumPnl-((msp||{})[r.mIdx]||0);const dp=r.dayPct!=null?r.dayPct.toFixed(2)+'%':'—';let lbl='';if(r.isMilestone)lbl='Milestone '+r.msVal;else if(r.day===1)lbl='Start';else if(idx===rows.length-1)lbl='Goal';L.push([r.day,cal(r.calMo),mo.toFixed(2),lbl,r.shares,r.outcome,r.numTr||0,r.dayTicks,dp,r.dayPnl.toFixed(2),(r.cumPnl/acct0*100).toFixed(2)+'%',r.surplus.toFixed(2),r.newSh,r.cumPnl.toFixed(2)].join(','));}
   const blob=new Blob([L.join('\n')],{type:'text/csv'});const url=URL.createObjectURL(blob);
@@ -1262,6 +1301,104 @@ function computeGauge(varDef){
   return{show:true,r,n,allTimeAvg,weekAvg,deviation,isGood,higherIsBetter};
 }
 
+/* ════════════════════════════════════════════════════════════
+   EVIDENCE-BASED ALERT THRESHOLDS
+   Sources: sleep research (Walker, Killgore), trading psychology
+   (Brett Steenbarger), cognitive performance studies (Harrison & Horne)
+   ════════════════════════════════════════════════════════════ */
+const ALERTS=[
+  // Sleep: under 6h linked to 30%+ cognitive impairment (Harrison & Horne 2000)
+  {key:'sleep',label:'Sleep',check:v=>v<6,msg:'Under 6h sleep — cognitive performance impaired ~30% (Harrison & Horne)',sev:'high'},
+  {key:'sleep',label:'Sleep',check:v=>v>=6&&v<7,msg:'Sub-optimal sleep — reaction time and risk assessment affected',sev:'med'},
+  // Stress: chronic high stress degrades prefrontal cortex function (Arnsten 2009)
+  {key:'stress',label:'Stress',check:v=>v>=4,msg:'High stress — prefrontal cortex function degraded, impulse control reduced',sev:'high'},
+  {key:'stress',label:'Stress',check:v=>v===3,msg:'Elevated stress — monitor for reactive trading patterns',sev:'med'},
+  // Fatigue: mental fatigue causes risk-seeking behaviour (Hagger et al. 2010)
+  {key:'fatigue',label:'Fatigue',check:v=>v>=4,msg:'High mental fatigue — studies show increased risk-seeking and loss-chasing',sev:'high'},
+  // Rule breaks: Steenbarger links >1 rule break/day to significant performance drag
+  {key:'rules',label:'Rule Breaks',check:v=>v>=3,msg:'3+ rule breaks — Steenbarger: consistency collapses above this threshold',sev:'high'},
+  {key:'rules',label:'Rule Breaks',check:v=>v===2,msg:'2 rule breaks logged — review what triggered each deviation',sev:'med'},
+  // Confidence extremes: overconfidence causes oversizing (Odean 1999)
+  {key:'conf',label:'Confidence',check:v=>v>=5,msg:'Max confidence — Odean (1999): overconfidence leads to oversizing and underestimating risk',sev:'med'},
+  // Hydration: even 2% dehydration reduces cognitive performance (Adan 2012)
+  {key:'hydration',label:'Hydration',check:v=>v<=2,msg:'Low hydration — 2% dehydration reduces cognitive performance and focus',sev:'med'},
+];
+
+function renderWeeklyReport(){
+  const wrap=$('weekly-report');if(!wrap)return;
+  const thisWeek=sessionLog.filter(e=>daysAgo(e.date)<7);
+  const thisWeekJ=journalLog.filter(e=>daysAgo(e.date)<7);
+  if(!thisWeek.length&&!thisWeekJ.length){
+    wrap.innerHTML='<div class="fc-note" style="padding:6px 4px;">Log this week\'s sessions to generate a report card.</div>';
+    return;
+  }
+  // Trading performance this week
+  const totTr=thisWeek.reduce((a,e)=>a+e.w+e.l+e.b,0);
+  const totW=thisWeek.reduce((a,e)=>a+e.w,0);
+  const totPnl=thisWeek.reduce((a,e)=>a+e.pnl,0);
+  const wr=totTr>0?(totW/totTr)*100:0;
+  const dy=thisWeek.length;
+  const avgPnl=dy>0?totPnl/dy:0;
+  // All-time baseline for comparison
+  const allTr=sessionLog.reduce((a,e)=>a+e.w+e.l+e.b,0);
+  const allW=sessionLog.reduce((a,e)=>a+e.w,0);
+  const allPnl=sessionLog.reduce((a,e)=>a+e.pnl,0)/Math.max(sessionLog.length,1);
+  const allWR=allTr>0?(allW/allTr)*100:0;
+  // Journal averages this week
+  const avgSleep=thisWeekJ.length?thisWeekJ.reduce((a,e)=>a+e.sleep,0)/thisWeekJ.length:0;
+  const avgStress=thisWeekJ.length?thisWeekJ.reduce((a,e)=>a+(e.stress||0),0)/thisWeekJ.length:0;
+  const avgRules=thisWeekJ.length?thisWeekJ.reduce((a,e)=>a+(+e.rules||0),0)/thisWeekJ.length:0;
+  const prayerDays=thisWeekJ.filter(e=>{
+    const ps=[e.fajr,e.dhuhr,e.asr,e.maghreb,e.isha].filter(Boolean);
+    return ps.length>0&&ps.every(p=>p==='On Time');
+  }).length;
+  // Compute overall week grade
+  let score=50;
+  if(wr>allWR)score+=15;else if(wr<allWR-5)score-=15;
+  if(totPnl>0)score+=10;else score-=10;
+  if(avgSleep>=7)score+=10;else if(avgSleep<6)score-=15;
+  if(avgStress<=2)score+=5;else if(avgStress>=4)score-=10;
+  if(avgRules<=0.5)score+=10;else if(avgRules>=2)score-=10;
+  score=Math.max(0,Math.min(100,score));
+  const grade=score>=85?'A':score>=70?'B':score>=55?'C':score>=40?'D':'F';
+  const gradeCol=grade==='A'||grade==='B'?'#34d399':grade==='C'?'#fbbf24':'#f87171';
+  // Active alerts
+  const fired=[];
+  for(const j of thisWeekJ){
+    for(const al of ALERTS){
+      const val=al.key==='sleep'?j.sleep:al.key==='stress'?j.stress:al.key==='fatigue'?j.fatigue:al.key==='rules'?+j.rules||0:al.key==='conf'?j.conf:al.key==='hydration'?j.hydration:null;
+      if(val!==null&&val!==undefined&&val!==0&&al.check(val)){
+        if(!fired.find(f=>f.msg===al.msg))fired.push({...al,date:j.date});
+      }
+    }
+  }
+  // Best and worst day
+  const best=thisWeek.length?thisWeek.reduce((a,b)=>a.pnl>b.pnl?a:b):null;
+  const worst=thisWeek.length?thisWeek.reduce((a,b)=>a.pnl<b.pnl?a:b):null;
+  const pnlCol=totPnl>=0?'#34d399':'#f87171';
+  const wrCol=wr>=allWR?'#34d399':'#f87171';
+  const alertsHtml=fired.length?fired.slice(0,4).map(a=>`<div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:3px;"><span style="color:${a.sev==='high'?'#f87171':'#fbbf24'};font-size:9px;flex-shrink:0;">${a.sev==='high'?'▲':'●'}</span><span style="font-size:9px;color:#8892a4;">${a.msg}</span></div>`).join(''):'<div style="font-size:9px;color:#34d399;">No threshold alerts this week.</div>';
+  wrap.innerHTML=`<div class="wrc">
+    <div class="wrc-hd">
+      <span class="wrc-title">Week of ${thisWeek[0]?.date||'—'}</span>
+      <span class="wrc-grade" style="color:${gradeCol}">${grade}</span>
+    </div>
+    <div class="wrc-body">
+      <div class="wrc-row"><span class="wrc-lbl">Days logged</span><span class="wrc-val" style="color:#e2e6ed">${dy}</span></div>
+      <div class="wrc-row"><span class="wrc-lbl">Win rate</span><span class="wrc-val" style="color:${wrCol}">${wr.toFixed(1)}% <span style="font-size:8px;color:#4d5a6e;">vs ${allWR.toFixed(1)}% all-time</span></span></div>
+      <div class="wrc-row"><span class="wrc-lbl">Total P&L</span><span class="wrc-val" style="color:${pnlCol}">${sgn(totPnl)}</span></div>
+      <div class="wrc-row"><span class="wrc-lbl">Avg P&L/day</span><span class="wrc-val" style="color:${avgPnl>=0?'#34d399':'#f87171'}">${sgn(avgPnl)}</span></div>
+      ${best?`<div class="wrc-row"><span class="wrc-lbl">Best day</span><span class="wrc-val" style="color:#34d399">${best.date} · ${sgn(best.pnl)}</span></div>`:''}
+      ${worst&&worst.date!==best?.date?`<div class="wrc-row"><span class="wrc-lbl">Worst day</span><span class="wrc-val" style="color:#f87171">${worst.date} · ${sgn(worst.pnl)}</span></div>`:''}
+      ${avgSleep>0?`<div class="wrc-row"><span class="wrc-lbl">Avg sleep</span><span class="wrc-val" style="color:${avgSleep>=7?'#34d399':avgSleep>=6?'#fbbf24':'#f87171'}">${avgSleep.toFixed(1)}h</span></div>`:''}
+      ${avgStress>0?`<div class="wrc-row"><span class="wrc-lbl">Avg stress</span><span class="wrc-val" style="color:${avgStress<=2?'#34d399':avgStress<=3?'#fbbf24':'#f87171'}">${avgStress.toFixed(1)}/5</span></div>`:''}
+      ${avgRules>0?`<div class="wrc-row"><span class="wrc-lbl">Avg rule breaks</span><span class="wrc-val" style="color:${avgRules<1?'#34d399':avgRules<2?'#fbbf24':'#f87171'}">${avgRules.toFixed(1)}/day</span></div>`:''}
+      ${thisWeekJ.length?`<div class="wrc-row"><span class="wrc-lbl">Full prayer days</span><span class="wrc-val" style="color:${prayerDays>=4?'#34d399':prayerDays>=2?'#fbbf24':'#f87171'}">${prayerDays} / ${thisWeekJ.length}</span></div>`:''}
+      <div class="wrc-insight"><div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px;">Alerts</div>${alertsHtml}</div>
+    </div>
+  </div>`;
+}
+
 function renderGauges(){
   const wrap=$('gauge-wrap');if(!wrap)return;
   if(sessionLog.length<5||journalLog.length<5){
@@ -1339,44 +1476,105 @@ function renderEquityCurves(){
   const ttMon=$('real-ct-month');if(ttMon)ttMon.textContent=monKeys.length+' months · '+sgn(mcum)+' total';
 }
 
-function onReal(){
-  renderGauges();
-  renderEquityCurves();
-  const cs=+$('rCapS').value||0,cc=+$('rCapC').value||0;
-  if(!sessionLog.length){
-    ['rTrades','rDays','rWR','rBE','rLoss','rAvgT','rTickW','rTickL','rRR','rPnlTotal','rDayPnl'].forEach(id=>{const e=$(id);if(e)e.textContent='—';});
-    if(cs&&cc){const ytd=((cc-cs)/cs)*100,rytd=$('rYTD');if(rytd){rytd.textContent=pct(ytd);rytd.style.color=ytd>=0?'#34d399':'#f87171';}}
-    const vsB=$('vs-badge'),vsR=$('vs-rows');
-    if(vsB){vsB.textContent='No Sim';vsB.className='vs-badge nosim';}
-    if(vsR)vsR.innerHTML='<div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Log trading days to compute stats.</div>';
-    $('rPace').textContent='—';
-    return;
+function renderStratComparison(){
+  const body=$('strat-cmp-body');const badge=$('strat-cmp-badge');
+  if(!body||!badge)return;
+  const COLS=['#34d399','#f87171','#fbbf24'];
+  const NAMES=['Strat A','Strat B','Strat C'];
+  const active=simResults.map((r,i)=>r?i:-1).filter(i=>i>=0);
+  if(active.length<2){
+    body.innerHTML='<div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run simulations on 2 or more strategies to compare.</div>';
+    badge.textContent='No Sims Run';badge.className='vs-badge nosim';return;
   }
+  badge.textContent=active.length+' Strategies';badge.className='vs-badge ahead';
+  const metrics=[
+    {lbl:'EV / Day',get:r=>r.c.evNet,fmt:v=>sgn(v),better:'higher'},
+    {lbl:'Monthly Est',get:r=>r.c.evNet*21,fmt:v=>sgn(v),better:'higher'},
+    {lbl:'Time to Goal',get:r=>(r.rows.length/252)*12,fmt:v=>cal(v),better:'lower'},
+    {lbl:'Win Rate',get:r=>r.c.wr*100,fmt:v=>v.toFixed(1)+'%',better:'higher'},
+    {lbl:'R:R Ratio',get:r=>r.c.avgL>0?r.c.avgP/r.c.avgL:0,fmt:v=>v.toFixed(2)+':1',better:'higher'},
+    {lbl:'Friction / Day',get:r=>r.c.frDay,fmt:v=>'$'+fmt(v),better:'lower'},
+    {lbl:'Sharpe',get:r=>{const pnls=r.rows.map(e=>e.dayPnl);return sharpe(pnls,r.acct0)||0;},fmt:v=>v.toFixed(2),better:'higher'},
+  ];
+  // Card-per-metric layout: each metric is its own row with strategy values side by side
+  let html='';
+  metrics.forEach(m=>{
+    const vals=active.map(i=>({i,v:m.get(simResults[i])}));
+    const best=m.better==='higher'?Math.max(...vals.map(r=>r.v)):Math.min(...vals.map(r=>r.v));
+    html+=`<div style="background:#1a2030;border-radius:3px;padding:7px 10px;margin-bottom:5px;">`;
+    html+=`<div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px;">${m.lbl}</div>`;
+    html+=`<div style="display:flex;gap:6px;">`;
+    vals.forEach(({i,v})=>{
+      const isBest=Math.abs(v-best)<1e-9;
+      const bg=isBest?`rgba(${i===0?'52,211,153':i===1?'248,113,113':'251,191,36'},.1)`:'transparent';
+      const border=isBest?`1px solid ${COLS[i]}`:'1px solid #252d3d';
+      html+=`<div style="flex:1;background:${bg};border:${border};border-radius:3px;padding:5px 7px;text-align:center;">`;
+      html+=`<div style="font-size:7px;color:${COLS[i]};letter-spacing:.08em;margin-bottom:2px;">${NAMES[i]}</div>`;
+      html+=`<div style="font-size:12px;font-weight:${isBest?'700':'400'};color:${isBest?COLS[i]:'#8892a4'};">${m.fmt(v)}${isBest?' ★':''}</div>`;
+      html+=`</div>`;
+    });
+    html+=`</div></div>`;
+  });
+  body.innerHTML=html;
+}
+
+// Auto-fill real stats inputs from sessionLog — called on load and by reset button
+function resetRealStats(){
+  if(!sessionLog.length)return;
   const dy=sessionLog.length;
   const tr=sessionLog.reduce((a,e)=>a+e.w+e.l+e.b,0);
-  const totW=sessionLog.reduce((a,e)=>a+e.w,0),totL=sessionLog.reduce((a,e)=>a+e.l,0),totB=sessionLog.reduce((a,e)=>a+e.b,0);
-  const wr=tr>0?(totW/tr)*100:0,be=tr>0?(totB/tr)*100:0,loss=tr>0?(totL/tr)*100:0;
-  const twArr=sessionLog.filter(e=>e.tw>0).map(e=>e.tw),tlArr=sessionLog.filter(e=>e.tl>0).map(e=>e.tl);
+  const totW=sessionLog.reduce((a,e)=>a+e.w,0),totB=sessionLog.reduce((a,e)=>a+e.b,0);
+  const wr=tr>0?(totW/tr)*100:0,be=tr>0?(totB/tr)*100:0;
+  const twArr=sessionLog.filter(e=>e.tw>0).map(e=>e.tw);
+  const tlArr=sessionLog.filter(e=>e.tl>0).map(e=>e.tl);
   const tw=twArr.length?twArr.reduce((a,b)=>a+b,0)/twArr.length:0;
   const tl_=tlArr.length?tlArr.reduce((a,b)=>a+b,0)/tlArr.length:0;
   const tp=sessionLog.reduce((a,e)=>a+e.pnl,0);
   const rdp=tp/dy;
-  $('rTrades').textContent=tr;
-  $('rDays').textContent=dy;
-  $('rWR').textContent=wr.toFixed(1)+'%';
-  $('rBE').textContent=be.toFixed(1)+'%';
-  $('rLoss').textContent=loss.toFixed(1)+'%';
-  $('rAvgT').textContent=(tr/dy).toFixed(1)+'/d';
-  $('rTickW').textContent=tw.toFixed(1)+'t';
-  $('rTickL').textContent=tl_.toFixed(1)+'t';
-  $('rRR').textContent=tl_>0?(tw/tl_).toFixed(2)+':1':'—';
-  const rpt=$('rPnlTotal');if(rpt){rpt.textContent=sgn(tp);rpt.style.color=tp>=0?'#34d399':'#f87171';}
-  const rdpEl=$('rDayPnl');if(rdpEl){rdpEl.textContent=sgn(rdp);rdpEl.style.color=rdp>=0?'#34d399':'#f87171';}
-  if(cs&&cc){const ytd=((cc-cs)/cs)*100;const rytd=$('rYTD');if(rytd){rytd.textContent=pct(ytd);rytd.style.color=ytd>=0?'#34d399':'#f87171';}}
+  const sv=(id,v)=>{const e=$(id);if(e)e.value=v;};
+  sv('rTrades',tr);sv('rDays',dy);
+  sv('rWR',wr.toFixed(1));sv('rBE',be.toFixed(1));
+  sv('rTickW',tw.toFixed(1));sv('rTickL',tl_.toFixed(1));
+  sv('rPnlTotal',tp.toFixed(2));sv('rDayPnl',rdp.toFixed(2));
+  onReal();
+}
+
+function onReal(){
+  renderWeeklyReport();
+  renderGauges();
+  renderEquityCurves();
+  renderStratComparison();
+  // Read from editable inputs (may be manually overridden or auto-filled)
+  const tr=+$('rTrades').value||0;
+  const dy=+$('rDays').value||1;
+  const wr=+$('rWR').value||0;
+  const be=+$('rBE').value||0;
+  const tw=+$('rTickW').value||0;
+  const tl_=+$('rTickL').value||0;
+  const tp=+$('rPnlTotal').value||0;
+  const rdp=+$('rDayPnl').value||0;
+  const cs=+$('rCapS').value||0,cc=+$('rCapC').value||0;
+  const loss=Math.max(0,100-wr-be);
+  // Derived read-only displays
+  const rLoss=$('rLoss');if(rLoss)rLoss.textContent=loss.toFixed(1)+'%';
+  const rAvgT=$('rAvgT');if(rAvgT)rAvgT.textContent=dy>0?(tr/dy).toFixed(1)+'/d':'—';
+  const rRR=$('rRR');if(rRR)rRR.textContent=tl_>0?(tw/tl_).toFixed(2)+':1':'—';
+  if(cs&&cc){const ytd=((cc-cs)/cs)*100;const el=$('rYTD');if(el){el.textContent=pct(ytd);el.style.color=ytd>=0?'#34d399':'#f87171';}}
   const res=simResults[activeStrat];const vsB=$('vs-badge'),vsR=$('vs-rows');
-  if(!res){if(vsB){vsB.textContent='No Sim';vsB.className='vs-badge nosim';}if(vsR)vsR.innerHTML='<div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run a simulation first.</div>';$('rPace').textContent='—';return;}
+  if(!res){
+    if(vsB){vsB.textContent='No Sim';vsB.className='vs-badge nosim';}
+    if(vsR)vsR.innerHTML='<div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run a simulation first.</div>';
+    const rp=$('rPace');if(rp)rp.textContent='—';
+    return;
+  }
   const sc=res.c;const realRR=tl_>0?tw/tl_:0,simRR=sc.avgP/sc.avgL;
-  const vrows=[{lbl:'Win Rate',real:wr.toFixed(1)+'%',sim:(sc.wr*100).toFixed(1)+'%',d:wr-sc.wr*100,u:'%'},{lbl:'Breakeven',real:be.toFixed(1)+'%',sim:(sc.be*100).toFixed(1)+'%',d:be-sc.be*100,u:'%'},{lbl:'Avg Win t',real:tw.toFixed(1),sim:sc.avgP.toFixed(1),d:tw-sc.avgP,u:'t'},{lbl:'R:R',real:realRR.toFixed(2)+':1',sim:simRR.toFixed(2)+':1',d:realRR-simRR,u:''},{lbl:'Daily P&L',real:'$'+fmt(Math.abs(rdp)),sim:'$'+fmt(Math.abs(sc.evNet)),d:rdp-sc.evNet,u:'$'}];
+  const vrows=[
+    {lbl:'Win Rate',real:wr.toFixed(1)+'%',sim:(sc.wr*100).toFixed(1)+'%',d:wr-sc.wr*100,u:'%'},
+    {lbl:'Breakeven',real:be.toFixed(1)+'%',sim:(sc.be*100).toFixed(1)+'%',d:be-sc.be*100,u:'%'},
+    {lbl:'Avg Win t',real:tw.toFixed(1),sim:sc.avgP.toFixed(1),d:tw-sc.avgP,u:'t'},
+    {lbl:'R:R',real:realRR.toFixed(2)+':1',sim:simRR.toFixed(2)+':1',d:realRR-simRR,u:''},
+    {lbl:'Daily P&L',real:'$'+fmt(Math.abs(rdp)),sim:'$'+fmt(Math.abs(sc.evNet)),d:rdp-sc.evNet,u:'$'}
+  ];
   let score=0;vrows.forEach(r=>{if(r.d>=0)score+=1;});
   const ahead=score>=5,onTrack=score>=3;
   if(vsB){vsB.textContent=ahead?'Ahead':onTrack?'On Track':'Behind';vsB.className='vs-badge '+(ahead?'ahead':onTrack?'on-track':'behind');}
@@ -1454,6 +1652,8 @@ function buildPanes(){
   [0,1,2].forEach(n=>{
     const pane=$('sp'+n);if(!pane)return;
     const s=n===0?'':'_'+n;const L=['A','B','C'][n];
+    const SCOL=['#34d399','#f87171','#fbbf24'][n];
+    const SCLS=['','sc-b','sc-c'][n];
     function tog(id,checked=true){const tid='tog-'+id+s;return`<label class="tog-wrap"><input type="checkbox" class="tog" id="${tid}"${checked?' checked':''} onchange="onTog(this,'fc-${id}${s}',${n})"><span class="tog-lbl" id="${tid}-l">${checked?'ON':'OFF'}</span></label>`;}
     function fc(id,lbl,bc,ik,body,hasTog=true,checked=true){
       const t=hasTog?tog(id,checked):'';
@@ -1490,16 +1690,26 @@ function buildPanes(){
 
     const ovr=`<div class="fc off" id="fc-rr${s}" style="border-left-color:#60a5fa"><div class="fc-top"><span class="fc-lbl">R:R Override <button class="ib" onclick="openInfo('rr')">?</button></span>${tog('rr',false)}</div>${ph('rrSlider')}<div class="fc-note">Overrides stop. Loss = profit ÷ R:R.</div></div><div class="fc off" id="fc-dp${s}" style="border-left-color:#fbbf24"><div class="fc-top"><span class="fc-lbl">Daily % Override <button class="ib" onclick="openInfo('dp')">?</button></span>${tog('dp',false)}</div>${dph('minDp','maxDp')}<div class="fc-note">Ignores tick math. Applies % directly to equity.</div></div><div class="fc off" id="fc-volceil${s}" style="border-left-color:#f87171"><div class="fc-top"><span class="fc-lbl">Volume Ceiling <button class="ib" onclick="openInfo('volceil')">?</button></span>${tog('volceil',false)}</div>${ph('volCeil')}<div class="fc-note">Hard cap on share growth. Prevents over-compounding.</div></div>`;
 
-    function grp(title,col,body,open=false,eid=''){return`<div class="dgrp"><div class="dgrp-hd" onclick="toggleGrp(this)"><span class="dgrp-title" style="color:${col}">${title}</span><div class="dgrp-r">${eid?`<span class="ovr-badge" id="${eid}">OVERRIDE</span>`:''}<span class="dgrp-arr${open?' open':''}">▲</span></div></div><div class="dgrp-body${open?' open':''}"><div class="dgrp-inner">${body}</div></div></div>`;}
+    // SVG icons for each section (inline, 14×14, stroke-based)
+    const ICONS={
+      core:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`,
+      risk:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+      ticker:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+      psych:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>`,
+      ovr:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`,
+    };
+    function grp(title,icon,body,open=false,eid=''){
+      return`<div class="dgrp"><div class="dgrp-hd" onclick="toggleGrp(this)"><span class="dgrp-title" style="color:#e2e6ed;display:flex;align-items:center;gap:6px;">${ICONS[icon]||''}${title}</span><div class="dgrp-r">${eid?`<span class="ovr-badge" id="${eid}">OVERRIDE</span>`:''}<span class="dgrp-arr${open?' open':''}">▲</span></div></div><div class="dgrp-body${open?' open':''}"><div class="dgrp-inner">${body}</div></div></div>`;
+    }
 
     pane.innerHTML=`
-      ${grp('① Core','#34d399',core,true)}
-      ${grp('② Risk Management','#f87171',risk)}
-      ${grp('③ Ticker','#8892a4',ticker)}
-      ${grp('④ Psychology','#60a5fa',psych)}
-      ${grp('⑤ Overrides','#fbbf24',ovr,false,'ovr-badge'+s)}
+      ${grp('Core','core',core,true)}
+      ${grp('Risk Management','risk',risk)}
+      ${grp('Ticker','ticker',ticker)}
+      ${grp('Psychology','psych',psych)}
+      ${grp('Overrides','ovr',ovr,false,'ovr-badge'+s)}
       <div class="sim-row">
-        <button class="sim-btn" onclick="simulate(${n})">Simulate ${L}</button>
+        <button class="sim-btn ${SCLS}" onclick="simulate(${n})">Simulate</button>
         <button class="exp-btn" onclick="exportData(${n})">CSV</button>
       </div>
       <div class="mode-row">
@@ -1547,12 +1757,12 @@ function wirePanes(){
   populateHourSelect('j-timeslept');populateHourSelect('j-timewoke');
 }
 
-const SK='ahm-v17';
+const SK='ahm-v18b';
 function getStpIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;SDEFS.forEach(([id])=>ids.push(id+s));});return ids;}
 const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-fees','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo','tog-swing','tog-dist','tog-startcap','tog-volceil'];
 function getTogIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;TOG_BASE.forEach(id=>ids.push(id+s));});return ids;}
 const SEL_BASE=['curve','mode'];
-const REAL_IDS=['rCapS','rCapC'];
+const REAL_IDS=['rCapS','rCapC','rTrades','rDays','rWR','rBE','rTickW','rTickL','rPnlTotal','rDayPnl'];
 
 function save(){
   try{
@@ -1590,7 +1800,8 @@ async function init(){
   const allCv=$('real-cv-all'),allTt=$('real-ct-all');if(allCv&&allTt)wireChart(allCv,allTt);
   const wkCv=$('real-cv-week'),wkTt=$('real-ct-week');if(wkCv&&wkTt)wireChart(wkCv,wkTt);
   const moCv=$('real-cv-month'),moTt=$('real-ct-month');if(moCv&&moTt)wireChart(moCv,moTt);
-  onReal();
+  if(sessionLog.length)resetRealStats();
+  else onReal();
   if(loaded){if(sessionLog.length)$('log-info').textContent=sessionLog.length+' days logged';if(journalLog.length)renderJournal();}
 }
 init();
