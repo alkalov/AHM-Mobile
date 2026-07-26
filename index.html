@@ -276,7 +276,7 @@ canvas.spark{width:100%;height:34px;display:block;}
 <div class="topbar">
   <div class="brand">
     <span class="brand-name">Anti-Hope Machine</span>
-    <span class="brand-ver">v19</span>
+    <span class="brand-ver">v20</span>
   </div>
   <div class="top-r">
     <button class="guide-btn" onclick="openGuide()">Guide</button>
@@ -568,6 +568,10 @@ const LIM={
   bias:{min:0,max:100,step:5},intv:{min:1,max:30,step:1},
   startCap:{min:0,max:1000000,step:100},
   volCeil:{min:0,max:1000000,step:50},
+  vwFH_min:{min:0,max:2000000,step:1000},vwFH_max:{min:0,max:2000000,step:1000},
+  vwMD_min:{min:0,max:2000000,step:1000},vwMD_max:{min:0,max:2000000,step:1000},
+  vwLH_min:{min:0,max:2000000,step:1000},vwLH_max:{min:0,max:2000000,step:1000},
+  partRate:{min:0.5,max:30,step:0.5},
 };
 
 let _ht=null,_hi=null;
@@ -671,6 +675,10 @@ function cfg(tab){
     minDp:n('minDp',-2),maxDp:n('maxDp',3),
     bias:n('bias',50)/100,curve:str('curve','linear'),mode:str('mode','rand'),
     startCap:n('startCap',0),volCeil:n('volCeil',0),
+    vwFH_min:n('vwFH_min',60000),vwFH_max:n('vwFH_max',120000),
+    vwMD_min:n('vwMD_min',15000),vwMD_max:n('vwMD_max',40000),
+    vwLH_min:n('vwLH_min',30000),vwLH_max:n('vwLH_max',70000),
+    partRate:n('partRate',10),
   };
   const c={
     minP:on('tog-p')?r.minP:Math.round((r.minP+r.maxP)/2),maxP:on('tog-p')?r.maxP:Math.round((r.minP+r.maxP)/2),
@@ -691,6 +699,11 @@ function cfg(tab){
     bias:on('tog-bias')?r.bias:0,curve:r.curve,mode:r.mode,
     startCap:on('tog-startcap')?r.startCap:0,
     volCeil:on('tog-volceil')?r.volCeil:0,
+    vwOn:on('tog-vw'),
+    vwFH_min:r.vwFH_min,vwFH_max:r.vwFH_max,
+    vwMD_min:r.vwMD_min,vwMD_max:r.vwMD_max,
+    vwLH_min:r.vwLH_min,vwLH_max:r.vwLH_max,
+    partRate:r.partRate/100,
   };
   const avgWR=(c.minWR+c.maxWR)/2,avgBE=(c.minBE+c.maxBE)/2;
   const [wr,be]=clampD(avgWR,avgBE);
@@ -704,6 +717,23 @@ function cfg(tab){
   const commCost=commissionForShares(c.sh);
   const frTr=commCost+exCost+(c.slip*c.tick*c.sh*2)+(c.spread*c.tick*c.sh),frDay=frTr*avgT;
   const avgEO=(c.minEO+c.maxEO)/2,effTgt=Math.max(0,avgP-avgEO);
+  // ── Volume windows: derive participation ceiling and fill-quality ratio per window ──
+  // squeezeRatio = your intended share size ÷ the volume you're comfortable taking (participation ceiling).
+  // Ratio ≤1 means you fit comfortably within your own participation limit — clean fills, no adjustment.
+  // Ratio >1 means your position exceeds what the window's liquidity comfortably supports at your
+  // chosen participation rate — you're pushing more size into less flow, so fills degrade:
+  // extra entry offset (you chase/scale in over more time) and extra slippage (worse average fill).
+  function windowStats(volMin,volMax){
+    const avgVol=(volMin+volMax)/2;
+    const ceilShares=avgVol*c.partRate;
+    const squeeze=ceilShares>0?c.sh/ceilShares:0;
+    const extraEO=squeeze>1?Math.min(8,(squeeze-1)*3):0; // caps extra offset at 8 ticks
+    const extraSlip=squeeze>1?Math.min(4,(squeeze-1)*1.5):0; // caps extra slippage at 4 ticks
+    return{avgVol,ceilShares,squeeze,extraEO,extraSlip};
+  }
+  const vwFH=windowStats(c.vwFH_min,c.vwFH_max);
+  const vwMD=windowStats(c.vwMD_min,c.vwMD_max);
+  const vwLH=windowStats(c.vwLH_min,c.vwLH_max);
   const pbRange=Math.max(c.maxPB-c.minPB,1);
   const pbKill=c.maxPB>0?Math.max(0,Math.min(1,(c.maxPB-effTgt)/pbRange)):0;
   const effWR=wr*(1-pbKill),effLoss=loss+wr*pbKill;
@@ -713,7 +743,7 @@ function cfg(tab){
   const deployedCapAvg=c.sh*avgPr;
   const evNet=c.dpct?(c.minDp+c.maxDp)/2/100*deployedCapAvg:evGross-frDay;
   const avgSw=(c.minSw+c.maxSw)/2,swUtil=avgSw>0?Math.min(100,(effTgt/avgSw)*100):0;
-  return{...c,wr,be,loss,avgP,avgL,avgT,avgPr,acct0,frTr,frDay,effTgt,pbKill,effWR,effLoss,evTick,evDol,evGross,evNet,avgSw,swUtil,commCost,exCost};
+  return{...c,wr,be,loss,avgP,avgL,avgT,avgPr,acct0,frTr,frDay,effTgt,pbKill,effWR,effLoss,evTick,evDol,evGross,evNet,avgSw,swUtil,commCost,exCost,vwFH,vwMD,vwLH};
 }
 
 function updateDist(tab){
@@ -726,7 +756,16 @@ function updateDist(tab){
   se('ev-tag',e=>{e.textContent='EV '+(ev>=0?'+$':'−$')+fmt(Math.abs(ev))+'/day';e.style.color=ev>0?'#34d399':ev<0?'#f87171':'#fbbf24';});
   const lr=$('lr-disp'+s);if(lr)lr.textContent=(c.loss*100).toFixed(1)+'%';
 }
-function onSlider(tab){updateDist(tab);updateFrictionBreakdown(tab);save();}
+function onSlider(tab){updateDist(tab);updateFrictionBreakdown(tab);updateVolWindowSummary(tab);save();}
+
+function updateVolWindowSummary(tab){
+  const s=tab===0?'':'_'+tab;
+  const c=cfg(tab);
+  const el=$('vw-summary'+s);if(!el)return;
+  if(!c.vwOn){el.textContent='';return;}
+  const fmtSqz=w=>w.squeeze<=1?'comfortable fit':'squeeze ×'+w.squeeze.toFixed(1)+' — +'+w.extraEO.toFixed(1)+'t offset, +'+w.extraSlip.toFixed(1)+'t slip';
+  el.innerHTML=`First Hour: ${fmtSqz(c.vwFH)}<br>Midday: ${fmtSqz(c.vwMD)}<br>Last Hour: ${fmtSqz(c.vwLH)}`;
+}
 
 function sharpe(pnls,acct){const n=pnls.length;if(n<2)return null;const r=pnls.map(p=>p/acct);const m=r.reduce((a,b)=>a+b,0)/n;const sd=Math.sqrt(r.reduce((a,v)=>a+(v-m)**2,0)/(n-1));return sd>0?(m/sd)*Math.sqrt(252):null;}
 function sharpeStr(s){if(!s||isNaN(s))return'—';if(s>=2)return s.toFixed(2)+' ★';if(s>=1)return s.toFixed(2)+' ✓';if(s>=.5)return s.toFixed(2)+' ~';return s.toFixed(2)+' ✗';}
@@ -764,7 +803,6 @@ function _sim(tab){
     const [wr,be]=clampD(dayWR,dayBE);
     const dayPr=c.minPr+Math.random()*(c.maxPr-c.minPr);
     const exCost=c.feesOn?(shares*0.0067):0;
-    const frTr=commissionForShares(shares)+exCost+(c.slip*c.tick*shares*2)+(c.spread*c.tick*shares);
     const effWR=Math.random()>c.disc?wr*.7:wr;const effBE=Math.random()>c.disc?be*.7:be;
     let dayPnl=0,dayTicks=0,numTr=0,dayPct=null,isBlowup=false,isGood=false;
     // deployedCap: capital actually at work through shares today — P&L can only be
@@ -778,11 +816,21 @@ function _sim(tab){
       numTr=c.mode==='rand'?ri(c.minT,c.maxT):Math.round(c.avgT);
       let lossT=0;
       for(let i=0;i<numTr;i++){
-        if(c.cap>0&&lossT>=c.cap)break;dayPnl-=frTr;
+        if(c.cap>0&&lossT>=c.cap)break;
+        // Assign this trade to a session window by its position in the day's trade sequence —
+        // early trades skew toward First Hour, middle trades toward Midday, late toward Last Hour.
+        let winEO=0,winSlip=0;
+        if(c.vwOn&&numTr>0){
+          const frac=numTr>1?i/(numTr-1):0.5;
+          const win=frac<0.33?c.vwFH:frac<0.75?c.vwMD:c.vwLH;
+          winEO=win.extraEO;winSlip=win.extraSlip;
+        }
+        const winFrTr=commissionForShares(shares)+exCost+((c.slip+winSlip)*c.tick*shares*2)+(c.spread*c.tick*shares);
+        dayPnl-=winFrTr;
         const roll=Math.random();
         if(roll<effWR){
           const pt=c.mode==='rand'?ri(c.minP,c.maxP):Math.round(c.avgP);
-          const eo=c.maxEO>0?(c.mode==='rand'?ri(c.minEO,c.maxEO):Math.round((c.minEO+c.maxEO)/2)):0;
+          const eo=(c.maxEO>0?(c.mode==='rand'?ri(c.minEO,c.maxEO):Math.round((c.minEO+c.maxEO)/2)):0)+winEO;
           const effT=Math.max(0,pt-eo);const pb=c.maxPB>0?(c.mode==='rand'?ri(c.minPB,c.maxPB):Math.round((c.minPB+c.maxPB)/2)):0;
           if(c.maxPB>0&&pb>=effT){let lt=c.mode==='rand'?ri(c.minL,c.maxL):Math.round(c.avgL);if(c.rr>0)lt=Math.round(c.avgP/c.rr);dayPnl-=shares*lt*c.tick;dayTicks-=lt;lossT+=lt;}
           else{dayPnl+=shares*effT*c.tick;dayTicks+=effT;}
@@ -1644,9 +1692,10 @@ const INFO={
   rr:{t:'R:R Override',b:'<p>Forces a specific reward:risk. Stop loss = Profit Target ÷ R:R. 0 = disabled.</p>'},
   tick:{t:'Tick Value',b:'<p>Dollar value of one tick per share. US equities: $0.01.</p>'},
   dp:{t:'Daily % Override',b:'<p>Bypasses tick math entirely. Applies a random % to account equity each day. Ignores friction, pullback, bad/good days.</p>'},
+  vw:{t:'Volume Windows',b:'<p>Custom per ticker — no assumptions baked in. Set typical volume/minute for three session windows: First Hour, Midday, Last Hour.</p><p>Your Participation Rate (%) determines your comfortable share of that flow. If your Starting Shares exceeds what your participation rate allows for a window volume, that window gets a "squeeze" — extra entry offset and slippage applied to trades landing in it, since you are pushing more size into less liquidity than you would comfortably want.</p><p>Trades are distributed across the three windows automatically based on their position in each simulated day trade sequence — early trades skew toward First Hour, late toward Last Hour.</p><p>Works for any ticker: a thin stock and a liquid one just get different volume numbers — the math scales itself.</p>'},
 };
 
-const SDEFS=[['minP',15,'t'],['maxP',30,'t'],['minL',5,'t'],['maxL',15,'t'],['minWR',55,'%'],['maxWR',65,'%'],['minBE',10,'%'],['maxBE',20,'%'],['minT',2,''],['maxT',5,''],['sh',100,''],['goal',500,''],['minPr',43,''],['maxPr',47,''],['spread',1,'t'],['slip',1,'t'],['buf',1,''],['cap',0,'t'],['disc',85,'%'],['bf',3,'%'],['bs',2,'%'],['gf',3,'%'],['gs_',2,'%'],['minPB',3,'t'],['maxPB',8,'t'],['minEO',1,'t'],['maxEO',4,'t'],['minSw',15,'t'],['maxSw',40,'t'],['rrSlider',0,''],['tickSz',1,'¢'],['minDp',-2,'%'],['maxDp',3,'%'],['bias',50,'%'],['intv',5,''],['startCap',0,'$'],['volCeil',0,'sh']];
+const SDEFS=[['minP',15,'t'],['maxP',30,'t'],['minL',5,'t'],['maxL',15,'t'],['minWR',55,'%'],['maxWR',65,'%'],['minBE',10,'%'],['maxBE',20,'%'],['minT',2,''],['maxT',5,''],['sh',100,''],['goal',500,''],['minPr',43,''],['maxPr',47,''],['spread',1,'t'],['slip',1,'t'],['buf',1,''],['cap',0,'t'],['disc',85,'%'],['bf',3,'%'],['bs',2,'%'],['gf',3,'%'],['gs_',2,'%'],['minPB',3,'t'],['maxPB',8,'t'],['minEO',1,'t'],['maxEO',4,'t'],['minSw',15,'t'],['maxSw',40,'t'],['rrSlider',0,''],['tickSz',1,'¢'],['minDp',-2,'%'],['maxDp',3,'%'],['bias',50,'%'],['intv',5,''],['startCap',0,'$'],['volCeil',0,'sh'],['vwFH_min',60000,'/m'],['vwFH_max',120000,'/m'],['vwMD_min',15000,'/m'],['vwMD_max',40000,'/m'],['vwLH_min',30000,'/m'],['vwLH_max',70000,'/m'],['partRate',10,'%']];
 
 function buildPanes(){
   [0,1,2].forEach(n=>{
@@ -1684,7 +1733,20 @@ function buildPanes(){
     const frictionCard=`<div class="fc" id="fc-comm${s}" style="border-left-color:#fbbf24;"><div class="fc-top"><span class="fc-lbl">Commission (Tiered) <button class="ib" onclick="openInfo('comm')">?</button></span></div><div class="fc-note">Auto-calculated: $0.35 flat round trip under 100 shares, or $0.0070/share × 2 legs at 100+ shares. Scales with your Starting Shares.</div></div><div class="fc" id="fc-fees${s}" style="border-left-color:#34d399;"><div class="fc-top"><span class="fc-lbl">Exchange + Clearing + Reg <button class="ib" onclick="openInfo('fees')">?</button></span>${tog('fees',true)}</div><div class="friction-breakdown" id="fb${s}"><div class="fb-row"><span class="fb-lbl">Commission</span><span class="fb-val" id="fb-comm${s}">—</span></div><div class="fb-row"><span class="fb-lbl">Exchange + Clearing + Reg (0.0067/sh)</span><span class="fb-val" id="fb-ex${s}">—</span></div><div class="fb-row"><span class="fb-lbl">Slippage (×2 legs)</span><span class="fb-val" id="fb-slip${s}">—</span></div><div class="fb-row"><span class="fb-lbl">Spread cost</span><span class="fb-val" id="fb-spr${s}">—</span></div><div class="fb-total"><span class="fb-lbl">Est. round trip</span><span class="fb-val" id="fb-rt${s}">—</span></div></div><div class="fb-tier" id="fb-tier${s}">—</div></div>`;
 
     const swingCard=`<div class="fc" id="fc-swing${s}" style="border-left-color:#252d3d"><div class="fc-top"><span class="fc-lbl">Avg Swing <button class="ib" onclick="openInfo('swing')">?</button></span>${tog('swing',true)}</div>${dph('minSw','maxSw')}</div>`;
-    const ticker=fc('pr','Price Range','#4d5a6e','price',dph('minPr','maxPr'))+startCapCard+shGoalCard+frictionCard+fc('sp','Spread','#fb923c','spread',ph('spread'))+fc('buf','Cash Buffer','#4d5a6e','buf',ph('buf'))+fc('tk','Tick Value','#4d5a6e','tick',ph('tickSz'))+fc('sl','Slippage','#f87171','slip',ph('slip'))+swingCard+fc('pb','Pullback','#60a5fa','pullback',dph('minPB','maxPB'))+fc('eo','Entry Offset','#4d5a6e','eo',dph('minEO','maxEO'));
+    const volWindowCard=`<div class="fc off" id="fc-vw${s}" style="border-left-color:#60a5fa;">
+      <div class="fc-top"><span class="fc-lbl">Volume Windows <button class="ib" onclick="openInfo('vw')">?</button></span>${tog('vw',false)}</div>
+      <div class="fc-note" style="margin-bottom:6px;">Custom per ticker — set typical volume/minute for each session window. Buffer, entry offset, and slippage are derived automatically from your participation rate against these numbers.</div>
+      <div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin:6px 0 3px;">First Hour · 9:30–10:30</div>
+      ${dph('vwFH_min','vwFH_max')}
+      <div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin:8px 0 3px;">Midday · 10:30–2:30</div>
+      ${dph('vwMD_min','vwMD_max')}
+      <div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin:8px 0 3px;">Last Hour · 2:30–4:00</div>
+      ${dph('vwLH_min','vwLH_max')}
+      <div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin:8px 0 3px;">Participation Rate</div>
+      ${ph('partRate')}
+      <div class="fc-note" id="vw-summary${s}" style="margin-top:6px;"></div>
+    </div>`;
+    const ticker=fc('pr','Price Range','#4d5a6e','price',dph('minPr','maxPr'))+startCapCard+shGoalCard+frictionCard+fc('sp','Spread','#fb923c','spread',ph('spread'))+fc('buf','Cash Buffer','#4d5a6e','buf',ph('buf'))+fc('tk','Tick Value','#4d5a6e','tick',ph('tickSz'))+fc('sl','Slippage','#f87171','slip',ph('slip'))+swingCard+fc('pb','Pullback','#60a5fa','pullback',dph('minPB','maxPB'))+fc('eo','Entry Offset','#4d5a6e','eo',dph('minEO','maxEO'))+volWindowCard;
 
     const psych=fc('bd','Bad Days','#f87171','bd',dph('bf','bs'))+fc('gd','Good Days','#34d399','gd',dph('gf','gs_'))+fc('cs','Discipline %','#4d5a6e','disc',ph('disc'))+fc('bias','Skill Growth %','#252d3d','bias',ph('bias')+sel('curve','<option value="slow" selected>Slow Start</option><option value="linear">Linear</option><option value="fast">Fast Start</option><option value="scurve">S-Curve</option>'));
 
@@ -1762,9 +1824,9 @@ function wirePanes(){
   populateHourSelect('j-timeslept');populateHourSelect('j-timewoke');
 }
 
-const SK='ahm-v19';
+const SK='ahm-v20';
 function getStpIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;SDEFS.forEach(([id])=>ids.push(id+s));});return ids;}
-const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-fees','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo','tog-swing','tog-dist','tog-startcap','tog-volceil'];
+const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-fees','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo','tog-swing','tog-dist','tog-startcap','tog-volceil','tog-vw'];
 function getTogIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;TOG_BASE.forEach(id=>ids.push(id+s));});return ids;}
 const SEL_BASE=['curve','mode'];
 const REAL_IDS=['rCapS','rCapC','rTrades','rDays','rWR','rBE','rTickW','rTickL','rPnlTotal','rDayPnl'];
@@ -1801,7 +1863,7 @@ async function load(){
 async function init(){
   buildPanes();wirePanes();
   const loaded=await load();
-  [0,1,2].forEach(n=>{updateDist(n);updateFrictionBreakdown(n);});
+  [0,1,2].forEach(n=>{updateDist(n);updateFrictionBreakdown(n);updateVolWindowSummary(n);});
   const allCv=$('real-cv-all'),allTt=$('real-ct-all');if(allCv&&allTt)wireChart(allCv,allTt);
   const wkCv=$('real-cv-week'),wkTt=$('real-ct-week');if(wkCv&&wkTt)wireChart(wkCv,wkTt);
   const moCv=$('real-cv-month'),moTt=$('real-ct-month');if(moCv&&moTt)wireChart(moCv,moTt);
