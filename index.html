@@ -26,6 +26,11 @@ html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mon
 .screens{flex:1;overflow:hidden;position:relative;}
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(60px + env(safe-area-inset-bottom,0px));display:none;}
 .screen.active{display:block;}
+/* Table tab only: flat flex column, no outer scroll — each .dv-half manages
+   its own scroll independently. Deliberately avoids nested auto-overflow
+   chains, since that pattern is what broke scrolling in a prior version. */
+#scr-tbl{padding-bottom:0;}
+#scr-tbl.active{display:flex;flex-direction:column;overflow:hidden;}
 .bnav{position:fixed;bottom:0;left:0;right:0;height:calc(56px + env(safe-area-inset-bottom,0px));background:#131720;border-top:1px solid #252d3d;display:flex;align-items:flex-start;padding-top:4px;z-index:100;}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:5px 0 0;position:relative;color:#4d5a6e;transition:color .12s;touch-action:manipulation;}
 .nb.on{color:#34d399;}
@@ -40,18 +45,36 @@ html,body{height:100%;background:#0d0f12;color:#e2e6ed;font-family:'IBM Plex Mon
 .sbtn.on{color:#34d399;border-color:#34d399;}
 .sbtn.on.sc-b{color:#f87171;border-color:#f87171;}
 .sbtn.on.sc-c{color:#fbbf24;border-color:#fbbf24;}
-.dgrp{border-bottom:1px solid #252d3d;}
-.dgrp-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;user-select:none;background:#131720;transition:background .08s;}
-.dgrp-hd:active{background:#1a2030;}
-.dgrp-title{font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#8892a4;}
-.dgrp-r{display:flex;align-items:center;gap:8px;}
-.dgrp-arr{font-size:9px;color:#4d5a6e;transition:transform .2s;}
-.dgrp-arr.open{transform:rotate(180deg);}
 .ovr-badge{font-size:7px;background:rgba(251,191,36,.1);color:#fbbf24;padding:1px 6px;border-radius:2px;letter-spacing:.1em;text-transform:uppercase;display:none;border:1px solid rgba(251,191,36,.2);}
 .ovr-badge.on{display:block;}
-.dgrp-body{overflow:hidden;max-height:0;transition:max-height .28s ease;}
-.dgrp-body.open{max-height:9999px;}
-.dgrp-inner{padding:7px 16px 10px;background:#1a2030;}
+
+/* ══════════════════════════════════════════════════════════════
+   CIRCLE NAVIGATION — replaces the dropdown accordion. Same five
+   categories, same icons/colours, contained differently: idle state
+   is a 3-over-2 cluster of icon-only circles; selecting one animates
+   it to a single centred slot above the rest (which dim and shrink),
+   and its panel scale-emerges outward from that circle's own
+   position — motion stays circular even in the transition, not a
+   rectangular accordion drop.
+   ══════════════════════════════════════════════════════════════ */
+.circ-nav{padding:14px 16px 4px;}
+.circ-cluster{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:4px;}
+.circ-row{display:flex;justify-content:center;gap:14px;}
+.circ-btn{width:56px;height:56px;border-radius:50%;background:#131720;border:1.5px solid #252d3d;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;position:relative;transition:transform .32s cubic-bezier(.34,1.4,.64,1),opacity .28s ease,border-color .28s ease,box-shadow .28s ease;flex-shrink:0;}
+.circ-btn svg{width:20px;height:20px;transition:width .28s,height .28s;}
+.circ-btn .ovr-badge{position:absolute;top:-6px;right:-6px;font-size:6px;padding:1px 4px;}
+.circ-btn.dim{opacity:.32;transform:scale(.78);}
+.circ-btn.sel{transform:scale(1.14);box-shadow:0 0 0 3px rgba(255,255,255,.04),0 4px 18px rgba(0,0,0,.35);}
+.circ-btn.sel svg{width:24px;height:24px;}
+.circ-cluster.has-sel{gap:6px;}
+.circ-cluster.has-sel .circ-row{gap:10px;}
+.circ-label{font-family:'Cabinet Grotesk',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;text-align:center;color:#e2e6ed;height:16px;opacity:1;margin-top:2px;overflow:hidden;transition:height .22s ease,opacity .18s ease,margin .22s ease;}
+.circ-label.dim-out{height:0;opacity:0;margin-top:0;}
+.circ-panel-wrap{overflow:hidden;max-height:0;opacity:0;transform:scale(.94);transform-origin:top center;transition:max-height .38s cubic-bezier(.25,.46,.45,.94),opacity .3s ease,transform .34s cubic-bezier(.25,.46,.45,.94);}
+.circ-panel-wrap.open{max-height:9999px;opacity:1;transform:scale(1);}
+.circ-panel-inner{padding:10px 16px 14px;background:#1a2030;border-radius:14px;margin:8px 0;}
+.circ-hint{text-align:center;font-size:9px;color:#4d5a6e;letter-spacing:.06em;padding:2px 0 6px;}
+
 .fc{background:#131720;border:1px solid #252d3d;border-left-width:2px;border-radius:3px;padding:8px 10px;margin-bottom:5px;}
 .fc.off{opacity:.22;pointer-events:none;}
 .fc.off .fc-top{pointer-events:auto;opacity:1;}
@@ -133,7 +156,17 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
 .tbl-controls{display:flex;gap:8px;padding:8px 16px;border-bottom:1px solid #252d3d;align-items:center;background:#131720;}
 .tc-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap;}
 .tc-stp{flex:1;}
-.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;}
+/* ── Table tab: flat split-screen, no nested scroll chains ── */
+.dv-half{flex:1 1 0;min-height:0;display:flex;flex-direction:column;border-bottom:1px solid #252d3d;overflow:hidden;}
+.dv-half:last-child{border-bottom:none;}
+.dv-empty{padding:32px;text-align:center;font-size:10px;color:#4d5a6e;}
+.dv-diag{padding:8px 12px 10px;border-top:1px solid #252d3d;background:#131720;flex-shrink:0;}
+.dv-diag-line{font-size:10px;line-height:1.6;padding:2px 0;}
+/* Original wide table, restored — now contained in the bottom .dv-half
+   instead of the whole screen. tbl-scroll is the ONE scroll context in
+   this half; thead sticks to its top correctly since overflow-y lives
+   directly on this same element, not on an ancestor several levels up. */
+.tbl-scroll{flex:1;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(56px + env(safe-area-inset-bottom,0px));}
 table{width:100%;border-collapse:collapse;min-width:580px;}
 thead{background:#1a2030;position:sticky;top:0;z-index:5;}
 th{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.04em;padding:6px 7px;text-align:right;border-bottom:1px solid #252d3d;white-space:nowrap;}
@@ -142,14 +175,14 @@ tbody tr{border-bottom:1px solid #1a2030;}
 tr.rl{background:rgba(248,113,113,.05);}tr.rb_{background:rgba(96,165,250,.04);}
 tr.rms-w{background:rgba(52,211,153,.07);}tr.rms-w td{color:#34d399 !important;}
 tr.rms-l{background:rgba(248,113,113,.07);}tr.rms-l td{color:#f87171 !important;}
-tr.blow{background:rgba(248,113,113,.1);}tr.blow td{color:#f87171 !important;}
-tr.good{background:rgba(52,211,153,.1);}tr.good td{color:#34d399 !important;}
+tr.sel-day{background:rgba(251,191,36,.1) !important;}tr.sel-day td{color:#fbbf24 !important;}
 td{padding:5px 7px;text-align:right;font-size:10px;white-space:nowrap;color:#e2e6ed;}
 td:nth-child(1),td:nth-child(2){text-align:center;color:#4d5a6e;font-size:9px;}
 td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
-.bw{position:relative;overflow:hidden;}.bf{position:absolute;left:0;top:0;bottom:0;pointer-events:none;}
-.bfp{background:rgba(52,211,153,.06);}.bfn{background:rgba(248,113,113,.07);}.bfz{background:rgba(96,165,250,.05);}
-.bw span{position:relative;}
+.global-capital{background:#131720;border-bottom:2px solid #34d399;padding-top:2px;}
+.gc-hd{display:flex;align-items:center;gap:6px;padding:9px 12px 6px;}
+.gc-hd span{font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#e2e6ed;}
+.gc-body{padding:0 12px 6px;}
 .tbl-empty{padding:32px;text-align:center;font-size:10px;color:#4d5a6e;}
 .log-body{padding:8px 16px;}
 .log-info{font-size:9px;color:#4d5a6e;text-align:center;margin-bottom:6px;letter-spacing:.07em;}
@@ -276,7 +309,7 @@ canvas.spark{width:100%;height:34px;display:block;}
 <div class="topbar">
   <div class="brand">
     <span class="brand-name">Anti-Hope Machine</span>
-    <span class="brand-ver">v25</span>
+    <span class="brand-ver">v38</span>
   </div>
   <div class="top-r">
     <button class="guide-btn" onclick="openGuide()">Guide</button>
@@ -287,6 +320,15 @@ canvas.spark{width:100%;height:34px;display:block;}
 <div class="screens">
 
   <div class="screen active" id="scr-sim">
+    <div class="global-capital">
+      <div class="gc-hd">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span>Capital</span>
+        <button class="ib" onclick="openInfo('globalcap')" style="margin-left:4px;">?</button>
+      </div>
+      <div class="gc-body" id="gc-stepper"></div>
+      <div class="fc-note" style="padding:0 12px 8px;">Shared starting capital across all three strategies — makes A/B/C directly comparable on the same account size. Each strategy still sets its own ticker, price, and share count.</div>
+    </div>
     <div class="sbar">
       <button class="sbtn on" id="stb0" onclick="switchStrat(0)">A</button>
       <button class="sbtn sc-b" id="stb1" onclick="switchStrat(1)">B</button>
@@ -298,27 +340,50 @@ canvas.spark{width:100%;height:34px;display:block;}
   </div>
 
   <div class="screen" id="scr-tbl">
-    <div class="sbar">
-      <button class="sbtn on" id="tsb0" onclick="switchTblStrat(0)">A</button>
-      <button class="sbtn sc-b" id="tsb1" onclick="switchTblStrat(1)">B</button>
-      <button class="sbtn sc-c" id="tsb2" onclick="switchTblStrat(2)">C</button>
+    <div class="dv-half">
+      <div class="chart-hd" style="padding:8px 12px 4px;"><span class="chart-lbl">Race to Goal · Capital vs Time</span></div>
+      <div class="chart-wrap" style="height:100%;"><canvas class="eqcv" id="dv-cv"></canvas></div>
+      <div id="dv-diag" class="dv-diag"></div>
     </div>
-    <div class="tbl-controls">
-      <span class="tc-lbl">Every</span>
-      <div class="tc-stp" id="intv-wrap"></div>
-      <span class="tc-lbl">days</span>
-    </div>
-    <div class="tbl-scroll">
-      <table>
-        <thead><tr><th>Day</th><th>Cal</th><th>Mo P&L</th><th>Label</th><th>Sh</th><th>WR%</th><th>Tr</th><th>Ticks</th><th>Day%</th><th>P&L</th><th>Ret%</th><th>Fees</th><th>Surplus</th><th>+Sh</th><th>Cumul</th></tr></thead>
-        <tbody id="main-tbody"></tbody>
-      </table>
+    <div class="dv-half">
+      <div class="sbar">
+        <button class="sbtn on" id="tsb0" onclick="switchTblStrat(0)">A</button>
+        <button class="sbtn sc-b" id="tsb1" onclick="switchTblStrat(1)">B</button>
+        <button class="sbtn sc-c" id="tsb2" onclick="switchTblStrat(2)">C</button>
+      </div>
+      <div class="tbl-controls">
+        <span class="tc-lbl">Every</span>
+        <div class="tc-stp" id="intv-wrap-0"></div>
+        <div class="tc-stp" id="intv-wrap-1" style="display:none;"></div>
+        <div class="tc-stp" id="intv-wrap-2" style="display:none;"></div>
+        <span class="tc-lbl">days</span>
+      </div>
+      <div class="tbl-scroll" id="tbl-scroll">
+        <table>
+          <thead><tr><th>Day</th><th>Cal</th><th>Mo P&L</th><th>Label</th><th>Sh</th><th>WR%</th><th>Tr</th><th>Ticks</th><th>Day%</th><th>P&L</th><th>Ret%</th><th>Fees</th><th>Surplus</th><th>+Sh</th><th>Cumul</th></tr></thead>
+          <tbody id="main-tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
   <div class="screen" id="scr-log">
     <div class="slbl">Session &amp; Journal</div>
     <div class="log-body">
+      <div class="jdate" id="jdate">—</div>
+
+      <!-- Journal sections compartmentalized into a 3-over-3 circle
+           cluster — same interaction language as the Sim tab's circle
+           nav: idle shows icon + name, tapping emphasizes that circle
+           and scale-emerges its panel below, others dim. Built by
+           buildJournalCircles() at init, not hand-written here, so the
+           six panels' field markup lives in one place only. -->
+      <div id="jcirc-mount"></div>
+
+      <button class="j-save-btn" onclick="saveJournal()">Save Entry</button>
+
+      <div class="log-divider"></div>
+
       <div class="log-info" id="log-info">0 days logged</div>
       <div class="inp-grp">
         <div class="inp-row"><label>Wins</label><input class="ni" id="dWins" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
@@ -355,68 +420,6 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="grade-big" id="sd-grade">—</div>
       </div>
 
-      <div class="log-divider"></div>
-
-      <div class="jdate" id="jdate">—</div>
-      <div class="jsec">
-        <div class="jsec-hd">Sleep &amp; Recovery</div>
-        <div class="jrow"><label>Time slept</label><select class="jsel" id="j-timeslept" style="min-width:90px;"><option value="">—</option></select></div>
-        <div class="jrow"><label>Time woke up</label><select class="jsel" id="j-timewoke" style="min-width:90px;"><option value="">—</option></select></div>
-        <div class="jrow"><label>Emotion before sleep</label><select class="jsel" id="j-presleep-emo"><option value="">—</option><option>Calm</option><option>Content</option><option>Excited</option><option>Happy</option><option>Grateful</option><option>Hopeful</option><option>Anxious</option><option>Stressed</option><option>Overwhelmed</option><option>Sad</option><option>Angry</option><option>Frustrated</option><option>Restless</option><option>Numb</option><option>Lonely</option></select></div>
-        <div class="jrow"><label>Sleep quality (1–5)</label><div class="scale-row" id="jsc-sleepq"></div></div>
-        <div class="jrow"><label>Social plans night before</label><select class="jsel" id="j-social"><option value="">—</option><option>None — normal night</option><option>Yes — stayed on schedule</option><option>Yes — stayed up late</option></select></div>
-        <div class="jrow"><label>Physical state</label><select class="jsel" id="j-phys"><option value="">—</option><option>Rested</option><option>Energised</option><option>Tired</option><option>Sick</option><option>Sore</option></select></div>
-        <div class="jrow"><label>Feeling sick today</label><select class="jsel" id="j-sick"><option value="">—</option><option>No</option><option>Mildly</option><option>Yes</option></select></div>
-        <div class="jrow"><label>Hydration (1–5)</label><div class="scale-row" id="jsc-hydration"></div></div>
-        <div class="jrow"><label>Felt temperature</label><select class="jsel" id="j-temp"><option value="">—</option><option>Cold</option><option>Comfortable</option><option>Warm/Hot</option></select></div>
-        <div class="jrow"><label>Diet quality (1–5)</label><div class="scale-row" id="jsc-diet"></div></div>
-        <div class="jrow"><label>Exercise</label><select class="jsel" id="j-exercise"><option value="">—</option><option>None</option><option>Light walk</option><option>Moderate</option><option>Intense</option></select></div>
-      </div>
-      <div class="jsec">
-        <div class="jsec-hd">Mental State</div>
-        <div class="jrow"><label>Stress level (1–5)</label><div class="scale-row" id="jsc-stress"></div></div>
-        <div class="jrow"><label>Mental fatigue (1–5)</label><div class="scale-row" id="jsc-fatigue"></div></div>
-        <div class="jrow"><label>Confidence (1–5)</label><div class="scale-row" id="jsc-conf"></div></div>
-        <div class="jrow"><label>Emotional state</label><select class="jsel" id="j-emo"><option value="">—</option><option>Happy</option><option>Content</option><option>Grateful</option><option>Calm</option><option>Focused</option><option>Motivated</option><option>Hopeful</option><option>Anxious</option><option>Overconfident</option><option>Distracted</option><option>Numb</option><option>Frustrated</option><option>Sad</option><option>Angry</option><option>Overwhelmed</option><option>Lonely</option></select></div>
-        <div class="jrow"><label>Emotional conflict/fight</label><select class="jsel" id="j-conflict"><option value="">—</option><option>None</option><option>Minor</option><option>Significant</option></select></div>
-        <div class="jrow"><label>News today</label><select class="jsel" id="j-news"><option value="">—</option><option>Neither</option><option>Good news</option><option>Bad news</option></select></div>
-      </div>
-      <div class="jsec">
-        <div class="jsec-hd">Prayer</div>
-        <div class="jrow"><label>Fajr</label><select class="jsel" id="j-fajr"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
-        <div class="jrow"><label>Dhuhr</label><select class="jsel" id="j-dhuhr"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
-        <div class="jrow"><label>Asr</label><select class="jsel" id="j-asr"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
-        <div class="jrow"><label>Maghreb</label><select class="jsel" id="j-maghreb"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
-        <div class="jrow"><label>Isha</label><select class="jsel" id="j-isha"><option value="">—</option><option>On Time</option><option>Late</option><option>Missed</option></select></div>
-        <div class="jrow"><label>Sunnah prayers</label><select class="jsel" id="j-sunnah"><option value="">—</option><option>Yes</option><option>No</option></select></div>
-        <div class="jrow"><label>Qiyam al-layl</label><select class="jsel" id="j-qiyam"><option value="">—</option><option>Yes</option><option>No</option></select></div>
-        <div class="jrow"><label>Dhikr</label><select class="jsel" id="j-dhikr"><option value="">—</option><option>Yes</option><option>No</option></select></div>
-      </div>
-      <div class="jsec">
-        <div class="jsec-hd">Market Context</div>
-        <div class="jrow"><label>Price action character</label><select class="jsel" id="j-balance"><option value="">—</option><option>Balanced</option><option>Imbalanced</option></select></div>
-        <div class="jrow"><label>Control</label><select class="jsel" id="j-control"><option value="">—</option><option>Buyers in control</option><option>Sellers in control</option><option>Balanced/contested</option></select></div>
-        <div class="jrow"><label>Behavior</label><select class="jsel" id="j-behavior"><option value="">—</option><option>Normal</option><option>Unusual</option></select></div>
-        <div class="jrow"><label>News day</label><select class="jsel" id="j-newsday"><option value="">—</option><option>Yes</option><option>No</option></select></div>
-        <div class="jrow"><label>Location traded from</label><input class="ni" id="j-location" type="text" placeholder="Home, office..." style="width:120px;text-align:left;"></div>
-        <div class="jrow"><label>Ticker traded</label><input class="ni" id="j-ticker" type="text" placeholder="RGTI" style="width:90px;"></div>
-        <div class="jrow"><label>Software used</label><input class="ni" id="j-software" type="text" placeholder="TradingView..." style="width:120px;text-align:left;"></div>
-        <div class="jrow"><label>Order flow tool</label><select class="jsel" id="j-orderflow"><option value="">—</option><option>Bookmap</option><option>Volume Profile only</option><option>Neither</option></select></div>
-      </div>
-      <div class="jsec">
-        <div class="jsec-hd">Day Grade (Process, Not P&amp;L)</div>
-        <div class="jrow"><label>Overall day grade</label><select class="jsel" id="j-daygrade"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>F</option></select></div>
-        <div class="jrow"><label>Market favorability</label><select class="jsel" id="j-marketfav"><option value="">—</option><option>Favorable for my style</option><option>Neutral</option><option>Unfavorable for my style</option></select></div>
-        <div class="jnotes-wrap"><label style="font-size:9px;color:#4d5a6e;display:block;margin-bottom:4px;">One focus point for tomorrow</label><textarea class="jnote" id="j-focus" rows="2" placeholder="The one thing that would most improve tomorrow's trading."></textarea></div>
-        <div class="jnotes-wrap"><label style="font-size:9px;color:#4d5a6e;display:block;margin-bottom:4px;">Best opportunity (taken or missed)</label><textarea class="jnote" id="j-bestop" rows="2" placeholder="What was the best setup of the day, whether or not you took it?"></textarea></div>
-      </div>
-      <div class="jsec">
-        <div class="jsec-hd">Trading Discipline</div>
-        <div class="jrow"><label>Rule breaks (0–5)</label><div class="scale-row" id="jsc-rules"></div></div>
-        <div class="jrow"><label>Pre-market prep</label><select class="jsel" id="j-prep"><option value="">—</option><option>None</option><option>Brief</option><option>Thorough</option></select></div>
-        <div class="jnotes-wrap"><label style="font-size:9px;color:#4d5a6e;display:block;margin-bottom:4px;">Notes</label><textarea class="jnote" id="j-note" rows="3" placeholder="What happened today? What will you change?"></textarea></div>
-      </div>
-      <button class="j-save-btn" onclick="saveJournal()">Save Entry</button>
       <button class="j-save-btn" onclick="exportLogCSV()" style="border-color:#60a5fa;color:#60a5fa;">Export Log + Journal CSV</button>
       <div class="spark-grid" id="spark-grid" style="display:none;"></div>
       <div class="jhist" id="jhist"><div class="jhist-hd">History</div><div class="jentry" style="color:#4d5a6e;font-size:10px;text-align:center;padding:14px;">No entries yet.</div></div>
@@ -431,31 +434,9 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="vs-rows" id="vs-rows"><div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run a simulation first.</div></div>
       </div>
 
-      <div class="vs-card" id="strat-cmp-card">
-        <div class="vs-hd"><span class="vs-title">Strategy Comparison</span><span class="vs-badge nosim" id="strat-cmp-badge">No Sims Run</span></div>
-        <div id="strat-cmp-body" style="padding:4px 12px 8px;"><div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run simulations on 2 or more strategies to compare.</div></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;padding:0 2px;">
-        <span style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;">Real Trading Data</span>
-        <button onclick="resetRealStats()" style="background:transparent;border:1px solid #252d3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:8px;padding:2px 8px;border-radius:2px;cursor:pointer;letter-spacing:.08em;">↺ Auto-fill from Log</button>
-      </div>
-      <div class="stats-inp">
-        <div class="si"><label>Total Trades</label><input class="ni" id="rTrades" type="number" placeholder="—" oninput="onReal()" style="width:78px;"></div>
-        <div class="si"><label>Trading Days</label><input class="ni" id="rDays" type="number" placeholder="—" oninput="onReal()" style="width:78px;"></div>
-        <div class="si"><label>Win Rate %</label><input class="ni" id="rWR" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
-        <div class="si"><label>Breakeven %</label><input class="ni" id="rBE" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
-        <div class="si"><label>Avg Win Ticks</label><input class="ni" id="rTickW" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
-        <div class="si"><label>Avg Loss Ticks</label><input class="ni" id="rTickL" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
-        <div class="si"><label>Total P&amp;L $</label><input class="ni" id="rPnlTotal" type="number" step="0.01" placeholder="—" oninput="onReal()" style="width:88px;"></div>
-        <div class="si"><label>Avg Daily P&amp;L $</label><input class="ni" id="rDayPnl" type="number" step="0.01" placeholder="—" oninput="onReal()" style="width:88px;"></div>
-      </div>
-      <div class="stats-grid" style="margin-top:2px;">
-        <div class="sg"><div class="sgl">Loss Rate</div><div class="sgv" id="rLoss" style="color:#f87171">—</div></div>
-        <div class="sg"><div class="sgl">Avg T/Day</div><div class="sgv" id="rAvgT" style="color:#fbbf24">—</div></div>
-        <div class="sg"><div class="sgl">R:R Ratio</div><div class="sgv" id="rRR" style="color:#34d399">—</div></div>
-        <div class="sg"><div class="sgl">Days ±Pace</div><div class="sgv" id="rPace">—</div></div>
-      </div>
-      <div class="fc-note" style="padding:0 4px 8px;">Fields auto-fill from your Log. Edit any value to override. Hit ↺ to revert to auto-computed.</div>
+      <!-- Broker data entry, compartmentalized behind a single circle —
+           same interaction language as the Sim tab and Log tab. -->
+      <div id="scirc-mount"></div>
 
       <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Weekly Report Card</div>
       <div id="weekly-report" style="padding-top:8px;margin-bottom:4px;"></div>
@@ -479,10 +460,6 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="chart-wrap"><canvas class="eqcv" id="real-cv-month"></canvas></div>
       </div>
 
-      <div class="stats-inp">
-        <div class="si"><label>Start Capital $</label><input class="ni" id="rCapS" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
-        <div class="si"><label>Current Capital $</label><input class="ni" id="rCapC" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
-      </div>
       <div class="stats-grid">
         <div class="sg"><div class="sgl">YTD Return</div><div class="sgv" id="rYTD">—</div></div>
       </div>
@@ -566,7 +543,7 @@ const LIM={
   rrSlider:{min:0,max:200,step:1},tickSz:{min:1,max:100,step:1},
   minDp:{min:-200,max:200,step:1},maxDp:{min:-200,max:200,step:1},
   bias:{min:0,max:100,step:5},intv:{min:1,max:30,step:1},
-  startCap:{min:0,max:1000000,step:100},
+  gcStartCap:{min:0,max:1000000,step:100},
   volCeil:{min:0,max:1000000,step:50},
   vwFH_min:{min:0,max:2000000,step:1000},vwFH_max:{min:0,max:2000000,step:1000},
   vwMD_min:{min:0,max:2000000,step:1000},vwMD_max:{min:0,max:2000000,step:1000},
@@ -631,7 +608,7 @@ function switchStrat(n){
   });
   updateDist(n);
 }
-function switchTblStrat(n){activeTblStrat=n;[0,1,2].forEach(i=>$('tsb'+i).classList.toggle('on',i===n));renderTable(n);}
+function switchTblStrat(n){activeTblStrat=n;[0,1,2].forEach(i=>{$('tsb'+i).classList.toggle('on',i===n);const iw=$('intv-wrap-'+i);if(iw)iw.style.display=i===n?'flex':'none';});renderTable(n);}
 
 function openGuide(){$('gmodal').classList.add('open');}
 function closeGuide(){$('gmodal').classList.remove('open');}
@@ -647,7 +624,29 @@ function onTog(cb,ctrl,tab){
   const b=$('ovr-badge'+s);if(b)b.classList.toggle('on',isOn('tog-rr'+s)||isOn('tog-dp'+s)||isOn('tog-volceil'+s));
 }
 const isOn=id=>{const e=$(id);return!e||e.checked;};
-function toggleGrp(hd){const body=hd.nextElementSibling;const arr=hd.querySelector('.dgrp-arr');const o=body.classList.toggle('open');if(arr)arr.classList.toggle('open',o);}
+function circSelect(tab,catKey){
+  const s=tab===0?'':'_'+tab;
+  const cluster=$('circ-cluster'+s);
+  const panelWrap=$('circ-panel-wrap'+s);
+  const currentSel=cluster?.dataset.sel;
+  const deselecting=currentSel===catKey;
+  cluster.querySelectorAll('.circ-btn').forEach(btn=>{
+    const isThis=btn.dataset.cat===catKey;
+    btn.classList.toggle('sel',isThis&&!deselecting);
+    btn.classList.toggle('dim',!isThis&&!deselecting);
+    const lbl=btn.parentElement.querySelector('.circ-label');
+    // Labels show by default (idle state); any selection hides all of them,
+    // including the tapped circle's own — reappearing once deselected.
+    if(lbl)lbl.classList.toggle('dim-out',!deselecting);
+  });
+  cluster.classList.toggle('has-sel',!deselecting);
+  cluster.dataset.sel=deselecting?'':catKey;
+  document.querySelectorAll('.circ-panel'+s).forEach(p=>{
+    p.style.display=(!deselecting&&p.dataset.cat===catKey)?'block':'none';
+  });
+  if(panelWrap)panelWrap.classList.toggle('open',!deselecting);
+}
+
 
 function commissionForShares(shares){
   if(shares<100) return 0.35;
@@ -674,7 +673,7 @@ function cfg(tab){
     minSw:n('minSw',15),maxSw:n('maxSw',40),
     minDp:n('minDp',-2),maxDp:n('maxDp',3),
     bias:n('bias',50)/100,curve:str('curve','linear'),mode:str('mode','rand'),
-    startCap:n('startCap',0),volCeil:n('volCeil',0),
+    volCeil:n('volCeil',0),
     vwFH_min:n('vwFH_min',60000),vwFH_max:n('vwFH_max',120000),
     vwMD_min:n('vwMD_min',15000),vwMD_max:n('vwMD_max',40000),
     vwLH_min:n('vwLH_min',30000),vwLH_max:n('vwLH_max',70000),
@@ -697,7 +696,7 @@ function cfg(tab){
     minSw:on('tog-swing')?r.minSw:Math.round((r.minSw+r.maxSw)/2),maxSw:on('tog-swing')?r.maxSw:Math.round((r.minSw+r.maxSw)/2),dpct:on('tog-dp'),
     minDp:on('tog-dp')?r.minDp:0,maxDp:on('tog-dp')?r.maxDp:0,
     bias:on('tog-bias')?r.bias:0,curve:r.curve,mode:r.mode,
-    startCap:on('tog-startcap')?r.startCap:0,
+    startCap:sv('gcStartCap',0,0), // shared across all strategies — not tab-scoped
     volCeil:on('tog-volceil')?r.volCeil:0,
     vwOn:on('tog-vw'),
     vwFH_min:r.vwFH_min,vwFH_max:r.vwFH_max,
@@ -711,7 +710,13 @@ function cfg(tab){
   const avgP=(c.minP+c.maxP)/2;
   let avgL=(c.minL+c.maxL)/2;if(c.rr>0)avgL=avgP/c.rr;
   const avgT=(c.minT+c.maxT)/2,avgPr=(c.minPr+c.maxPr)/2;
-  const acct0=c.startCap>0?c.startCap:c.sh*avgPr;
+  // Capital always determines share count — no manual override. Shares are
+  // purely a consequence of how much capital is deployed against this
+  // strategy's own price midpoint. This is what makes A/B/C genuinely
+  // comparable: same capital base, shares fall out of that automatically.
+  const gCap=sv('gcStartCap',0,0);
+  c.sh=gCap>0&&avgPr>0?Math.max(1,Math.round(gCap/avgPr)):c.sh;
+  const acct0=gCap>0?gCap:c.sh*avgPr;
   const exFee=0.0067;
   const exCost=c.feesOn?(c.sh*exFee):0;
   const commCost=commissionForShares(c.sh);
@@ -756,7 +761,25 @@ function updateDist(tab){
   se('ev-tag',e=>{e.textContent='EV '+(ev>=0?'+$':'−$')+fmt(Math.abs(ev))+'/day';e.style.color=ev>0?'#34d399':ev<0?'#f87171':'#fbbf24';});
   const lr=$('lr-disp'+s);if(lr)lr.textContent=(c.loss*100).toFixed(1)+'%';
 }
-function onSlider(tab){updateDist(tab);updateFrictionBreakdown(tab);updateVolWindowSummary(tab);save();}
+function onSlider(tab){updateDist(tab);updateFrictionBreakdown(tab);updateVolWindowSummary(tab);updateDerivedShares(tab);save();}
+
+function updateDerivedShares(tab){
+  const s=tab===0?'':'_'+tab;
+  const note=$('sh-derived-note'+s);
+  const c=cfg(tab);
+  const gCap=sv('gcStartCap',0,0);
+  if(note){
+    note.textContent=gCap>0
+      ? `Set by Capital: $${fmt(gCap,0)} ÷ $${c.avgPr.toFixed(0)} avg price ≈ ${c.sh.toLocaleString()} shares`
+      : `Set Capital above to determine share count.`;
+  }
+  // Starting Shares is now a read-only, derived display — capital is the
+  // only real input. Reflect the derived value and disable manual entry.
+  const shField=$('sh'+s);
+  if(shField){shField.value=c.sh;shField.disabled=true;}
+  const shWrap=shField?.closest('.stp');
+  if(shWrap)shWrap.querySelectorAll('.stp-btn').forEach(b=>b.disabled=true);
+}
 
 function updateVolWindowSummary(tab){
   const s=tab===0?'':'_'+tab;
@@ -906,6 +929,55 @@ function _drawChart(cv,equity,acct0){
   ctx.strokeStyle=pnls[pnls.length-1]>=0?'#34d399':'#f87171';ctx.lineWidth=2;ctx.stroke();
   cv._cs={equity,acct0,pd,pw,ph,W,H,pnls,mn,rng,xS,yS};
 }
+/* Combined multi-strategy comparison overlay — shared y-scale so magnitude
+   is directly comparable; each series keeps its own true x-length, so a
+   strategy that finishes faster visibly ends sooner on the chart. */
+const STRAT_COLORS=['#34d399','#f87171','#fbbf24'];
+const STRAT_LABELS=['A','B','C'];
+function drawCombinedChart(cv,legendEl){
+  if(!cv||!cv.getContext)return;
+  const active=[0,1,2].filter(i=>simResults[i]&&simResults[i].equity&&simResults[i].equity.length>1);
+  const dpr=window.devicePixelRatio||1;
+  const W=cv.offsetWidth,H=cv.offsetHeight;if(!W||!H)return;
+  cv.width=W*dpr;cv.height=H*dpr;
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  ctx.fillStyle='#131720';ctx.fillRect(0,0,W,H);
+  if(!active.length){
+    ctx.fillStyle='#4d5a6e';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';
+    ctx.fillText('Run a simulation on any strategy to see it here',W/2,H/2);
+    if(legendEl)legendEl.innerHTML='';
+    return;
+  }
+  const pd={t:8,b:8,l:6,r:6};const pw=W-pd.l-pd.r,ph=H-pd.t-pd.b;
+  let allPnls=[];
+  const series=active.map(i=>{
+    const eq=simResults[i].equity;const pnls=eq.map(p=>p.cumPnl);
+    allPnls=allPnls.concat(pnls);
+    return{idx:i,eq,pnls,color:STRAT_COLORS[i],label:STRAT_LABELS[i]};
+  });
+  const mn=Math.min(0,...allPnls),mx=Math.max(0,...allPnls),rng=mx-mn||1;
+  const maxLen=Math.max(...series.map(s=>s.pnls.length));
+  const xS=i=>pd.l+(i/Math.max(maxLen-1,1))*pw;
+  const yS=v=>pd.t+ph-((v-mn)/rng)*ph;
+  const zy=yS(0);
+  ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+  ctx.beginPath();ctx.moveTo(pd.l,zy);ctx.lineTo(pd.l+pw,zy);ctx.stroke();ctx.setLineDash([]);
+  for(const s of series){
+    ctx.beginPath();ctx.moveTo(xS(0),yS(s.pnls[0]));
+    for(let i=1;i<s.pnls.length;i++){const cpx=(xS(i-1)+xS(i))/2;ctx.bezierCurveTo(cpx,yS(s.pnls[i-1]),cpx,yS(s.pnls[i]),xS(i),yS(s.pnls[i]));}
+    ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.stroke();
+    const lastI=s.pnls.length-1;
+    ctx.beginPath();ctx.arc(xS(lastI),yS(s.pnls[lastI]),3,0,Math.PI*2);
+    ctx.fillStyle=s.color;ctx.fill();ctx.strokeStyle='#131720';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  if(legendEl){
+    legendEl.innerHTML=series.map(s=>{
+      const last=s.pnls[s.pnls.length-1];const days=s.eq[s.eq.length-1].day;
+      return`<div style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0;"></span><span style="font-size:9px;color:#8892a4;">${s.label}</span><span style="font-size:9px;font-weight:600;color:${s.color};">${last>=0?'+$':'−$'}${fmt(Math.abs(last))}</span><span style="font-size:8px;color:#4d5a6e;">· ${days}d</span></div>`;
+    }).join('');
+  }
+}
+
 function wireChart(cv,tt){
   function onX(cx){
     const st=cv._cs;if(!st)return;
@@ -1048,6 +1120,27 @@ function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,
       rows.push(row('Volume ceiling','CAPPED at '+c.volCeil.toLocaleString()+' sh','neu','growth stops here',avgShDisp,c.volCeil,'lower'));
     }
     rows.push(row('Status',wrOk&&c.evNet>0?'PROFITABLE':c.evNet>0?'MARGINAL':'NEGATIVE',wrOk&&c.evNet>0?'pos':c.evNet>0?'neu':'neg'));
+    // ── Which strategy is faster / better, if others have been simulated ──
+    const others=[0,1,2].filter(i=>i!==tab&&simResults[i]&&simResults[i].rows&&simResults[i].rows.length);
+    if(others.length){
+      const myDays=days,myEV=c.evNet;
+      const cmp=others.map(i=>{
+        const r=simResults[i];
+        const oDays=r.rows.length;
+        const oEV=r.c.evNet;
+        return{label:STRAT_LABELS[i],oDays,oEV};
+      });
+      const fasterThan=cmp.filter(o=>myDays<o.oDays).map(o=>o.label);
+      const slowerThan=cmp.filter(o=>myDays>o.oDays).map(o=>o.label);
+      const higherEVThan=cmp.filter(o=>myEV>o.oEV).map(o=>o.label);
+      let speedNote;
+      if(fasterThan.length&&!slowerThan.length)speedNote=`Faster to goal than ${fasterThan.join(', ')}`;
+      else if(slowerThan.length&&!fasterThan.length)speedNote=`Slower to goal than ${slowerThan.join(', ')}`;
+      else if(fasterThan.length&&slowerThan.length)speedNote=`Faster than ${fasterThan.join(', ')}, slower than ${slowerThan.join(', ')}`;
+      else speedNote='Same pace as '+cmp.map(o=>o.label).join(', ');
+      const speedCls=fasterThan.length>=slowerThan.length?'pos':'neg';
+      rows.push(row('vs. other strategies',speedNote,speedCls,higherEVThan.length===cmp.length?'also highest EV/day':higherEVThan.length===0?'lowest EV/day of the three':''));
+    }
   }
   let cls;
   if(capped||c.evNet<0)cls='ng';
@@ -1060,11 +1153,26 @@ function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,
   if(l)l.innerHTML=rows.join('');
 }
 
+/* ══════════════════════════════════════════════════════════════
+   TABLE TAB — flat, linked equity curve + scroll-wheel day picker.
+   Deliberately avoids nested overflow:auto chains. Only two scroll
+   contexts exist here, siblings not nested: the equity chart never
+   scrolls at all, and .tbl-scroll is the ONE scrollable element.
+   ══════════════════════════════════════════════════════════════ */
+let dvSelDay=null; // the currently highlighted day (shared across table + chart)
+
+/* Original wide table, restored — now rendered inside the bottom .dv-half
+   instead of full-screen. Row click sets the shared highlighted day, which
+   the shares-vs-time chart above reads to draw its crosshair. */
 function renderTable(tab,rowsIn,acct0In,cIn,mspIn,cappedIn){
   const res=simResults[tab];
   const rows=rowsIn||res?.rows,acct0=acct0In||res?.acct0,c=cIn||res?.c,msp=mspIn||res?.msp,capped=cappedIn||false;
   const tbody=$('main-tbody');
-  if(!rows||!rows.length){tbody.innerHTML=`<tr><td colspan="15" class="tbl-empty">No sim data. Run a simulation first.</td></tr>`;return;}
+  if(!rows||!rows.length){
+    if(tbody)tbody.innerHTML=`<tr><td colspan="15" class="dv-empty">No sim data. Run a simulation first.</td></tr>`;
+    dvRedrawChart();
+    return;
+  }
   const intv=sv('intv',tab,5)||5;tbody.innerHTML='';
   const show=new Set([0,rows.length-1]);
   rows.forEach((r,i)=>{if(r.isMilestone||r.day%intv===0)show.add(i);});
@@ -1074,9 +1182,7 @@ function renderTable(tab,rowsIn,acct0In,cIn,mspIn,cappedIn){
     const r=rows[idx];const tr=document.createElement('tr');
     if(r.isMilestone)tr.className=r.outcome==='WIN'?'rms-w':'rms-l';
     else if(r.outcome==='LOSS')tr.className='rl';else if(r.outcome==='BE')tr.className='rb_';
-    if(r.isBlowup)tr.classList.add('blow');if(r.isGood)tr.classList.add('good');
-    const bP=(Math.abs(r.dayPnl)/maxA*100).toFixed(1);
-    const bC=r.dayPnl>0?'bfp':r.dayPnl<0?'bfn':'bfz';
+    if(dvSelDay===r.day)tr.classList.add('sel-day');
     const pC=r.dayPnl>0?'#34d399':r.dayPnl<0?'#f87171':'#fbbf24';
     const moPnl=r.cumPnl-((msp||{})[r.mIdx]||0);
     const dpS=r.dayPct!=null?(r.dayPct>=0?'+':'')+r.dayPct.toFixed(2)+'%':'—';
@@ -1087,16 +1193,324 @@ function renderTable(tab,rowsIn,acct0In,cIn,mspIn,cappedIn){
     else if(idx===rows.length-1)label=capped?'Cap':'Goal ✓';
     const totTr=r.dayWinCt+r.dayLoseCt+r.dayBECt;
     const wrPct=totTr>0?((r.dayWinCt/totTr)*100).toFixed(0)+'%':'—';
-    tr.innerHTML=`<td>${r.day}</td><td>${cal(r.calMo)}</td><td style="color:#e2e6ed">${(moPnl>=0?'+$':'−$')+fmt(Math.abs(moPnl))}</td><td>${label}</td><td style="color:#fbbf24;font-weight:600">${r.shares.toLocaleString()}</td><td style="color:#4d5a6e;font-size:9px">${wrPct}</td><td style="font-size:9px;color:#8892a4">${r.numTr||'—'}</td><td style="color:${r.dayTicks>0?'#34d399':r.dayTicks<0?'#f87171':'#4d5a6e'}">${r.dayTicks!==0?(r.dayTicks>0?'+':'')+r.dayTicks+'t':'—'}</td><td style="color:${dpC};font-size:9px">${dpS}</td><td class="bw"><div class="bf ${bC}" style="width:${bP}%"></div><span style="color:${pC}">${sgn(r.dayPnl)}</span></td><td style="color:${(r.cumPnl/acct0*100)>=0?'#34d399':'#f87171'};font-size:9px">${pct(r.cumPnl/acct0*100,1)}</td><td style="color:#4d5a6e;font-size:9px">${r.dayFees>0?'−$'+fmt(r.dayFees):'—'}</td><td style="color:#4d5a6e;font-size:9px">${(r.surplus>=0?'$':'−$')+fmt(Math.abs(r.surplus))}</td><td style="color:#fbbf24;font-size:9px">${r.newSh>0?'+'+r.newSh:'—'}</td><td style="color:#e2e6ed;font-weight:600">${(r.cumPnl>=0?'$':'−$')+fmt(Math.abs(r.cumPnl))}</td>`;
+    tr.innerHTML=`<td>${r.day}</td><td>${cal(r.calMo)}</td><td style="color:#e2e6ed">${(moPnl>=0?'+$':'−$')+fmt(Math.abs(moPnl))}</td><td>${label}</td><td style="color:#fbbf24;font-weight:600">${r.shares.toLocaleString()}</td><td style="color:#4d5a6e;font-size:9px">${wrPct}</td><td style="font-size:9px;color:#8892a4">${r.numTr||'—'}</td><td style="color:${r.dayTicks>0?'#34d399':r.dayTicks<0?'#f87171':'#4d5a6e'}">${r.dayTicks!==0?(r.dayTicks>0?'+':'')+r.dayTicks+'t':'—'}</td><td style="color:${dpC};font-size:9px">${dpS}</td><td style="color:${pC};font-weight:600">${sgn(r.dayPnl)}</td><td style="color:${(r.cumPnl/acct0*100)>=0?'#34d399':'#f87171'};font-size:9px">${pct(r.cumPnl/acct0*100,1)}</td><td style="color:#4d5a6e;font-size:9px">${r.dayFees>0?'−$'+fmt(r.dayFees):'—'}</td><td style="color:#4d5a6e;font-size:9px">${(r.surplus>=0?'$':'−$')+fmt(Math.abs(r.surplus))}</td><td style="color:#fbbf24;font-size:9px">${r.newSh>0?'+'+r.newSh:'—'}</td><td style="color:#e2e6ed;font-weight:600">${(r.cumPnl>=0?'$':'−$')+fmt(Math.abs(r.cumPnl))}</td>`;
+    tr.addEventListener('click',()=>{dvSelDay=r.day;renderTable(tab);});
     tbody.appendChild(tr);
   }
   if(capped){const w=document.createElement('tr');w.innerHTML=`<td colspan="15" style="text-align:center;color:#f87171;padding:8px;font-size:9px;">CAPPED AT 10,000 DAYS</td>`;tbody.appendChild(w);}
+  dvRedrawChart();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RACE-TO-GOAL CHART — capital/equity (Y) vs time (X), one line per
+   active strategy, endpoint annotated with its final share count. Y-axis
+   is equity because that's the actual outcome that matters; share count
+   sits at the endpoint as a label rather than driving the chart's shape,
+   since a chart shaped by share count made the visual height mean the
+   wrong thing. "Who finished first" still reads clearly from WHERE each
+   line stops on the X-axis — that hasn't changed, just what the height
+   represents while getting there.
+   ══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   RACE-TO-GOAL CHART — capital/equity (Y) vs time (X), gridlines and
+   axis labels so a first-time viewer understands it unaided. Endpoint
+   and crosshair labels use magnetic stacking: when two strategies'
+   values land close together, their labels separate vertically
+   instead of overlapping into unreadable text.
+   ══════════════════════════════════════════════════════════════ */
+function dvDrawRaceChart(cv,legendEl,hoverDay){
+  if(!cv||!cv.getContext)return;
+  const active=[0,1,2].filter(i=>simResults[i]&&simResults[i].rows&&simResults[i].rows.length>1);
+  const dpr=window.devicePixelRatio||1;
+  const W=cv.offsetWidth,H=cv.offsetHeight;if(!W||!H)return;
+  cv.width=W*dpr;cv.height=H*dpr;
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  ctx.fillStyle='#131720';ctx.fillRect(0,0,W,H);
+  const realCapS=+$('rCapS')?.value||0;
+  const sortedLog=sessionLog&&sessionLog.length?[...sessionLog].sort((a,b)=>a.date.localeCompare(b.date)):[];
+  let realCum=0;
+  const realPts=sortedLog.length?sortedLog.map((e,i)=>{realCum+=e.pnl;return{idx:i,date:e.date,cap:realCapS+realCum};}):[];
+  const hasReal=realPts.length>1&&realCapS>0;
+  if(!active.length&&!hasReal){
+    ctx.fillStyle='#4d5a6e';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';
+    ctx.fillText('Run a simulation to see the race to goal',W/2,H/2);
+    if(legendEl)legendEl.innerHTML='';
+    cv._race=null;
+    return;
+  }
+  // Extra padding on every edge: left for $ axis labels, bottom for date
+  // labels, right for endpoint value labels, top for breathing room.
+  const pd={t:14,b:22,l:44,r:66};
+  const pw=W-pd.l-pd.r,ph=H-pd.t-pd.b;
+  const series=active.map(i=>{
+    const rows=simResults[i].rows;
+    const acct0=simResults[i].acct0;
+    const pts=rows.map(r=>({day:r.day,sh:r.shares,cum:r.cumPnl,cap:acct0+r.cumPnl}));
+    return{idx:i,pts,color:STRAT_COLORS[i],label:STRAT_LABELS[i],acct0};
+  });
+  const maxDay=active.length?Math.max(...series.map(s=>s.pts[s.pts.length-1].day)):(hasReal?realPts.length:1);
+  let allCaps=series.flatMap(s=>s.pts.map(p=>p.cap));
+  if(hasReal)allCaps=allCaps.concat(realPts.map(p=>p.cap));
+  const maxCap=Math.max(...allCaps),minCap=Math.min(0,...allCaps);
+  const capRng=(maxCap-minCap)||1;
+  const xS=day=>pd.l+(Math.min(day,maxDay)/Math.max(maxDay,1))*pw;
+  const yS=cap=>pd.t+ph-((cap-minCap)/capRng)*ph;
+  const dayToCal=day=>(day/252)*12; // trading days -> calendar months, same conversion used app-wide
+
+  // ── Gridlines + axis labels ──
+  // Horizontal: 4 evenly-spaced $ levels including the zero/start line.
+  const gridN=4;
+  ctx.font='8px IBM Plex Mono';ctx.textAlign='right';
+  for(let i=0;i<=gridN;i++){
+    const cap=minCap+(capRng*i/gridN);
+    const gy=yS(cap);
+    ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pd.l,gy);ctx.lineTo(pd.l+pw,gy);ctx.stroke();
+    ctx.fillStyle='#4d5a6e';ctx.fillText('$'+fmt(cap,0),pd.l-6,gy+3);
+  }
+  // Vertical: time gridlines at roughly-even day intervals, labeled in
+  // calendar terms so a first-time viewer reads "2mo" not "day 42".
+  const vGridN=Math.min(5,Math.max(2,Math.round(maxDay/40)));
+  ctx.textAlign='center';
+  for(let i=0;i<=vGridN;i++){
+    const day=Math.round((maxDay*i)/vGridN);
+    const gx=xS(day);
+    ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(gx,pd.t);ctx.lineTo(gx,pd.t+ph);ctx.stroke();
+    ctx.fillStyle='#4d5a6e';ctx.fillText(cal(dayToCal(day)),gx,pd.t+ph+13);
+  }
+  // Axis titles
+  ctx.save();
+  ctx.fillStyle='#4d5a6e';ctx.font='7px IBM Plex Mono';
+  ctx.textAlign='left';ctx.fillText('CAPITAL',pd.l-38,pd.t-4);
+  ctx.textAlign='right';ctx.fillText('TIME →',pd.l+pw,H-4);
+  ctx.restore();
+
+  // Draw the real line first, beneath the strategy lines, in white.
+  if(hasReal){
+    ctx.beginPath();ctx.moveTo(xS(0),yS(realPts[0].cap));
+    for(let i=1;i<realPts.length;i++){
+      const cpx=(xS(i-1)+xS(i))/2;
+      ctx.bezierCurveTo(cpx,yS(realPts[i-1].cap),cpx,yS(realPts[i].cap),xS(i),yS(realPts[i].cap));
+    }
+    ctx.strokeStyle='#e2e6ed';ctx.lineWidth=2;ctx.stroke();
+  }
+  for(const s of series){
+    ctx.beginPath();ctx.moveTo(xS(s.pts[0].day),yS(s.pts[0].cap));
+    for(let i=1;i<s.pts.length;i++){
+      const cpx=(xS(s.pts[i-1].day)+xS(s.pts[i].day))/2;
+      ctx.bezierCurveTo(cpx,yS(s.pts[i-1].cap),cpx,yS(s.pts[i].cap),xS(s.pts[i].day),yS(s.pts[i].cap));
+    }
+    ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.stroke();
+  }
+
+  // ── Endpoint dots + magnetically-stacked labels ──
+  // Collect every endpoint (real + each strategy) with its natural label
+  // Y position, then resolve collisions by nudging apart any pair whose
+  // labels would overlap — closest pair first, repeated until no overlaps
+  // remain or a safety cap is hit. This is what keeps two strategies that
+  // finish at similar capital from becoming an unreadable stack of text.
+  const endpoints=[];
+  if(hasReal){
+    const lastR=realPts[realPts.length-1];
+    endpoints.push({x:xS(realPts.length-1),y:yS(lastR.cap),color:'#e2e6ed',text:'$'+fmt(lastR.cap,0)+' real'});
+  }
+  for(const s of series){
+    const last=s.pts[s.pts.length-1];
+    const ex=xS(last.day),ey=yS(last.cap);
+    endpoints.push({x:ex,y:ey,color:s.color,text:'$'+fmt(last.cap,0)+' · '+last.sh.toLocaleString()+'sh',dotColor:s.color});
+  }
+  dvResolveLabelCollisions(endpoints,11);
+  for(const s of series){
+    const last=s.pts[s.pts.length-1];
+    ctx.beginPath();ctx.arc(xS(last.day),yS(last.cap),3.5,0,Math.PI*2);ctx.fillStyle=s.color;ctx.fill();
+    ctx.strokeStyle='#131720';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  if(hasReal){
+    const lastR=realPts[realPts.length-1];
+    ctx.beginPath();ctx.arc(xS(realPts.length-1),yS(lastR.cap),3.5,0,Math.PI*2);ctx.fillStyle='#e2e6ed';ctx.fill();
+    ctx.strokeStyle='#131720';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  ctx.font='9px IBM Plex Mono';ctx.textAlign='left';
+  for(const ep of endpoints){
+    ctx.fillStyle=ep.color;ctx.fillText(ep.text,ep.x+7,ep.labelY!==undefined?ep.labelY:ep.y+3);
+  }
+
+  cv._race={series,realPts,hasReal,pd,pw,ph,xS,yS,maxDay,dayToCal};
+  if(legendEl)legendEl.innerHTML='';
+
+  // Crosshair for the currently highlighted/hovered day.
+  if(hoverDay!=null){
+    const st=cv._race;
+    const cx=st.xS(hoverDay);
+    ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.setLineDash([2,3]);
+    ctx.beginPath();ctx.moveTo(cx,st.pd.t);ctx.lineTo(cx,st.pd.t+st.ph);ctx.stroke();
+    ctx.setLineDash([]);
+    // Day-count label anchored to the crosshair, upper third — now with
+    // its calendar equivalent alongside the raw day count.
+    const dayLabelY=st.pd.t+st.ph*0.33;
+    const dayText='Day '+hoverDay+' · '+cal(st.dayToCal(hoverDay));
+    ctx.font='9px IBM Plex Mono';ctx.textAlign='center';
+    const tw=ctx.measureText(dayText).width;
+    ctx.fillStyle='#131720';ctx.fillRect(cx-tw/2-4,dayLabelY-9,tw+8,13);
+    ctx.fillStyle='#e2e6ed';ctx.fillText(dayText,cx,dayLabelY);
+    // Collect hover-point labels for the same magnetic-stacking treatment.
+    const hoverPts=[];
+    for(const s of st.series){
+      const ownFinalDay=s.pts[s.pts.length-1].day;
+      const clampedDay=Math.min(hoverDay,ownFinalDay);
+      let pt=null;
+      for(const p of s.pts){if(p.day<=clampedDay)pt=p;else break;}
+      if(pt)hoverPts.push({x:st.xS(clampedDay),y:st.yS(pt.cap),color:s.color,text:`${s.label} $${fmt(pt.cap,0)} · ${pt.sh.toLocaleString()}sh`,dotX:st.xS(clampedDay),dotY:st.yS(pt.cap)});
+    }
+    dvResolveLabelCollisions(hoverPts,11);
+    for(const hp of hoverPts){
+      ctx.beginPath();ctx.arc(hp.dotX,hp.dotY,4,0,Math.PI*2);ctx.fillStyle=hp.color;ctx.fill();
+      ctx.strokeStyle='#131720';ctx.lineWidth=1.5;ctx.stroke();
+    }
+    ctx.font='9px IBM Plex Mono';ctx.textAlign='left';
+    for(const hp of hoverPts){
+      const ly=hp.labelY!==undefined?hp.labelY:hp.y-6;
+      const lw=ctx.measureText(hp.text).width;
+      const labelX=Math.min(hp.x+8,st.pd.l+st.pw-lw-4);
+      ctx.fillStyle='#131720';ctx.fillRect(labelX-2,ly-9,lw+4,12);
+      ctx.fillStyle=hp.color;ctx.fillText(hp.text,labelX,ly);
+    }
+  }
+}
+
+// Magnetic label collision resolution: given a list of {y, ...} points with
+// a shared minimum vertical spacing, nudge any pair closer than that apart
+// (moving both away from each other) until none overlap or the safety cap
+// is reached. Sets point.labelY to the resolved position; leaves point.y
+// untouched (that's still the true data position, used for the dot itself).
+function dvResolveLabelCollisions(points,minGap){
+  points.forEach(p=>{if(p.labelY===undefined)p.labelY=p.y+3;});
+  for(let pass=0;pass<12;pass++){
+    let moved=false;
+    const sorted=[...points].sort((a,b)=>a.labelY-b.labelY);
+    for(let i=0;i<sorted.length-1;i++){
+      const a=sorted[i],b=sorted[i+1];
+      const gap=b.labelY-a.labelY;
+      if(gap<minGap){
+        const shift=(minGap-gap)/2;
+        a.labelY-=shift;b.labelY+=shift;
+        moved=true;
+      }
+    }
+    if(!moved)break;
+  }
+}
+
+// Comparative diagnostic text — replaces the old static legend. Draws
+// genuinely useful observations from whatever's actually been simulated
+// (and the real line, if present), using only white for neutral facts
+// and the app's established green/red for good/bad judgments — no other
+// colours, so the reading stays simple and consistent with the rest of
+// the app's language for "this is fine" vs "this needs attention."
+function dvRenderDiagnostics(){
+  const wrap=$('dv-diag');if(!wrap)return;
+  const active=[0,1,2].filter(i=>simResults[i]&&simResults[i].rows&&simResults[i].rows.length>1);
+  if(!active.length){
+    wrap.innerHTML='<div class="dv-diag-line" style="color:#4d5a6e;">Run a simulation on any strategy to see comparison notes here.</div>';
+    return;
+  }
+  const lines=[];
+  const info=active.map(i=>{
+    const r=simResults[i];
+    const last=r.rows[r.rows.length-1];
+    return{i,label:STRAT_LABELS[i],days:last.day,cap:r.acct0+last.cumPnl,acct0:r.acct0,evNet:r.c.evNet,frDay:r.c.frDay,wr:r.c.wr};
+  });
+  if(info.length>=2){
+    const fastest=info.reduce((a,b)=>a.days<b.days?a:b);
+    const slowest=info.reduce((a,b)=>a.days>b.days?a:b);
+    const richest=info.reduce((a,b)=>a.cap>b.cap?a:b);
+    if(fastest.i!==slowest.i){
+      const dayDiff=slowest.days-fastest.days;
+      lines.push(`<span style="color:#e2e6ed;">${fastest.label} reaches its goal ${cal((dayDiff/252)*12)} sooner than ${slowest.label}.</span>`);
+    }
+    lines.push(`<span style="color:#e2e6ed;">${richest.label} ends with the highest capital: $${fmt(richest.cap,0)}.</span>`);
+    // Friction-quality callouts: green if friction is a small share of
+    // daily edge, red if it's eating a large share. Strategies sharing
+    // the same finding are grouped into ONE sentence naming all of them,
+    // rather than repeating the same sentence once per strategy.
+    const efficient=[],costly=[];
+    info.forEach(s=>{
+      if(s.evNet<=0)return;
+      const frShare=s.frDay/(s.evNet+s.frDay);
+      if(frShare<0.15)efficient.push(s.label);
+      else if(frShare>0.4)costly.push(s.label);
+    });
+    const joinNames=arr=>arr.length===1?arr[0]:arr.length===2?arr.join(' and '):arr.slice(0,-1).join(', ')+', and '+arr[arr.length-1];
+    if(efficient.length){
+      const verb=efficient.length>1?'are':'is';
+      lines.push(`<span style="color:#34d399;">${joinNames(efficient)}'s friction ${verb} a small share of ${efficient.length>1?'their':'its'} daily edge — efficient.</span>`);
+    }
+    if(costly.length){
+      const verb=costly.length>1?'are':'is';
+      lines.push(`<span style="color:#f87171;">${joinNames(costly)} ${verb} losing a large share of ${costly.length>1?'their':'its'} edge to friction — worth revisiting size or target.</span>`);
+    }
+  }
+  // Real-vs-sim callout, only when there's enough real data to say anything meaningful.
+  const realCapS=+$('rCapS')?.value||0;
+  if(sessionLog&&sessionLog.length>=5&&realCapS>0){
+    const sortedLog=[...sessionLog].sort((a,b)=>a.date.localeCompare(b.date));
+    const realTotal=sortedLog.reduce((a,e)=>a+e.pnl,0);
+    const realCap=realCapS+realTotal;
+    const best=info.reduce((a,b)=>a.cap>b.cap?a:b);
+    if(realCap>=best.cap){
+      lines.push(`<span style="color:#34d399;">Your real trading is ahead of every simulated strategy right now.</span>`);
+    }else{
+      const gap=best.cap-realCap;
+      lines.push(`<span style="color:#f87171;">Real trading is $${fmt(gap,0)} behind ${best.label}'s simulated pace.</span>`);
+    }
+  }
+  wrap.innerHTML=lines.map(l=>`<div class="dv-diag-line">${l}</div>`).join('');
+}
+
+function dvRedrawChart(){
+  const cv=$('dv-cv');if(!cv)return;
+  dvDrawRaceChart(cv,null,dvSelDay);
+  dvRenderDiagnostics();
+}
+
+// Live crosshair while scrolling the table — throttled to animation-frame
+// rate so it tracks continuously without hammering the CPU on every pixel.
+function dvWireTableScroll(){
+  const scroller=$('tbl-scroll');if(!scroller)return;
+  let ticking=false;
+  scroller.addEventListener('scroll',()=>{
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(()=>{
+      const sRect=scroller.getBoundingClientRect();
+      const rows=[...$('main-tbody').children].filter(el=>el.children.length>1);
+      const centerY=sRect.top+80; // bias toward the rows just below the sticky header
+      let closest=null,closestDist=Infinity;
+      for(const el of rows){
+        const r=el.getBoundingClientRect();
+        const dist=Math.abs((r.top+r.height/2)-centerY);
+        if(dist<closestDist){closestDist=dist;closest=el;}
+      }
+      if(closest){
+        const dayText=closest.children[0]?.textContent;
+        const day=parseInt(dayText,10);
+        if(!isNaN(day)&&day!==dvSelDay){
+          dvSelDay=day;
+          [...$('main-tbody').children].forEach(el=>el.classList.remove('sel-day'));
+          closest.classList.add('sel-day');
+          dvRedrawChart();
+        }
+      }
+      ticking=false;
+    });
+  },{passive:true});
 }
 
 function exportData(tab){
   const res=simResults[tab];if(!res||!res.rows.length){alert('Run a simulation first.');return;}
   const {rows,acct0,c,msp}=res;const names=['Strat-A','Strat-B','Strat-C'];
-  const L=['AHM v25 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,WR%,Trades,Ticks,Day%,P&L,Ret%,Fees,Surplus,+Sh,Cumul'];
+  const L=['AHM v38 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,WR%,Trades,Ticks,Day%,P&L,Ret%,Fees,Surplus,+Sh,Cumul'];
   const show=new Set([0,rows.length-1]);rows.forEach((r,i)=>{if(r.isMilestone||r.day%c.intv===0)show.add(i);});
   for(const idx of [...show].sort((a,b)=>a-b)){const r=rows[idx];const mo=r.cumPnl-((msp||{})[r.mIdx]||0);const dp=r.dayPct!=null?r.dayPct.toFixed(2)+'%':'—';let lbl='';if(r.isMilestone)lbl='Milestone '+r.msVal;else if(r.day===1)lbl='Start';else if(idx===rows.length-1)lbl='Goal';const tt=r.dayWinCt+r.dayLoseCt+r.dayBECt;const wrp=tt>0?((r.dayWinCt/tt)*100).toFixed(0)+'%':'—';L.push([r.day,cal(r.calMo),mo.toFixed(2),lbl,r.shares,r.outcome,wrp,r.numTr||0,r.dayTicks,dp,r.dayPnl.toFixed(2),(r.cumPnl/acct0*100).toFixed(2)+'%',(r.dayFees||0).toFixed(2),r.surplus.toFixed(2),r.newSh,r.cumPnl.toFixed(2)].join(','));}
   const blob=new Blob([L.join('\n')],{type:'text/csv'});const url=URL.createObjectURL(blob);
@@ -1144,6 +1558,216 @@ function clearLog(){if(!sessionLog.length)return;if(!confirm('Clear all session 
 
 let journalLog=[];
 function mkScale(id,n){const c=$(id);if(!c)return;c.innerHTML='';for(let i=1;i<=n;i++){const b=document.createElement('button');b.className='scale-btn';b.dataset.v=i;b.textContent=i;b.type='button';b.addEventListener('click',()=>{c.querySelectorAll('.scale-btn').forEach(x=>x.classList.toggle('on',+x.dataset.v<=i));});c.appendChild(b);}}
+
+// Good/Bad/Great — single-select three-way choice, distinct from the
+// cumulative 1-5 fill pattern above. Used for Soul's simple check-in
+// variables and Performance's per-block discipline rating.
+function mkGbg(id){
+  const c=$(id);if(!c)return;
+  c.innerHTML='';
+  [['Bad','#f87171'],['Good','#fbbf24'],['Great','#34d399']].forEach(([label,color])=>{
+    const b=document.createElement('button');
+    b.className='scale-btn';b.dataset.v=label;b.textContent=label;b.type='button';
+    b.style.width='auto';b.style.padding='0 8px';b.style.fontSize='8px';
+    b.addEventListener('click',()=>{
+      const already=b.classList.contains('on');
+      c.querySelectorAll('.scale-btn').forEach(x=>{x.classList.remove('on');x.style.color='';x.style.borderColor='';x.style.background='';});
+      if(!already){b.classList.add('on');b.style.color=color;b.style.borderColor=color+'66';b.style.background=color+'12';}
+    });
+    c.appendChild(b);
+  });
+}
+function getGbg(id){const c=$(id);if(!c)return'';const on=c.querySelector('.scale-btn.on');return on?on.dataset.v:'';}
+function resetGbg(id){const c=$(id);if(!c)return;c.querySelectorAll('.scale-btn').forEach(x=>{x.classList.remove('on');x.style.color='';x.style.borderColor='';x.style.background='';});}
+
+
+/* ══════════════════════════════════════════════════════════════
+   JOURNAL CIRCLE NAV — same interaction language as the Sim tab's
+   circle cluster (buildPanes/circSelect), applied to the Log tab's
+   six journal sections. Built once at init from a single source of
+   truth for each panel's field markup, rather than hand-duplicated
+   HTML, so there's exactly one place each field lives.
+   ══════════════════════════════════════════════════════════════ */
+const JICONS={
+  soul:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>`,
+  mind:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V9"/><path d="M6 3c-1.5 2-2 4-2 6a8 8 0 0 0 16 0c0-2-.5-4-2-6"/></svg>`,
+  body:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  grade:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/></svg>`,
+  market:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.1-2.8-2.8L7 14"/></svg>`,
+  performance:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+};
+// Good/Bad/Great selector — three-way version of the existing scale-btn
+// pattern, used for Soul's simple check-in variables.
+function gbgRow(id,label){
+  return`<div class="jrow"><label>${label}</label><div class="scale-row" id="${id}"></div></div>`;
+}
+const TIME_BLOCKS=[
+  {key:'ob1',label:'9:30–11:00'},
+  {key:'ob2',label:'11:00–12:00'},
+  {key:'ob3',label:'12:00–2:00'},
+  {key:'ob4',label:'2:00–4:00'},
+];
+const JCATS=[
+  {key:'soul',title:'Soul',body:()=>`
+    ${gbgRow('jgbg-worship','Worship')}
+    ${gbgRow('jgbg-faith','Faith')}
+    ${gbgRow('jgbg-prayer','Prayer')}`},
+  {key:'mind',title:'Mind',body:()=>`
+    <div class="jrow"><label>Stress level (1–5)</label><div class="scale-row" id="jsc-stress"></div></div>
+    <div class="jrow"><label>Mental fatigue (1–5)</label><div class="scale-row" id="jsc-fatigue"></div></div>
+    <div class="jrow"><label>Confidence (1–5)</label><div class="scale-row" id="jsc-conf"></div></div>
+    <div class="jrow"><label>Emotional state</label><select class="jsel" id="j-emo"><option value="">—</option><option>Happy</option><option>Content</option><option>Grateful</option><option>Calm</option><option>Focused</option><option>Motivated</option><option>Hopeful</option><option>Anxious</option><option>Overconfident</option><option>Distracted</option><option>Numb</option><option>Frustrated</option><option>Sad</option><option>Angry</option><option>Overwhelmed</option><option>Lonely</option></select></div>
+    <div class="jrow"><label>Emotional conflict/fight</label><select class="jsel" id="j-conflict"><option value="">—</option><option>None</option><option>Minor</option><option>Significant</option></select></div>
+    <div class="jrow"><label>News today</label><select class="jsel" id="j-news"><option value="">—</option><option>Neither</option><option>Good news</option><option>Bad news</option></select></div>`},
+  {key:'body',title:'Body',body:()=>`
+    <div class="jrow"><label>Time slept</label><select class="jsel" id="j-timeslept" style="min-width:90px;"><option value="">—</option></select></div>
+    <div class="jrow"><label>Time woke up</label><select class="jsel" id="j-timewoke" style="min-width:90px;"><option value="">—</option></select></div>
+    <div class="jrow"><label>Emotion before sleep</label><select class="jsel" id="j-presleep-emo"><option value="">—</option><option>Calm</option><option>Content</option><option>Excited</option><option>Happy</option><option>Grateful</option><option>Hopeful</option><option>Anxious</option><option>Stressed</option><option>Overwhelmed</option><option>Sad</option><option>Angry</option><option>Frustrated</option><option>Restless</option><option>Numb</option><option>Lonely</option></select></div>
+    <div class="jrow"><label>Sleep quality (1–5)</label><div class="scale-row" id="jsc-sleepq"></div></div>
+    <div class="jrow"><label>Social plans night before</label><select class="jsel" id="j-social"><option value="">—</option><option>None — normal night</option><option>Yes — stayed on schedule</option><option>Yes — stayed up late</option></select></div>
+    <div class="jrow"><label>Physical state</label><select class="jsel" id="j-phys"><option value="">—</option><option>Rested</option><option>Energised</option><option>Tired</option><option>Sick</option><option>Sore</option></select></div>
+    <div class="jrow"><label>Feeling sick today</label><select class="jsel" id="j-sick"><option value="">—</option><option>No</option><option>Mildly</option><option>Yes</option></select></div>
+    <div class="jrow"><label>Hydration (1–5)</label><div class="scale-row" id="jsc-hydration"></div></div>
+    <div class="jrow"><label>Felt temperature</label><select class="jsel" id="j-temp"><option value="">—</option><option>Cold</option><option>Comfortable</option><option>Warm/Hot</option></select></div>
+    <div class="jrow"><label>Diet quality (1–5)</label><div class="scale-row" id="jsc-diet"></div></div>
+    <div class="jrow"><label>Exercise</label><select class="jsel" id="j-exercise"><option value="">—</option><option>None</option><option>Light walk</option><option>Moderate</option><option>Intense</option></select></div>`},
+  {key:'grade',title:'Grade',body:()=>`
+    <div class="jrow"><label>Overall day grade</label><select class="jsel" id="j-daygrade"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>F</option></select></div>
+    <div class="jrow"><label>Market favorability</label><select class="jsel" id="j-marketfav"><option value="">—</option><option>Favorable for my style</option><option>Neutral</option><option>Unfavorable for my style</option></select></div>
+    <div class="jrow"><label>Rule breaks (0–5)</label><div class="scale-row" id="jsc-rules"></div></div>
+    <div class="jrow"><label>Pre-market prep</label><select class="jsel" id="j-prep"><option value="">—</option><option>None</option><option>Brief</option><option>Thorough</option></select></div>
+    <div class="jnotes-wrap"><label style="font-size:9px;color:#4d5a6e;display:block;margin-bottom:4px;">One focus point for tomorrow</label><textarea class="jnote" id="j-focus" rows="2" placeholder="The one thing that would most improve tomorrow's trading."></textarea></div>
+    <div class="jnotes-wrap"><label style="font-size:9px;color:#4d5a6e;display:block;margin-bottom:4px;">Best opportunity (taken or missed)</label><textarea class="jnote" id="j-bestop" rows="2" placeholder="What was the best setup of the day, whether or not you took it?"></textarea></div>
+    <div class="jnotes-wrap"><label style="font-size:9px;color:#4d5a6e;display:block;margin-bottom:4px;">Notes</label><textarea class="jnote" id="j-note" rows="3" placeholder="What happened today? What will you change?"></textarea></div>`},
+  {key:'market',title:'Market',body:()=>`
+    <div class="jrow"><label>Price action character</label><select class="jsel" id="j-balance"><option value="">—</option><option>Balanced</option><option>Imbalanced</option></select></div>
+    <div class="jrow"><label>Control</label><select class="jsel" id="j-control"><option value="">—</option><option>Buyers in control</option><option>Sellers in control</option><option>Balanced/contested</option></select></div>
+    <div class="jrow"><label>Behavior</label><select class="jsel" id="j-behavior"><option value="">—</option><option>Normal</option><option>Unusual</option></select></div>
+    <div class="jrow"><label>News day</label><select class="jsel" id="j-newsday"><option value="">—</option><option>Yes</option><option>No</option></select></div>
+    <div class="jrow"><label>Location traded from</label><input class="ni" id="j-location" type="text" placeholder="Home, office..." style="width:120px;text-align:left;"></div>`},
+  {key:'performance',title:'Performance',body:()=>`
+    <div class="fc-note" style="padding:2px 0 8px;">Discipline, trades taken, and win/loss tally for each session window — trends here can show if a specific time block is quietly costing you.</div>
+    ${TIME_BLOCKS.map(b=>`
+    <div class="jsec-hd" style="margin:6px -16px 4px;">${b.label}</div>
+    <div class="jrow"><label>Discipline</label><div class="scale-row" id="jgbg-${b.key}-disc"></div></div>
+    <div class="jrow"><label>Trades taken</label><input class="ni" id="j-${b.key}-tr" type="number" min="0" placeholder="0" style="width:60px;"></div>
+    <div class="jrow"><label>Wins</label><input class="ni" id="j-${b.key}-w" type="number" min="0" placeholder="0" style="width:60px;"></div>
+    <div class="jrow"><label>Losses</label><input class="ni" id="j-${b.key}-l" type="number" min="0" placeholder="0" style="width:60px;"></div>`).join('')}`},
+];
+
+function buildJournalCircles(){
+  const mount=$('jcirc-mount');if(!mount)return;
+  const circBtn=cat=>`<div style="display:flex;flex-direction:column;align-items:center;">
+    <button class="circ-btn" data-cat="${cat.key}" onclick="circSelectJ('${cat.key}')">${JICONS[cat.key]||''}</button>
+    <span class="circ-label">${cat.title}</span>
+  </div>`;
+  mount.innerHTML=`
+    <div class="circ-nav">
+      <div class="circ-cluster" id="jcirc-cluster" data-sel="">
+        <div class="circ-row">${circBtn(JCATS[0])}${circBtn(JCATS[1])}${circBtn(JCATS[2])}</div>
+        <div class="circ-row">${circBtn(JCATS[3])}${circBtn(JCATS[4])}${circBtn(JCATS[5])}</div>
+      </div>
+      <div class="circ-hint">Tap a circle to open its section</div>
+      <div class="circ-panel-wrap" id="jcirc-panel-wrap">
+        <div class="circ-panel-inner">
+          ${JCATS.map(cat=>`<div class="jcirc-panel" data-cat="${cat.key}" style="display:none;"><div class="jsec-hd" style="margin:-10px -16px 8px;">${cat.title}</div>${cat.body()}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  // Scale-row inputs only exist in the DOM now that panels are inserted —
+  // wire them here, same as the original init sequence did.
+  ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet','jsc-hydration'].forEach(id=>mkScale(id,5));
+  ['jgbg-worship','jgbg-faith','jgbg-prayer',...TIME_BLOCKS.map(b=>'jgbg-'+b.key+'-disc')].forEach(mkGbg);
+  populateHourSelect('j-timeslept');populateHourSelect('j-timewoke');
+}
+
+function circSelectJ(catKey){
+  const cluster=$('jcirc-cluster');
+  const panelWrap=$('jcirc-panel-wrap');
+  if(!cluster)return;
+  const currentSel=cluster.dataset.sel;
+  const deselecting=currentSel===catKey;
+  cluster.querySelectorAll('.circ-btn').forEach(btn=>{
+    const isThis=btn.dataset.cat===catKey;
+    btn.classList.toggle('sel',isThis&&!deselecting);
+    btn.classList.toggle('dim',!isThis&&!deselecting);
+    const lbl=btn.parentElement.querySelector('.circ-label');
+    if(lbl)lbl.classList.toggle('dim-out',!deselecting);
+  });
+  cluster.classList.toggle('has-sel',!deselecting);
+  cluster.dataset.sel=deselecting?'':catKey;
+  document.querySelectorAll('.jcirc-panel').forEach(p=>{
+    p.style.display=(!deselecting&&p.dataset.cat===catKey)?'block':'none';
+  });
+  if(panelWrap)panelWrap.classList.toggle('open',!deselecting);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STATS TAB CIRCLE — single circle for manual broker data entry,
+   same interaction pattern as the Sim and Log tab clusters, just
+   sized to one. Everything auto-computed (Weekly Report, Gauges,
+   Real Equity charts, Real vs Sim) stays visible outside it — this
+   circle is only for the fields a person types in by hand.
+   ══════════════════════════════════════════════════════════════ */
+function buildStatsCircle(){
+  const mount=$('scirc-mount');if(!mount)return;
+  const icon=`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>`;
+  mount.innerHTML=`
+    <div class="circ-nav">
+      <div class="circ-cluster" id="scirc-cluster" data-sel="">
+        <div class="circ-row">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <button class="circ-btn" data-cat="broker" onclick="circSelectS('broker')">${icon}</button>
+            <span class="circ-label">Enter your broker trading data</span>
+          </div>
+        </div>
+      </div>
+      <div class="circ-panel-wrap" id="scirc-panel-wrap">
+        <div class="circ-panel-inner">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <span style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;">Real Trading Data</span>
+            <button onclick="resetRealStats()" style="background:transparent;border:1px solid #252d3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:8px;padding:2px 8px;border-radius:2px;cursor:pointer;letter-spacing:.08em;">↺ Auto-fill from Log</button>
+          </div>
+          <div class="stats-inp">
+            <div class="si"><label>Total Trades</label><input class="ni" id="rTrades" type="number" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+            <div class="si"><label>Trading Days</label><input class="ni" id="rDays" type="number" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+            <div class="si"><label>Win Rate %</label><input class="ni" id="rWR" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+            <div class="si"><label>Breakeven %</label><input class="ni" id="rBE" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+            <div class="si"><label>Avg Win Ticks</label><input class="ni" id="rTickW" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+            <div class="si"><label>Avg Loss Ticks</label><input class="ni" id="rTickL" type="number" step="0.1" placeholder="—" oninput="onReal()" style="width:78px;"></div>
+            <div class="si"><label>Total P&amp;L $</label><input class="ni" id="rPnlTotal" type="number" step="0.01" placeholder="—" oninput="onReal()" style="width:88px;"></div>
+            <div class="si"><label>Avg Daily P&amp;L $</label><input class="ni" id="rDayPnl" type="number" step="0.01" placeholder="—" oninput="onReal()" style="width:88px;"></div>
+            <div class="si"><label>Start Capital $</label><input class="ni" id="rCapS" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
+            <div class="si"><label>Current Capital $</label><input class="ni" id="rCapC" type="number" placeholder="—" oninput="onReal()" style="width:88px;"></div>
+          </div>
+          <div class="stats-grid" style="margin-top:2px;">
+            <div class="sg"><div class="sgl">Loss Rate</div><div class="sgv" id="rLoss" style="color:#f87171">—</div></div>
+            <div class="sg"><div class="sgl">Avg T/Day</div><div class="sgv" id="rAvgT" style="color:#fbbf24">—</div></div>
+            <div class="sg"><div class="sgl">R:R Ratio</div><div class="sgv" id="rRR" style="color:#34d399">—</div></div>
+            <div class="sg"><div class="sgl">Days ±Pace</div><div class="sgv" id="rPace">—</div></div>
+          </div>
+          <div class="fc-note" style="padding:0 4px 0;">Fields auto-fill from your Log. Edit any value to override. Hit ↺ to revert to auto-computed.</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function circSelectS(catKey){
+  const cluster=$('scirc-cluster');
+  const panelWrap=$('scirc-panel-wrap');
+  if(!cluster)return;
+  const currentSel=cluster.dataset.sel;
+  const deselecting=currentSel===catKey;
+  cluster.querySelectorAll('.circ-btn').forEach(btn=>{
+    const isThis=btn.dataset.cat===catKey;
+    btn.classList.toggle('sel',isThis&&!deselecting);
+    const lbl=btn.parentElement.querySelector('.circ-label');
+    if(lbl)lbl.classList.toggle('dim-out',!deselecting);
+  });
+  cluster.dataset.sel=deselecting?'':catKey;
+  if(panelWrap)panelWrap.classList.toggle('open',!deselecting);
+}
+
 function getScale(id){const c=$(id);if(!c)return 0;return[...c.querySelectorAll('.scale-btn.on')].length;}
 function resetScale(id){const c=$(id);if(!c)return;c.querySelectorAll('.scale-btn').forEach(x=>x.classList.remove('on'));}
 
@@ -1175,19 +1799,27 @@ function saveJournal(){
     phys:$('j-phys').value,sick:$('j-sick').value,temp:$('j-temp').value,
     emo:$('j-emo').value,conflict:$('j-conflict').value,news:$('j-news').value,
     exercise:$('j-exercise').value,prep:$('j-prep').value,note:$('j-note').value.trim(),
-    fajr:$('j-fajr').value,dhuhr:$('j-dhuhr').value,asr:$('j-asr').value,maghreb:$('j-maghreb').value,isha:$('j-isha').value,
-    sunnah:$('j-sunnah').value,qiyam:$('j-qiyam').value,dhikr:$('j-dhikr').value,
+    worship:getGbg('jgbg-worship'),faith:getGbg('jgbg-faith'),prayer:getGbg('jgbg-prayer'),
     balance:$('j-balance').value,control:$('j-control').value,behavior:$('j-behavior').value,newsday:$('j-newsday').value,
-    location:$('j-location').value.trim(),ticker:$('j-ticker').value.trim(),software:$('j-software').value.trim(),orderflow:$('j-orderflow').value,
+    location:$('j-location').value.trim(),
     daygrade:$('j-daygrade').value,marketfav:$('j-marketfav').value,focus:$('j-focus').value.trim(),bestop:$('j-bestop').value.trim(),
+    blocks:TIME_BLOCKS.map(b=>({
+      key:b.key,
+      disc:getGbg('jgbg-'+b.key+'-disc'),
+      tr:+$('j-'+b.key+'-tr').value||0,
+      w:+$('j-'+b.key+'-w').value||0,
+      l:+$('j-'+b.key+'-l').value||0,
+    })),
   };
   const idx=journalLog.findIndex(e=>e.date===entry.date);
   if(idx>=0)journalLog[idx]=entry;else journalLog.unshift(entry);
   renderJournal();
   $('j-timeslept').value='';$('j-timewoke').value='';$('j-note').value='';$('j-focus').value='';$('j-bestop').value='';
-  $('j-location').value='';$('j-ticker').value='';$('j-software').value='';
-  ['j-phys','j-emo','j-exercise','j-prep','j-social','j-sick','j-temp','j-conflict','j-news','j-fajr','j-dhuhr','j-asr','j-maghreb','j-isha','j-sunnah','j-qiyam','j-dhikr','j-balance','j-control','j-behavior','j-newsday','j-orderflow','j-daygrade','j-marketfav','j-presleep-emo'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  $('j-location').value='';
+  ['j-phys','j-emo','j-exercise','j-prep','j-social','j-sick','j-temp','j-conflict','j-news','j-balance','j-control','j-behavior','j-newsday','j-daygrade','j-marketfav','j-presleep-emo'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  TIME_BLOCKS.forEach(b=>{['tr','w','l'].forEach(f=>{const e=$('j-'+b.key+'-'+f);if(e)e.value='';});});
   ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet','jsc-hydration'].forEach(resetScale);
+  ['jgbg-worship','jgbg-faith','jgbg-prayer',...TIME_BLOCKS.map(b=>'jgbg-'+b.key+'-disc')].forEach(resetGbg);
   const btn=document.querySelector('.j-save-btn');if(btn){btn.textContent='Saved';setTimeout(()=>btn.textContent='Save Entry',1500);}
   save();
 }
@@ -1218,9 +1850,7 @@ function renderJournal(){
   const lvl=(n,max=5)=>'█'.repeat(n)+'░'.repeat(max-n);
   hist.innerHTML='<div class="jhist-hd">History — '+journalLog.length+' entries</div>'+
     journalLog.slice(0,10).map(e=>{
-      const prayers=[e.fajr,e.dhuhr,e.asr,e.maghreb,e.isha].filter(Boolean);
-      const onTimeCt=prayers.filter(p=>p==='On Time').length;
-      const prayerSummary=prayers.length?`${onTimeCt}/${prayers.length} on time`:'';
+      const blockSummary=e.blocks?.length?e.blocks.reduce((a,b)=>a+b.w,0)+'W-'+e.blocks.reduce((a,b)=>a+b.l,0)+'L across blocks':'';
       return `<div class="jentry"><div class="jentry-date">${e.date}${e.daygrade?` · Grade ${e.daygrade}`:''}</div><div class="jentry-grid">
       ${e.sleep?`<div class="jentry-cell"><span class="jk">Sleep</span>${e.sleep}h${e.timeSlept!==''&&e.timeWoke!==''?` (${HOUR_LABELS[e.timeSlept]}–${HOUR_LABELS[e.timeWoke]})`:''} · Q${e.sleepQ||'—'}</div>`:''}
       ${e.preSleepEmo?`<div class="jentry-cell"><span class="jk">Pre-Sleep</span>${e.preSleepEmo}</div>`:''}
@@ -1236,10 +1866,10 @@ function renderJournal(){
       ${e.news&&e.news!=='Neither'?`<div class="jentry-cell"><span class="jk">News</span>${e.news}</div>`:''}
       ${e.exercise?`<div class="jentry-cell"><span class="jk">Exercise</span>${e.exercise}</div>`:''}
       ${e.phys?`<div class="jentry-cell"><span class="jk">Physical</span>${e.phys}</div>`:''}
-      ${prayerSummary?`<div class="jentry-cell"><span class="jk">Prayers</span>${prayerSummary}</div>`:''}
-      ${e.qiyam==='Yes'?`<div class="jentry-cell"><span class="jk">Qiyam</span>Yes</div>`:''}
-      ${e.ticker?`<div class="jentry-cell"><span class="jk">Ticker</span>${e.ticker}</div>`:''}
-      ${e.orderflow?`<div class="jentry-cell"><span class="jk">Order Flow</span>${e.orderflow}</div>`:''}
+      ${e.worship?`<div class="jentry-cell"><span class="jk">Worship</span>${e.worship}</div>`:''}
+      ${e.faith?`<div class="jentry-cell"><span class="jk">Faith</span>${e.faith}</div>`:''}
+      ${e.prayer?`<div class="jentry-cell"><span class="jk">Prayer</span>${e.prayer}</div>`:''}
+      ${blockSummary?`<div class="jentry-cell"><span class="jk">Blocks</span>${blockSummary}</div>`:''}
       ${e.marketfav?`<div class="jentry-cell"><span class="jk">Mkt Favorability</span>${e.marketfav}</div>`:''}
       ${e.prep?`<div class="jentry-cell"><span class="jk">Prep</span>${e.prep}</div>`:''}
     </div>${e.focus?`<div class="jentry-note">Focus: ${e.focus.slice(0,80)}${e.focus.length>80?'…':''}</div>`:''}${e.note?`<div class="jentry-note">${e.note.slice(0,100)}${e.note.length>100?'…':''}</div>`:''}</div>`;
@@ -1279,14 +1909,18 @@ const GAUGE_VARS=[
     if(!e.exercise)return null;
     return{'None':0,'Light walk':1,'Moderate':2,'Intense':3}[e.exercise]??null;
   }},
-  {key:'prayerOnTime',label:'Prayer On-Time Rate',unit:'%',extract:e=>{
-    const ps=[e.fajr,e.dhuhr,e.asr,e.maghreb,e.isha].filter(Boolean);
-    if(!ps.length)return null;
-    const score=ps.reduce((a,p)=>a+(p==='On Time'?1:p==='Late'?0.5:0),0);
-    return (score/ps.length)*100;
+  {key:'worship',label:'Worship',unit:'',extract:e=>{
+    if(!e.worship)return null;
+    return{'Bad':0,'Good':1,'Great':2}[e.worship]??null;
   }},
-  {key:'qiyam',label:'Qiyam al-Layl',unit:'',extract:e=>e.qiyam?(e.qiyam==='Yes'?1:0):null},
-  {key:'dhikr',label:'Dhikr',unit:'',extract:e=>e.dhikr?(e.dhikr==='Yes'?1:0):null},
+  {key:'faith',label:'Faith',unit:'',extract:e=>{
+    if(!e.faith)return null;
+    return{'Bad':0,'Good':1,'Great':2}[e.faith]??null;
+  }},
+  {key:'prayer',label:'Prayer',unit:'',extract:e=>{
+    if(!e.prayer)return null;
+    return{'Bad':0,'Good':1,'Great':2}[e.prayer]??null;
+  }},
   {key:'sh',label:'Position Size',unit:' sh',extract:e=>e.sh>0?e.sh:null},
 ];
 
@@ -1414,10 +2048,7 @@ function renderWeeklyReport(){
   const avgSleep=thisWeekJ.length?thisWeekJ.reduce((a,e)=>a+e.sleep,0)/thisWeekJ.length:0;
   const avgStress=thisWeekJ.length?thisWeekJ.reduce((a,e)=>a+(e.stress||0),0)/thisWeekJ.length:0;
   const avgRules=thisWeekJ.length?thisWeekJ.reduce((a,e)=>a+(+e.rules||0),0)/thisWeekJ.length:0;
-  const prayerDays=thisWeekJ.filter(e=>{
-    const ps=[e.fajr,e.dhuhr,e.asr,e.maghreb,e.isha].filter(Boolean);
-    return ps.length>0&&ps.every(p=>p==='On Time');
-  }).length;
+  const greatSoulDays=thisWeekJ.filter(e=>e.worship==='Great'&&e.faith==='Great'&&e.prayer==='Great').length;
   // Compute overall week grade
   let score=50;
   if(wr>allWR)score+=15;else if(wr<allWR-5)score-=15;
@@ -1459,7 +2090,7 @@ function renderWeeklyReport(){
       ${avgSleep>0?`<div class="wrc-row"><span class="wrc-lbl">Avg sleep</span><span class="wrc-val" style="color:${avgSleep>=7?'#34d399':avgSleep>=6?'#fbbf24':'#f87171'}">${avgSleep.toFixed(1)}h</span></div>`:''}
       ${avgStress>0?`<div class="wrc-row"><span class="wrc-lbl">Avg stress</span><span class="wrc-val" style="color:${avgStress<=2?'#34d399':avgStress<=3?'#fbbf24':'#f87171'}">${avgStress.toFixed(1)}/5</span></div>`:''}
       ${avgRules>0?`<div class="wrc-row"><span class="wrc-lbl">Avg rule breaks</span><span class="wrc-val" style="color:${avgRules<1?'#34d399':avgRules<2?'#fbbf24':'#f87171'}">${avgRules.toFixed(1)}/day</span></div>`:''}
-      ${thisWeekJ.length?`<div class="wrc-row"><span class="wrc-lbl">Full prayer days</span><span class="wrc-val" style="color:${prayerDays>=4?'#34d399':prayerDays>=2?'#fbbf24':'#f87171'}">${prayerDays} / ${thisWeekJ.length}</span></div>`:''}
+      ${thisWeekJ.length?`<div class="wrc-row"><span class="wrc-lbl">Great Soul days</span><span class="wrc-val" style="color:${greatSoulDays>=4?'#34d399':greatSoulDays>=2?'#fbbf24':'#f87171'}">${greatSoulDays} / ${thisWeekJ.length}</span></div>`:''}
       <div class="wrc-insight"><div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px;">Alerts</div>${alertsHtml}</div>
     </div>
   </div>`;
@@ -1543,45 +2174,54 @@ function renderEquityCurves(){
 }
 
 function renderStratComparison(){
-  const body=$('strat-cmp-body');const badge=$('strat-cmp-badge');
-  if(!body||!badge)return;
   const COLS=['#34d399','#f87171','#fbbf24'];
   const NAMES=['Strat A','Strat B','Strat C'];
   const active=simResults.map((r,i)=>r?i:-1).filter(i=>i>=0);
+  // Comparison content is identical regardless of which strategy tab is
+  // active — it compares all of them — so compute once, write into all
+  // three per-pane instances (each pane shows it beneath its own
+  // Diagnostics, but the content itself doesn't depend on which pane).
+  let bodyHtml,badgeText,badgeCls;
   if(active.length<2){
-    body.innerHTML='<div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run simulations on 2 or more strategies to compare.</div>';
-    badge.textContent='No Sims Run';badge.className='vs-badge nosim';return;
-  }
-  badge.textContent=active.length+' Strategies';badge.className='vs-badge ahead';
-  const metrics=[
-    {lbl:'EV / Day',get:r=>r.c.evNet,fmt:v=>sgn(v),better:'higher'},
-    {lbl:'Monthly Est',get:r=>r.c.evNet*21,fmt:v=>sgn(v),better:'higher'},
-    {lbl:'Time to Goal',get:r=>(r.rows.length/252)*12,fmt:v=>cal(v),better:'lower'},
-    {lbl:'Win Rate',get:r=>r.c.wr*100,fmt:v=>v.toFixed(1)+'%',better:'higher'},
-    {lbl:'R:R Ratio',get:r=>r.c.avgL>0?r.c.avgP/r.c.avgL:0,fmt:v=>v.toFixed(2)+':1',better:'higher'},
-    {lbl:'Friction / Day',get:r=>r.c.frDay,fmt:v=>'$'+fmt(v),better:'lower'},
-    {lbl:'Sharpe',get:r=>{const pnls=r.rows.map(e=>e.dayPnl);return sharpe(pnls,r.acct0)||0;},fmt:v=>v.toFixed(2),better:'higher'},
-  ];
-  // Card-per-metric layout: each metric is its own row with strategy values side by side
-  let html='';
-  metrics.forEach(m=>{
-    const vals=active.map(i=>({i,v:m.get(simResults[i])}));
-    const best=m.better==='higher'?Math.max(...vals.map(r=>r.v)):Math.min(...vals.map(r=>r.v));
-    html+=`<div style="background:#1a2030;border-radius:3px;padding:7px 10px;margin-bottom:5px;">`;
-    html+=`<div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px;">${m.lbl}</div>`;
-    html+=`<div style="display:flex;gap:6px;">`;
-    vals.forEach(({i,v})=>{
-      const isBest=Math.abs(v-best)<1e-9;
-      const bg=isBest?`rgba(${i===0?'52,211,153':i===1?'248,113,113':'251,191,36'},.1)`:'transparent';
-      const border=isBest?`1px solid ${COLS[i]}`:'1px solid #252d3d';
-      html+=`<div style="flex:1;background:${bg};border:${border};border-radius:3px;padding:5px 7px;text-align:center;">`;
-      html+=`<div style="font-size:7px;color:${COLS[i]};letter-spacing:.08em;margin-bottom:2px;">${NAMES[i]}</div>`;
-      html+=`<div style="font-size:12px;font-weight:${isBest?'700':'400'};color:${isBest?COLS[i]:'#8892a4'};">${m.fmt(v)}${isBest?' ★':''}</div>`;
-      html+=`</div>`;
+    bodyHtml='<div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run simulations on 2 or more strategies to compare.</div>';
+    badgeText='No Sims Run';badgeCls='vs-badge nosim';
+  }else{
+    badgeText=active.length+' Strategies';badgeCls='vs-badge ahead';
+    const metrics=[
+      {lbl:'EV / Day',get:r=>r.c.evNet,fmt:v=>sgn(v),better:'higher'},
+      {lbl:'Monthly Est',get:r=>r.c.evNet*21,fmt:v=>sgn(v),better:'higher'},
+      {lbl:'Time to Goal',get:r=>(r.rows.length/252)*12,fmt:v=>cal(v),better:'lower'},
+      {lbl:'Win Rate',get:r=>r.c.wr*100,fmt:v=>v.toFixed(1)+'%',better:'higher'},
+      {lbl:'R:R Ratio',get:r=>r.c.avgL>0?r.c.avgP/r.c.avgL:0,fmt:v=>v.toFixed(2)+':1',better:'higher'},
+      {lbl:'Friction / Day',get:r=>r.c.frDay,fmt:v=>'$'+fmt(v),better:'lower'},
+      {lbl:'Sharpe',get:r=>{const pnls=r.rows.map(e=>e.dayPnl);return sharpe(pnls,r.acct0)||0;},fmt:v=>v.toFixed(2),better:'higher'},
+    ];
+    let html='';
+    metrics.forEach(m=>{
+      const vals=active.map(i=>({i,v:m.get(simResults[i])}));
+      const best=m.better==='higher'?Math.max(...vals.map(r=>r.v)):Math.min(...vals.map(r=>r.v));
+      html+=`<div style="background:#1a2030;border-radius:3px;padding:7px 10px;margin-bottom:5px;">`;
+      html+=`<div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px;">${m.lbl}</div>`;
+      html+=`<div style="display:flex;gap:6px;">`;
+      vals.forEach(({i,v})=>{
+        const isBest=Math.abs(v-best)<1e-9;
+        const bg=isBest?`rgba(${i===0?'52,211,153':i===1?'248,113,113':'251,191,36'},.1)`:'transparent';
+        const border=isBest?`1px solid ${COLS[i]}`:'1px solid #252d3d';
+        html+=`<div style="flex:1;background:${bg};border:${border};border-radius:3px;padding:5px 7px;text-align:center;">`;
+        html+=`<div style="font-size:7px;color:${COLS[i]};letter-spacing:.08em;margin-bottom:2px;">${NAMES[i]}</div>`;
+        html+=`<div style="font-size:12px;font-weight:${isBest?'700':'400'};color:${isBest?COLS[i]:'#8892a4'};">${m.fmt(v)}${isBest?' ★':''}</div>`;
+        html+=`</div>`;
+      });
+      html+=`</div></div>`;
     });
-    html+=`</div></div>`;
+    bodyHtml=html;
+  }
+  [0,1,2].forEach(tab=>{
+    const s=tab===0?'':'_'+tab;
+    const body=$('strat-cmp-body'+s),badge=$('strat-cmp-badge'+s);
+    if(body)body.innerHTML=bodyHtml;
+    if(badge){badge.textContent=badgeText;badge.className=badgeCls;}
   });
-  body.innerHTML=html;
 }
 
 // Auto-fill real stats inputs from sessionLog — called on load and by reset button
@@ -1655,26 +2295,33 @@ function exportLogCSV(){
   const dates=[...allDates].sort();
   const sessByDate={};sessionLog.forEach(e=>sessByDate[e.date]=e);
   const jByDate={};journalLog.forEach(e=>jByDate[e.date]=e);
+  const blockHeaders=TIME_BLOCKS.flatMap(b=>[b.label+' Discipline',b.label+' Trades',b.label+' Wins',b.label+' Losses']);
   const headers=['Date','Wins','Losses','Breakevens','AvgWinTicks','AvgLossTicks','PnL',
     'ProfitableCount','ProfitableCapture%','BreakevenCount','BreakevenCapture%','LoserCount','LoserCapture%',
     'TimeSlept','TimeWoke','PreSleepEmotion','SleepHrs','SleepQ','SocialNightBefore','Physical','Sick','Hydration','Temp','Diet','Exercise',
     'Stress','Fatigue','Confidence','Emotion','Conflict','News',
-    'Fajr','Dhuhr','Asr','Maghreb','Isha','Sunnah','Qiyam','Dhikr',
-    'Balance','Control','Behavior','NewsDay','Location','Ticker','Software','OrderFlow',
-    'DayGrade','MarketFav','FocusPoint','BestOpportunity','RuleBreaks','PrepLevel','Notes'];
+    'Worship','Faith','Prayer',
+    'Balance','Control','Behavior','NewsDay','Location',
+    'DayGrade','MarketFav','FocusPoint','BestOpportunity','RuleBreaks','PrepLevel','Notes',
+    ...blockHeaders];
   const rows=[headers.join(',')];
   for(const d of dates){
     const s=sessByDate[d]||{},j=jByDate[d]||{};
     const esc=v=>{if(v===undefined||v===null)return'';const str=String(v).replace(/"/g,'""');return str.includes(',')||str.includes('\n')?`"${str}"`:str;};
     const tSlept=j.timeSlept!==undefined&&j.timeSlept!==''?HOUR_LABELS[j.timeSlept]:'';
     const tWoke=j.timeWoke!==undefined&&j.timeWoke!==''?HOUR_LABELS[j.timeWoke]:'';
+    const blockVals=TIME_BLOCKS.flatMap(b=>{
+      const blk=j.blocks?.find(x=>x.key===b.key)||{};
+      return[esc(blk.disc),blk.tr||'',blk.w||'',blk.l||''];
+    });
     rows.push([d,s.w||'',s.l||'',s.b||'',s.tw||'',s.tl||'',s.pnl||'',
       s.totW||'',s.capW||'',s.totBE||'',s.capBE||'',s.totL||'',s.capL||'',
       esc(tSlept),esc(tWoke),esc(j.preSleepEmo),j.sleep||'',j.sleepQ||'',esc(j.social),esc(j.phys),esc(j.sick),j.hydration||'',esc(j.temp),j.diet||'',esc(j.exercise),
       j.stress||'',j.fatigue||'',j.conf||'',esc(j.emo),esc(j.conflict),esc(j.news),
-      esc(j.fajr),esc(j.dhuhr),esc(j.asr),esc(j.maghreb),esc(j.isha),esc(j.sunnah),esc(j.qiyam),esc(j.dhikr),
-      esc(j.balance),esc(j.control),esc(j.behavior),esc(j.newsday),esc(j.location),esc(j.ticker),esc(j.software),esc(j.orderflow),
-      esc(j.daygrade),esc(j.marketfav),esc(j.focus),esc(j.bestop),j.rules||'',esc(j.prep),esc(j.note)
+      esc(j.worship),esc(j.faith),esc(j.prayer),
+      esc(j.balance),esc(j.control),esc(j.behavior),esc(j.newsday),esc(j.location),
+      esc(j.daygrade),esc(j.marketfav),esc(j.focus),esc(j.bestop),j.rules||'',esc(j.prep),esc(j.note),
+      ...blockVals
     ].join(','));
   }
   const blob=new Blob([rows.join('\n')],{type:'text/csv'});const url=URL.createObjectURL(blob);
@@ -1695,9 +2342,9 @@ const INFO={
   comm:{t:'Commission (Tiered)',b:'<p>Tiered commission model:</p><ul><li><b>Under 100 shares:</b> $0.35 flat per round trip</li><li><b>100 shares and above:</b> $0.0035/share × 2 legs</li></ul><p>This scales correctly as your position size grows through compounding — small positions pay the flat fee, larger positions pay the per-share rate.</p>'},
   fees:{t:'Exchange + Clearing + Reg Fees',b:'<p>Toggleable overhead layer separate from commission:</p><ul><li><b>Exchange + clearing + regulatory:</b> $0.0067/share</li><li><b>Spread:</b> $0.01/share (set via Spread field above)</li></ul><p>These are real costs charged by exchanges and regulators on top of your broker commission. Toggle OFF to see strategy performance in isolation from these overheads.</p>'},
   price:{t:'Share Price Range',b:'<p>Used for account size and share purchase cost. Set min/max to reflect daily price variation.</p>'},
-  sh:{t:'Starting Shares',b:'<p>How many shares you begin with. Starting account = shares × avg price, unless Starting Capital is set directly.</p>'},
+  sh:{t:'Starting Shares',b:'<p>Fully determined by the shared Capital field above — not a manual entry. Shares = Capital ÷ this strategy\\u2019s average price.</p><p>This is what keeps A, B, and C directly comparable: same capital, different tickers, share count falls out automatically for each.</p>'},
   goal:{t:'Share Goal',b:'<p>Target share count. Simulation runs until you reach this, hit the Volume Ceiling (if set), or the 5,000 day cap.</p>'},
-  startcap:{t:'Starting Capital',b:'<p>Override your account starting value directly in dollars instead of deriving it from shares × price. Useful when you know your actual account balance and want the simulation to start from there.</p><p>When set, this takes priority over the shares × price calculation for your starting account size.</p>'},
+  globalcap:{t:'Capital',b:'<p>One shared starting capital value used by every strategy — A, B, and C all compound from the same account size, regardless of what ticker or share price each is testing.</p><p>Set to $0, each strategy falls back to its own Starting Shares × Price Range as its account base — same as before, just per-strategy again in that case.</p><p>Keeping this shared is what makes the Strategy Comparison and combined equity curve genuinely apples-to-apples.</p>'},
   volceil:{t:'Volume Ceiling',b:'<p>A hard cap on share count growth, separate from your Share Goal. Prevents the simulation from over-compounding indefinitely — once shares reach this ceiling, compounding stops even if the Share Goal is higher.</p><p>Acts like the other overrides: when enabled, it constrains the simulation regardless of other settings. Set to 0 to disable.</p>'},
   swing:{t:'Avg Swing',b:'<p>Tick range of a typical price move. Swing Capture % = your profit target as a percentage of the full swing.</p>'},
   pullback:{t:'Pullback',b:'<p>If pullback ≥ effective target, win becomes stop-out (Pullback Kill).</p>'},
@@ -1713,7 +2360,7 @@ const INFO={
   vw:{t:'Volume Windows',b:'<p>Custom per ticker — no assumptions baked in. Set typical volume/minute for three session windows: First Hour, Midday, Last Hour.</p><p>Your Participation Rate (%) determines your comfortable share of that flow. If your Starting Shares exceeds what your participation rate allows for a window volume, that window gets a "squeeze" — extra entry offset and slippage applied to trades landing in it, since you are pushing more size into less liquidity than you would comfortably want.</p><p>Trades are distributed across the three windows automatically based on their position in each simulated day trade sequence — early trades skew toward First Hour, late toward Last Hour.</p><p>Works for any ticker: a thin stock and a liquid one just get different volume numbers — the math scales itself.</p>'},
 };
 
-const SDEFS=[['minP',15,'t'],['maxP',30,'t'],['minL',5,'t'],['maxL',15,'t'],['minWR',55,'%'],['maxWR',65,'%'],['minBE',10,'%'],['maxBE',20,'%'],['minT',2,''],['maxT',5,''],['sh',100,''],['goal',500,''],['minPr',43,''],['maxPr',47,''],['spread',1,'t'],['slip',1,'t'],['buf',1,''],['cap',0,'t'],['disc',85,'%'],['bf',3,'%'],['bs',2,'%'],['gf',3,'%'],['gs_',2,'%'],['minPB',3,'t'],['maxPB',8,'t'],['minEO',1,'t'],['maxEO',4,'t'],['minSw',15,'t'],['maxSw',40,'t'],['rrSlider',0,''],['tickSz',1,'¢'],['minDp',-2,'%'],['maxDp',3,'%'],['bias',50,'%'],['intv',5,''],['startCap',0,'$'],['volCeil',0,'sh'],['vwFH_min',60000,'/m'],['vwFH_max',120000,'/m'],['vwMD_min',15000,'/m'],['vwMD_max',40000,'/m'],['vwLH_min',30000,'/m'],['vwLH_max',70000,'/m'],['partRate',10,'%']];
+const SDEFS=[['minP',15,'t'],['maxP',30,'t'],['minL',5,'t'],['maxL',15,'t'],['minWR',55,'%'],['maxWR',65,'%'],['minBE',10,'%'],['maxBE',20,'%'],['minT',2,''],['maxT',5,''],['sh',100,''],['goal',500,''],['minPr',43,''],['maxPr',47,''],['spread',1,'t'],['slip',1,'t'],['buf',1,''],['cap',0,'t'],['disc',85,'%'],['bf',3,'%'],['bs',2,'%'],['gf',3,'%'],['gs_',2,'%'],['minPB',3,'t'],['maxPB',8,'t'],['minEO',1,'t'],['maxEO',4,'t'],['minSw',15,'t'],['maxSw',40,'t'],['rrSlider',0,''],['tickSz',1,'¢'],['minDp',-2,'%'],['maxDp',3,'%'],['bias',50,'%'],['intv',5,''],['volCeil',0,'sh'],['vwFH_min',60000,'/m'],['vwFH_max',120000,'/m'],['vwMD_min',15000,'/m'],['vwMD_max',40000,'/m'],['vwLH_min',30000,'/m'],['vwLH_max',70000,'/m'],['partRate',10,'%']];
 
 function buildPanes(){
   [0,1,2].forEach(n=>{
@@ -1744,9 +2391,7 @@ function buildPanes(){
     const core=fc('wr','Win Rate %','#34d399','wr',dph('minWR','maxWR'))+fc('be','Breakeven %','#60a5fa','be',dph('minBE','maxBE'))+roLoss+distCard;
     const risk=fc('p','Profit Target','#fbbf24','profit',dph('minP','maxP'))+fc('l','Stop Loss','#f87171','loss',dph('minL','maxL'))+fc('t','Trades / Day','#fb923c','trades',dph('minT','maxT'))+fc('cap','Daily Loss Cap','#f87171','cap',ph('cap'));
 
-    const startCapCard=`<div class="fc off" id="fc-startcap${s}" style="border-left-color:#34d399;"><div class="fc-top"><span class="fc-lbl">Starting Capital <button class="ib" onclick="openInfo('startcap')">?</button></span>${tog('startcap',false)}</div>${ph('startCap')}<div class="fc-note">When ON, overrides shares × price as your starting account value.</div></div>`;
-
-    const shGoalCard=`<div class="fc" id="fc-sh${s}" style="border-left-color:#fbbf24"><div class="fc-top"><span class="fc-lbl">Starting Shares <button class="ib" onclick="openInfo('sh')">?</button></span></div>${ph('sh')}</div><div class="fc" id="fc-goal${s}" style="border-left-color:#34d399"><div class="fc-top"><span class="fc-lbl">Share Goal <button class="ib" onclick="openInfo('goal')">?</button></span></div>${ph('goal')}</div>`;
+    const shGoalCard=`<div class="fc" id="fc-sh${s}" style="border-left-color:#fbbf24"><div class="fc-top"><span class="fc-lbl">Starting Shares <button class="ib" onclick="openInfo('sh')">?</button></span></div>${ph('sh')}<div class="fc-note" id="sh-derived-note${s}"></div></div><div class="fc" id="fc-goal${s}" style="border-left-color:#34d399"><div class="fc-top"><span class="fc-lbl">Share Goal <button class="ib" onclick="openInfo('goal')">?</button></span></div>${ph('goal')}</div>`;
 
     const frictionCard=`<div class="fc" id="fc-comm${s}" style="border-left-color:#fbbf24;"><div class="fc-top"><span class="fc-lbl">Commission (Tiered) <button class="ib" onclick="openInfo('comm')">?</button></span></div><div class="fc-note">Auto-calculated: $0.35 flat round trip under 100 shares, or $0.0035/share × 2 legs at 100+ shares. Scales with your Starting Shares.</div></div><div class="fc" id="fc-fees${s}" style="border-left-color:#34d399;"><div class="fc-top"><span class="fc-lbl">Exchange + Clearing + Reg <button class="ib" onclick="openInfo('fees')">?</button></span>${tog('fees',true)}</div><div class="friction-breakdown" id="fb${s}"><div class="fb-row"><span class="fb-lbl">Commission</span><span class="fb-val" id="fb-comm${s}">—</span></div><div class="fb-row"><span class="fb-lbl">Exchange + Clearing + Reg (0.0067/sh)</span><span class="fb-val" id="fb-ex${s}">—</span></div><div class="fb-row"><span class="fb-lbl">Slippage (×2 legs)</span><span class="fb-val" id="fb-slip${s}">—</span></div><div class="fb-row"><span class="fb-lbl">Spread cost</span><span class="fb-val" id="fb-spr${s}">—</span></div><div class="fb-total"><span class="fb-lbl">Est. round trip</span><span class="fb-val" id="fb-rt${s}">—</span></div></div><div class="fb-tier" id="fb-tier${s}">—</div></div>`;
 
@@ -1764,7 +2409,7 @@ function buildPanes(){
       ${ph('partRate')}
       <div class="fc-note" id="vw-summary${s}" style="margin-top:6px;"></div>
     </div>`;
-    const ticker=fc('pr','Price Range','#4d5a6e','price',dph('minPr','maxPr'))+startCapCard+shGoalCard+frictionCard+fc('sp','Spread','#fb923c','spread',ph('spread'))+fc('buf','Cash Buffer','#4d5a6e','buf',ph('buf'))+fc('tk','Tick Value','#4d5a6e','tick',ph('tickSz'))+fc('sl','Slippage','#f87171','slip',ph('slip'))+swingCard+fc('pb','Pullback','#60a5fa','pullback',dph('minPB','maxPB'))+fc('eo','Entry Offset','#4d5a6e','eo',dph('minEO','maxEO'))+volWindowCard;
+    const ticker=fc('pr','Price Range','#4d5a6e','price',dph('minPr','maxPr'))+shGoalCard+frictionCard+fc('sp','Spread','#fb923c','spread',ph('spread'))+fc('buf','Cash Buffer','#4d5a6e','buf',ph('buf'))+fc('tk','Tick Value','#4d5a6e','tick',ph('tickSz'))+fc('sl','Slippage','#f87171','slip',ph('slip'))+swingCard+fc('pb','Pullback','#60a5fa','pullback',dph('minPB','maxPB'))+fc('eo','Entry Offset','#4d5a6e','eo',dph('minEO','maxEO'))+volWindowCard;
 
     const psych=fc('bd','Bad Days','#f87171','bd',dph('bf','bs'))+fc('gd','Good Days','#34d399','gd',dph('gf','gs_'))+fc('cs','Discipline %','#4d5a6e','disc',ph('disc'))+fc('bias','Skill Growth %','#252d3d','bias',ph('bias')+sel('curve','<option value="slow" selected>Slow Start</option><option value="linear">Linear</option><option value="fast">Fast Start</option><option value="scurve">S-Curve</option>'));
 
@@ -1783,16 +2428,43 @@ function buildPanes(){
       // Gear wheel — now Overrides (was Core's icon)
       ovr:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
     };
-    function grp(title,icon,body,open=false,eid=''){
-      return`<div class="dgrp"><div class="dgrp-hd" onclick="toggleGrp(this)"><span class="dgrp-title" style="color:#e2e6ed;display:flex;align-items:center;justify-content:center;gap:6px;flex:1;">${ICONS[icon]||''}${title}</span><div class="dgrp-r">${eid?`<span class="ovr-badge" id="${eid}">OVERRIDE</span>`:''}<span class="dgrp-arr${open?' open':''}">▲</span></div></div><div class="dgrp-body${open?' open':''}"><div class="dgrp-inner">${body}</div></div></div>`;
+    // Circle nav: same five categories, contained as a 3-over-2 circle
+    // cluster instead of an accordion. Selecting a circle emphasizes it
+    // (scale up, others dim) and reveals its panel below the cluster —
+    // the panel's transform-origin anchors to the cluster itself so the
+    // scale-emerge motion stays visually tied to "this circle opened."
+    const CATS=[
+      {key:'core',title:'Core',body:core,eid:''},
+      {key:'risk',title:'Risk',body:risk,eid:''},
+      {key:'ticker',title:'Ticker',body:ticker,eid:''},
+      {key:'psych',title:'Psych',body:psych,eid:''},
+      {key:'ovr',title:'Overrides',body:ovr,eid:'ovr-badge'+s},
+    ];
+    function circBtn(cat){
+      const badgeHtml=cat.eid?`<span class="ovr-badge" id="${cat.eid}">!</span>`:'';
+      return`<div style="display:flex;flex-direction:column;align-items:center;">
+        <button class="circ-btn" data-cat="${cat.key}" onclick="circSelect(${n},'${cat.key}')">
+          ${ICONS[cat.key]||''}${badgeHtml}
+        </button>
+        <span class="circ-label">${cat.title}</span>
+      </div>`;
     }
+    const circHtml=`
+      <div class="circ-nav">
+        <div class="circ-cluster" id="circ-cluster${s}" data-sel="">
+          <div class="circ-row">${circBtn(CATS[0])}${circBtn(CATS[1])}${circBtn(CATS[2])}</div>
+          <div class="circ-row">${circBtn(CATS[3])}${circBtn(CATS[4])}</div>
+        </div>
+        <div class="circ-hint">Tap a circle to open its settings</div>
+        <div class="circ-panel-wrap" id="circ-panel-wrap${s}">
+          <div class="circ-panel-inner">
+            ${CATS.map(cat=>`<div class="circ-panel${s}" data-cat="${cat.key}" style="display:none;">${cat.body}</div>`).join('')}
+          </div>
+        </div>
+      </div>`;
 
     pane.innerHTML=`
-      ${grp('Core','core',core,true)}
-      ${grp('Risk','risk',risk)}
-      ${grp('Ticker','ticker',ticker)}
-      ${grp('Psych','psych',psych)}
-      ${grp('Overrides','ovr',ovr,false,'ovr-badge'+s)}
+      ${circHtml}
       <div class="sim-row">
         <button class="sim-btn ${SCLS}" onclick="simulate(${n})">Simulate</button>
         <button class="exp-btn" onclick="exportData(${n})">CSV</button>
@@ -1818,6 +2490,10 @@ function buildPanes(){
         <div class="diag-hd"><span class="diag-title" id="diag-t${s}">Diagnostics</span><span class="diag-badge" id="diag-b${s}">—</span></div>
         <div class="diag-body" id="diag-l${s}"></div>
       </div>
+      <div class="vs-card" id="strat-cmp-card${s}">
+        <div class="vs-hd"><span class="vs-title">Strategy Comparison</span><span class="vs-badge nosim" id="strat-cmp-badge${s}">No Sims Run</span></div>
+        <div id="strat-cmp-body${s}" style="padding:4px 12px 8px;"><div style="padding:8px 0;text-align:center;font-size:9px;color:#4d5a6e;">Run simulations on 2 or more strategies to compare.</div></div>
+      </div>
       <div class="disc"><p>Simulated results are hypothetical. Not financial advice.</p></div>
     `;
   });
@@ -1832,19 +2508,34 @@ function wirePanes(){
     });
     const cv=$('cv'+s),tt=$('ct'+s);if(cv&&tt)wireChart(cv,tt);
   });
-  const iw=$('intv-wrap');if(iw){
-    const el=mkStp('intv',0,'');iw.replaceWith(el);el.id='intv-wrap';
+  [0,1,2].forEach(tab=>{
+    const iw=$('intv-wrap-'+tab);if(!iw)return;
+    const el=mkStp('intv',tab,'');iw.replaceWith(el);el.id='intv-wrap-'+tab;
+    if(tab!==0)el.style.display='none';
     const inp=el.querySelector('.stp-val');
     if(inp){inp.addEventListener('change',()=>renderTable(activeTblStrat));inp.addEventListener('blur',()=>renderTable(activeTblStrat));}
     el.querySelectorAll('.stp-btn').forEach(b=>b.addEventListener('pointerup',()=>setTimeout(()=>renderTable(activeTblStrat),60)));
+  });
+  dvWireTableScroll();
+  const gcEl=$('gc-stepper');
+  if(gcEl){
+    const el=mkStp('gcStartCap',0,'$');gcEl.appendChild(el);
+    const inp=el.querySelector('.stp-val');
+    inp.value=0;
+    // Global capital affects every strategy's cfg() — refresh all three, not just tab 0.
+    const refreshAll=()=>{[0,1,2].forEach(t=>{updateDist(t);updateFrictionBreakdown(t);updateDerivedShares(t);});save();};
+    inp.removeEventListener?.('change',null);
+    // mkStp already wired change/blur/click to call onSlider(0); override with a
+    // handler that also updates B and C, since this field is shared.
+    el.querySelectorAll('.stp-btn').forEach(btn=>btn.addEventListener('click',()=>setTimeout(refreshAll,10)));
+    inp.addEventListener('change',refreshAll);
+    inp.addEventListener('blur',refreshAll);
   }
-  ['jsc-sleepq','jsc-stress','jsc-fatigue','jsc-conf','jsc-rules','jsc-diet','jsc-hydration'].forEach(id=>mkScale(id,5));
-  populateHourSelect('j-timeslept');populateHourSelect('j-timewoke');
 }
 
-const SK='ahm-v25';
+const SK='ahm-v38';
 function getStpIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;SDEFS.forEach(([id])=>ids.push(id+s));});return ids;}
-const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-fees','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo','tog-swing','tog-dist','tog-startcap','tog-volceil','tog-vw'];
+const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-fees','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo','tog-swing','tog-dist','tog-volceil','tog-vw'];
 function getTogIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;TOG_BASE.forEach(id=>ids.push(id+s));});return ids;}
 const SEL_BASE=['curve','mode'];
 const REAL_IDS=['rCapS','rCapC','rTrades','rDays','rWR','rBE','rTickW','rTickL','rPnlTotal','rDayPnl'];
@@ -1880,15 +2571,53 @@ async function load(){
 }
 async function init(){
   buildPanes();wirePanes();
+  buildJournalCircles();
+  buildStatsCircle();
   const loaded=await load();
-  [0,1,2].forEach(n=>{updateDist(n);updateFrictionBreakdown(n);updateVolWindowSummary(n);});
+  [0,1,2].forEach(n=>{updateDist(n);updateFrictionBreakdown(n);updateVolWindowSummary(n);updateDerivedShares(n);});
   const allCv=$('real-cv-all'),allTt=$('real-ct-all');if(allCv&&allTt)wireChart(allCv,allTt);
   const wkCv=$('real-cv-week'),wkTt=$('real-ct-week');if(wkCv&&wkTt)wireChart(wkCv,wkTt);
   const moCv=$('real-cv-month'),moTt=$('real-ct-month');if(moCv&&moTt)wireChart(moCv,moTt);
   if(sessionLog.length)resetRealStats();
   else onReal();
   if(loaded){if(sessionLog.length)$('log-info').textContent=sessionLog.length+' days logged';if(journalLog.length)renderJournal();}
+  wireGlobalResize();
 }
+
+// Canvases size themselves from offsetWidth/offsetHeight at draw time —
+// if that measurement happens before layout has actually settled (very
+// common right after initial page load, and on any viewport change like
+// an orientation rotation), the canvas is drawn at the wrong size and
+// nothing tells it to re-measure afterward. This was the root cause of
+// charts appearing cut off until an unrelated action (scrolling, which
+// happens to trigger a different redraw path) forced a fresh draw. This
+// listener redraws every chart that currently has valid cached state,
+// on any resize/orientation event, debounced so rapid events (like the
+// several fired during a rotation animation) don't cause redraw thrashing.
+let _resizeTimer=null;
+function wireGlobalResize(){
+  const onResize=()=>{
+    clearTimeout(_resizeTimer);
+    _resizeTimer=setTimeout(()=>{
+      // Sim tab per-strategy charts + Stats tab real equity charts —
+      // all driven by _drawChart, all cache their state on cv._cs.
+      ['cv','cv_1','cv_2','real-cv-all','real-cv-week','real-cv-month'].forEach(id=>{
+        const cv=$(id);
+        if(cv&&cv._cs)_drawChart(cv,cv._cs.equity,cv._cs.acct0);
+      });
+      // Table tab combined race chart
+      const dvCv=$('dv-cv');
+      if(dvCv)dvDrawRaceChart(dvCv,null,dvSelDay);
+    },150);
+  };
+  window.addEventListener('resize',onResize);
+  window.addEventListener('orientationchange',onResize);
+  // Fire once shortly after load to catch any layout that hadn't fully
+  // settled at the moment charts first drew (mobile browser chrome,
+  // safe-area insets, and webview quirks can all shift post-paint).
+  setTimeout(onResize,300);
+}
+
 init();
 </script>
 </body>
