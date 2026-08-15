@@ -20,7 +20,7 @@ input[type=number]{-moz-appearance:textfield;}
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-thumb{background:var(--accent-solid);opacity:.5;border-radius:2px;}
 html,body{height:100%;background:#0a0d13;color:#e2e6ed;font-family:'IBM Plex Mono',monospace;font-size:13px;overflow:hidden;}
-.app{display:flex;flex-direction:column;height:100%;}
+.app{display:flex;flex-direction:column;height:100%;position:relative;z-index:1;}
 .topbar{height:48px;background:#10141c;border-bottom:1px solid #232b3d;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;z-index:50;}
 .brand{display:flex;align-items:baseline;gap:8px;}
 .brand-name{font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:800;color:#e2e6ed;text-transform:uppercase;letter-spacing:-.01em;}
@@ -147,7 +147,7 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
 .dv-empty{padding:32px;text-align:center;font-size:10px;color:#4d5a6e;}
 .tbl-scroll{flex:1;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(56px + env(safe-area-inset-bottom,0px));}
 table{width:100%;border-collapse:collapse;min-width:580px;}
-thead{background:#161b26;position:sticky;top:0;z-index:5;}
+thead{background-color:rgba(18,23,33,.6);-webkit-backdrop-filter:blur(16px) saturate(1.5);backdrop-filter:blur(16px) saturate(1.5);position:sticky;top:0;z-index:5;box-shadow:inset 0 -1px 0 rgba(255,255,255,.08),0 4px 12px -6px rgba(0,0,0,.5);}
 th{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.04em;padding:6px 7px;text-align:right;border-bottom:1px solid #232b3d;white-space:nowrap;}
 th:nth-child(1),th:nth-child(2){text-align:center;}th:nth-child(4){text-align:left;}
 tbody tr{border-bottom:1px solid #161b26;}
@@ -408,6 +408,79 @@ tr.sel-day.row-bloom td{color:#eaf7ff !important;transition:color .05s ease;}
   .scale-btn:active,.scale-btn.pressed{box-shadow:none !important;filter:none !important;}
   tr.sel-day.row-bloom{box-shadow:none !important;}
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   FROST — rolled out app-wide. Two ingredients make real frosted glass
+   read as glass rather than "dark panel with a border":
+     1) Something soft and colorful behind the glass for the blur to
+        actually diffuse — flat backgrounds make backdrop-filter nearly
+        invisible, so a few large, fixed, blurred color blooms sit behind
+        the entire app (one shared layer, not per-tab) at low opacity.
+     2) Real translucency + backdrop-filter on every card, so those
+        blooms visibly diffuse through, plus a brighter gloss and a
+        floating drop-shadow so cards read as raised glass panes.
+   Nothing here is animated — same static-glass philosophy as before,
+   just turned up considerably and now consistent across every screen.
+   ══════════════════════════════════════════════════════════════════════ */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 12% 6%, rgba(59,130,246,.4), transparent 42%),
+    radial-gradient(circle at 92% 20%, rgba(34,211,238,.34), transparent 40%),
+    radial-gradient(circle at 30% 95%, rgba(52,211,153,.16), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(251,191,36,.1), transparent 40%);
+  filter:blur(60px) saturate(1.3);
+}
+
+/* Every card/panel across all four screens gets the same frosted treatment */
+.fc,.chart-panel,.diag,.vs-card,.stats-inp,.jsec,.grade-card,.wrc,.inp-grp,
+.gauge-row,.global-capital,.sc-s,.sg,.spark-cell,.stp,.jhist,.dv-half,
+.tbl-controls,.mode-row,.dgrp-hd,.dgrp-inner,.sbar,.friction-breakdown,
+.sim-row,.disc,.mbox,.ibox{
+  background-color:rgba(18,23,33,.52);
+  -webkit-backdrop-filter:blur(26px) saturate(1.7);
+  backdrop-filter:blur(26px) saturate(1.7);
+  background-image:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,0) 55%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.06),
+             0 10px 28px -10px rgba(0,0,0,.55);
+  border-color:rgba(255,255,255,.09);
+}
+.dgrp,.jhist-hd,.jsec-hd,.vs-hd,.wrc-hd{border-color:rgba(255,255,255,.07);}
+.chart-panel .chart-metrics .cm{border-color:rgba(255,255,255,.07);}
+.diag-hd,.diag-body,.jsec-hd,.vs-hd,.wrc-hd{background-color:transparent;}
+
+/* Buttons get the same glassy lift, a touch stronger since they're focal points */
+.sim-btn{
+  background-image:linear-gradient(135deg,rgba(255,255,255,.32),rgba(255,255,255,0) 60%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -10px 14px -8px rgba(0,0,0,.3),
+             0 10px 24px -8px rgba(52,211,153,.35);
+}
+.exp-btn,.j-save-btn,.sess-btn{
+  background-color:rgba(18,23,33,.5);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  border-color:rgba(255,255,255,.1);
+}
+.stp{
+  background-color:rgba(12,15,22,.55);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  border-color:rgba(255,255,255,.08);
+}
+.stp-btn,.stp-val,.stp-unit{background-color:transparent;}
+.fc-sel,.jsel,.ni,.jnote{
+  background-color:rgba(12,15,22,.55);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+}
+
+/* Table: the sticky header is frosted (see thead rule above) so rows
+   visibly blur past underneath it as you scroll — matching the bottom
+   nav, which was already frosted and already did this at the bottom.
+   The rows themselves stay solid enough to read cleanly; only the
+   header and the surrounding chart panel/controls are glass. */
+.tbl-scroll{background-color:rgba(10,13,19,.35);}
 </style>
 </head>
 <body>
