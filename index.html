@@ -429,10 +429,9 @@ body::before{
   z-index:0;
   pointer-events:none;
   background:
-    radial-gradient(circle at 12% 6%, rgba(59,130,246,.4), transparent 42%),
-    radial-gradient(circle at 92% 20%, rgba(34,211,238,.34), transparent 40%),
-    radial-gradient(circle at 30% 95%, rgba(52,211,153,.16), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(251,191,36,.1), transparent 40%);
+    radial-gradient(circle at 12% 6%, rgba(59,130,246,.42), transparent 45%),
+    radial-gradient(circle at 90% 22%, rgba(34,211,238,.36), transparent 42%),
+    radial-gradient(circle at 40% 95%, rgba(34,211,238,.16), transparent 48%);
   filter:blur(60px) saturate(1.3);
 }
 
@@ -523,7 +522,7 @@ body::before{
     <div class="dv-half">
       <div class="chart-hd" style="padding:8px 12px 4px;"><span class="chart-lbl">Race to Goal · Capital vs Time</span></div>
       <div class="chart-wrap" style="height:100%;"><canvas class="eqcv" id="dv-cv"></canvas></div>
-      <div id="dv-combo-legend" style="display:flex;gap:12px;padding:6px 12px;flex-wrap:wrap;"></div>
+      <div id="dv-combo-legend" style="display:none;"></div>
     </div>
     <div class="dv-half">
       <div class="sbar">
@@ -1123,7 +1122,9 @@ function _drawChart(cv,equity,acct0){
   const pd={t:5,b:5,l:5,r:5};const pw=W-pd.l-pd.r,ph=H-pd.t-pd.b;
   const xS=i=>pd.l+(i/Math.max(equity.length-1,1))*pw;
   const yS=v=>pd.t+ph-((v-mn)/rng)*ph;
-  ctx.fillStyle='#10141c';ctx.fillRect(0,0,W,H);
+  /* canvas left transparent on purpose — the .chart-panel behind it is
+     itself frosted glass (backdrop-filter + the shared ambient bloom),
+     so the curve floats directly on that glass instead of an opaque rect. */
   const zy=yS(0);
   ctx.beginPath();ctx.moveTo(xS(0),Math.min(yS(pnls[0]),zy));
   for(let i=1;i<pnls.length;i++)ctx.lineTo(xS(i),Math.min(yS(pnls[i]),zy));
@@ -1141,6 +1142,94 @@ function _drawChart(cv,equity,acct0){
   for(let i=1;i<pnls.length;i++){const cpx=(xS(i-1)+xS(i))/2;ctx.bezierCurveTo(cpx,yS(pnls[i-1]),cpx,yS(pnls[i]),xS(i),yS(pnls[i]));}
   ctx.strokeStyle=pnls[pnls.length-1]>=0?'#34d399':'#f87171';ctx.lineWidth=2;ctx.stroke();
   cv._cs={equity,acct0,pd,pw,ph,W,H,pnls,mn,rng,xS,yS};
+}
+function hexToRgb(hex){
+  const n=parseInt(hex.replace('#',''),16);
+  return[(n>>16)&255,(n>>8)&255,n&255];
+}
+/* Small frosted pill behind floating chart labels: translucent fill +
+   a soft tinted ring, so labels read as glass chips riding on the
+   chart rather than opaque boxes stamped over it. */
+function glassLabelBox(ctx,x,y,w,h,rgb){
+  const r=Math.min(5,h/2);
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+  ctx.fillStyle=`rgba(${rgb.join(',')},.14)`;ctx.fill();
+  ctx.strokeStyle=`rgba(${rgb.join(',')},.55)`;ctx.lineWidth=1;ctx.stroke();
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GLASS SPHERE — every chart "point" (endpoint markers, hover
+   highlights) renders through this, so they read as small lit glass
+   marbles rather than flat dots. Built from six layered passes,
+   back to front:
+     1. soft ambient bloom (localized, not a chart-wide glow)
+     2. a grounding cast shadow (squashed ellipse beneath the sphere)
+     3. a prismatic rim sliver — a thin arc of split color where light
+        would catch a curved glass edge at a grazing angle (uses
+        createConicGradient; silently skipped on browsers that lack it)
+     4. the lit sphere body itself — a radial gradient with the light
+        source offset upper-left, graduating through the strategy's
+        own hue down to a darkened shadow-side edge
+     5. a soft diffuse highlight across the upper glass
+     6. a tight, bright specular hotspot — the single detail that
+        actually sells "glass sphere" over "gradient circle"
+   ══════════════════════════════════════════════════════════════ */
+function drawGlassSphere(ctx,x,y,r,rgb){
+  const [cr,cg,cb]=rgb;
+  const lightX=x-r*0.38,lightY=y-r*0.42;
+  ctx.save();
+
+  const bloom=ctx.createRadialGradient(x,y,0,x,y,r*2.1);
+  bloom.addColorStop(0,`rgba(${cr},${cg},${cb},.3)`);
+  bloom.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=bloom;
+  ctx.beginPath();ctx.arc(x,y,r*2.1,0,Math.PI*2);ctx.fill();
+
+  ctx.save();
+  ctx.translate(x,y+r*0.55);ctx.scale(1,0.35);
+  const shadow=ctx.createRadialGradient(0,0,0,0,0,r*1.1);
+  shadow.addColorStop(0,'rgba(0,0,0,.4)');shadow.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=shadow;
+  ctx.beginPath();ctx.arc(0,0,r*1.1,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  try{
+    const conic=ctx.createConicGradient(Math.PI*0.15,x,y);
+    conic.addColorStop(0,'rgba(255,255,255,0)');
+    conic.addColorStop(.55,'rgba(255,255,255,0)');
+    conic.addColorStop(.61,'rgba(120,200,255,.55)');
+    conic.addColorStop(.67,'rgba(190,140,255,.5)');
+    conic.addColorStop(.73,'rgba(255,180,220,.45)');
+    conic.addColorStop(.79,'rgba(255,255,255,0)');
+    conic.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath();ctx.arc(x,y,r+1,0,Math.PI*2);
+    ctx.lineWidth=1.5;ctx.strokeStyle=conic;ctx.stroke();
+  }catch(e){/* conic gradients unsupported — prism sliver skipped, sphere still renders fine */}
+
+  const body=ctx.createRadialGradient(lightX,lightY,r*0.05,x,y,r*1.05);
+  body.addColorStop(0,`rgba(${Math.min(255,cr+130)},${Math.min(255,cg+130)},${Math.min(255,cb+130)},.95)`);
+  body.addColorStop(.3,`rgba(${cr},${cg},${cb},.95)`);
+  body.addColorStop(.68,`rgba(${Math.round(cr*.5)},${Math.round(cg*.5)},${Math.round(cb*.5)},.92)`);
+  body.addColorStop(1,`rgba(${Math.round(cr*.22)},${Math.round(cg*.22)},${Math.round(cb*.22)},.88)`);
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle=body;ctx.fill();
+  ctx.lineWidth=.8;ctx.strokeStyle=`rgba(${cr},${cg},${cb},.9)`;ctx.stroke();
+
+  ctx.save();
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.clip();
+  const glow2=ctx.createRadialGradient(x-r*.15,y-r*.2,0,x-r*.15,y-r*.2,r*.9);
+  glow2.addColorStop(0,'rgba(255,255,255,.3)');glow2.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=glow2;ctx.fillRect(x-r,y-r,r*2,r*2);
+  const hi=ctx.createRadialGradient(lightX,lightY,0,lightX,lightY,r*.36);
+  hi.addColorStop(0,'rgba(255,255,255,.95)');hi.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=hi;ctx.beginPath();ctx.arc(lightX,lightY,r*.36,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  ctx.restore();
 }
 const STRAT_COLORS=['#34d399','#f87171','#fbbf24'];
 const STRAT_LABELS=['A','B','C'];
@@ -1206,8 +1295,9 @@ function wireChart(cv,tt){
     ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;ctx.setLineDash([2,3]);
     ctx.beginPath();ctx.moveTo(cx2,st.pd.t);ctx.lineTo(cx2,st.pd.t+st.ph);ctx.stroke();
     ctx.beginPath();ctx.moveTo(st.pd.l,cy2);ctx.lineTo(st.pd.l+st.pw,cy2);ctx.stroke();
-    ctx.setLineDash([]);ctx.beginPath();ctx.arc(cx2,cy2,3.5,0,Math.PI*2);
-    ctx.fillStyle=pnl>=0?'#34d399':'#f87171';ctx.fill();
+    ctx.setLineDash([]);
+    const [r,g,b]=hexToRgb(pnl>=0?'#34d399':'#f87171');
+    drawGlassSphere(ctx,cx2,cy2,7.5,[r,g,b]);
   }
   cv.addEventListener('mousemove',e=>onX(e.clientX));
   cv.addEventListener('mouseleave',()=>{tt.textContent='';_drawChart(cv,cv._cs?.equity,cv._cs?.acct0);});
@@ -1413,7 +1503,7 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
   const W=cv.offsetWidth,H=cv.offsetHeight;if(!W||!H)return;
   cv.width=W*dpr;cv.height=H*dpr;
   const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
-  ctx.fillStyle='#10141c';ctx.fillRect(0,0,W,H);
+  /* canvas left transparent — the panel behind it is frosted glass */
   if(!active.length){
     ctx.fillStyle='#4d5a6e';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';
     ctx.fillText('Run a simulation to see the race to goal',W/2,H/2);
@@ -1436,6 +1526,7 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
   const xS=day=>pd.l+(Math.min(day,maxDay)/Math.max(maxDay,1))*pw;
   const yS=cap=>pd.t+ph-((cap-minCap)/capRng)*ph;
   for(const s of series){
+    const [r,g,b]=hexToRgb(s.color);
     ctx.beginPath();ctx.moveTo(xS(s.pts[0].day),yS(s.pts[0].cap));
     for(let i=1;i<s.pts.length;i++){
       const cpx=(xS(s.pts[i-1].day)+xS(s.pts[i].day))/2;
@@ -1444,12 +1535,15 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
     ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.stroke();
     const last=s.pts[s.pts.length-1];
     const ex=xS(last.day),ey=yS(last.cap);
-    ctx.beginPath();ctx.arc(ex,ey,3.5,0,Math.PI*2);ctx.fillStyle=s.color;ctx.fill();
-    ctx.strokeStyle='#10141c';ctx.lineWidth=1.5;ctx.stroke();
-    ctx.font='9px IBM Plex Mono';ctx.textAlign='left';ctx.fillStyle=s.color;
-    ctx.fillText('$'+fmt(last.cap,0),ex+7,ey-2);
+    drawGlassSphere(ctx,ex,ey,7,[r,g,b]);
+    const lbl1=`$${fmt(last.cap,0)}`,lbl2=`${last.sh.toLocaleString()}sh`;
+    ctx.font='9px IBM Plex Mono';
+    const lw=Math.max(ctx.measureText(lbl1).width,ctx.measureText(lbl2).width);
+    glassLabelBox(ctx,ex+9,ey-16,lw+8,24,[r,g,b]);
+    ctx.textAlign='left';ctx.fillStyle=s.color;
+    ctx.fillText(lbl1,ex+13,ey-6);
     ctx.fillStyle='#8892a4';
-    ctx.fillText(last.sh.toLocaleString()+'sh',ex+7,ey+9);
+    ctx.fillText(lbl2,ex+13,ey+7);
   }
   cv._race={series,pd,pw,ph,xS,yS,maxDay};
   if(legendEl){
@@ -1468,7 +1562,7 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
     ctx.font='9px IBM Plex Mono';ctx.textAlign='center';
     const dayText='Day '+hoverDay;
     const tw=ctx.measureText(dayText).width;
-    ctx.fillStyle='#10141c';ctx.fillRect(cx-tw/2-4,dayLabelY-9,tw+8,13);
+    glassLabelBox(ctx,cx-tw/2-5,dayLabelY-9,tw+10,14,[34,211,238]);
     ctx.fillStyle='#e2e6ed';ctx.fillText(dayText,cx,dayLabelY);
     for(const s of st.series){
       const ownFinalDay=s.pts[s.pts.length-1].day;
@@ -1476,14 +1570,14 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
       let pt=null;
       for(const p of s.pts){if(p.day<=clampedDay)pt=p;else break;}
       if(pt){
+        const [r,g,b]=hexToRgb(s.color);
         const dotX=st.xS(clampedDay),dotY=st.yS(pt.cap);
-        ctx.beginPath();ctx.arc(dotX,dotY,4,0,Math.PI*2);ctx.fillStyle=s.color;ctx.fill();
-        ctx.strokeStyle='#10141c';ctx.lineWidth=1.5;ctx.stroke();
-        ctx.font='9px IBM Plex Mono';ctx.textAlign='left';ctx.fillStyle=s.color;
+        drawGlassSphere(ctx,dotX,dotY,7.5,[r,g,b]);
+        ctx.font='9px IBM Plex Mono';ctx.textAlign='left';
         const label=`${s.label} $${fmt(pt.cap,0)} · ${pt.sh.toLocaleString()}sh`;
         const lw=ctx.measureText(label).width;
-        const labelX=Math.min(dotX+8,st.pd.l+st.pw-lw-4);
-        ctx.fillStyle='#10141c';ctx.fillRect(labelX-2,dotY-15,lw+4,12);
+        const labelX=Math.min(dotX+10,st.pd.l+st.pw-lw-6);
+        glassLabelBox(ctx,labelX-4,dotY-16,lw+8,14,[r,g,b]);
         ctx.fillStyle=s.color;ctx.fillText(label,labelX,dotY-6);
       }
     }
