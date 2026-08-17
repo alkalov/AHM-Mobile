@@ -1150,13 +1150,27 @@ function hexToRgb(hex){
 /* Small frosted pill behind floating chart labels: translucent fill +
    a soft tinted ring, so labels read as glass chips riding on the
    chart rather than opaque boxes stamped over it. */
-function glassLabelBox(ctx,x,y,w,h,rgb){
+/* litZone: true only when this box sits in the upper-left region of the
+   canvas, near the established light source (see drawGlassSphere below,
+   and the app-wide ambient bloom which also anchors upper-left). A box
+   out of that reach — e.g. an endpoint label near the right edge of a
+   chart — gets flat glass with no highlight, since nothing would
+   realistically be lighting it from that corner. */
+function glassLabelBox(ctx,x,y,w,h,rgb,litZone){
   const r=Math.min(5,h/2);
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
   ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
   ctx.fillStyle=`rgba(${rgb.join(',')},.14)`;ctx.fill();
+  if(litZone){
+    ctx.save();ctx.clip();
+    const gloss=ctx.createLinearGradient(x,y,x+w*.75,y+h*.85);
+    gloss.addColorStop(0,'rgba(255,255,255,.24)');
+    gloss.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=gloss;ctx.fillRect(x,y,w,h);
+    ctx.restore();
+  }
   ctx.strokeStyle=`rgba(${rgb.join(',')},.55)`;ctx.lineWidth=1;ctx.stroke();
   ctx.restore();
 }
@@ -1183,54 +1197,74 @@ function drawGlassSphere(ctx,x,y,r,rgb){
   const lightX=x-r*0.38,lightY=y-r*0.42;
   ctx.save();
 
-  const bloom=ctx.createRadialGradient(x,y,0,x,y,r*2.1);
-  bloom.addColorStop(0,`rgba(${cr},${cg},${cb},.3)`);
+  /* bloom pulled in tighter and much dimmer — this was the main source
+     of "flare"; it should barely be noticeable, just enough to lift the
+     sphere off the chart, not project a halo around it */
+  const bloom=ctx.createRadialGradient(x,y,0,x,y,r*1.4);
+  bloom.addColorStop(0,`rgba(${cr},${cg},${cb},.14)`);
   bloom.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=bloom;
-  ctx.beginPath();ctx.arc(x,y,r*2.1,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,r*1.4,0,Math.PI*2);ctx.fill();
 
   ctx.save();
   ctx.translate(x,y+r*0.55);ctx.scale(1,0.35);
   const shadow=ctx.createRadialGradient(0,0,0,0,0,r*1.1);
-  shadow.addColorStop(0,'rgba(0,0,0,.4)');shadow.addColorStop(1,'rgba(0,0,0,0)');
+  shadow.addColorStop(0,'rgba(0,0,0,.35)');shadow.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=shadow;
   ctx.beginPath();ctx.arc(0,0,r*1.1,0,Math.PI*2);ctx.fill();
   ctx.restore();
 
-  try{
-    const conic=ctx.createConicGradient(Math.PI*0.15,x,y);
-    conic.addColorStop(0,'rgba(255,255,255,0)');
-    conic.addColorStop(.55,'rgba(255,255,255,0)');
-    conic.addColorStop(.61,'rgba(120,200,255,.55)');
-    conic.addColorStop(.67,'rgba(190,140,255,.5)');
-    conic.addColorStop(.73,'rgba(255,180,220,.45)');
-    conic.addColorStop(.79,'rgba(255,255,255,0)');
-    conic.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.beginPath();ctx.arc(x,y,r+1,0,Math.PI*2);
-    ctx.lineWidth=1.5;ctx.strokeStyle=conic;ctx.stroke();
-  }catch(e){/* conic gradients unsupported — prism sliver skipped, sphere still renders fine */}
-
+  /* body alphas brought down across every stop so the glass is genuinely
+     see-through — the chart line and grid behind it should still read
+     faintly through the sphere, not just around its silhouette */
   const body=ctx.createRadialGradient(lightX,lightY,r*0.05,x,y,r*1.05);
-  body.addColorStop(0,`rgba(${Math.min(255,cr+130)},${Math.min(255,cg+130)},${Math.min(255,cb+130)},.95)`);
-  body.addColorStop(.3,`rgba(${cr},${cg},${cb},.95)`);
-  body.addColorStop(.68,`rgba(${Math.round(cr*.5)},${Math.round(cg*.5)},${Math.round(cb*.5)},.92)`);
-  body.addColorStop(1,`rgba(${Math.round(cr*.22)},${Math.round(cg*.22)},${Math.round(cb*.22)},.88)`);
+  body.addColorStop(0,`rgba(${Math.min(255,cr+130)},${Math.min(255,cg+130)},${Math.min(255,cb+130)},.55)`);
+  body.addColorStop(.3,`rgba(${cr},${cg},${cb},.5)`);
+  body.addColorStop(.68,`rgba(${Math.round(cr*.5)},${Math.round(cg*.5)},${Math.round(cb*.5)},.45)`);
+  body.addColorStop(1,`rgba(${Math.round(cr*.22)},${Math.round(cg*.22)},${Math.round(cb*.22)},.4)`);
   ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
   ctx.fillStyle=body;ctx.fill();
-  ctx.lineWidth=.8;ctx.strokeStyle=`rgba(${cr},${cg},${cb},.9)`;ctx.stroke();
+  /* outer outline dropped to a faint 20% — a hint of an edge, not a ring */
+  ctx.lineWidth=.8;ctx.strokeStyle=`rgba(${cr},${cg},${cb},.2)`;ctx.stroke();
+
+  /* prism dispersion: light enters at the upper-left (where the
+     specular hotspot sits) and the sphere bends it — physically that
+     refracted, split-color fringe shows on the FAR side of the sphere
+     from the light, i.e. lower-right, not near the highlight itself.
+     Drawn on top of the body (not underneath it) and much more visible
+     than before, as a real chromatic sliver rather than a faint hint. */
+  try{
+    const conic=ctx.createConicGradient(0,x,y);
+    conic.addColorStop(0,'rgba(255,255,255,0)');
+    conic.addColorStop(.02,'rgba(255,255,255,0)');
+    conic.addColorStop(.05,'rgba(100,190,255,.85)');
+    conic.addColorStop(.09,'rgba(175,130,255,.92)');
+    conic.addColorStop(.125,'rgba(225,120,255,1)');
+    conic.addColorStop(.16,'rgba(255,150,195,.92)');
+    conic.addColorStop(.20,'rgba(255,210,165,.65)');
+    conic.addColorStop(.23,'rgba(255,255,255,0)');
+    conic.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.save();
+    ctx.beginPath();ctx.arc(x,y,r+1.6,0,Math.PI*2);
+    ctx.lineWidth=4.5;ctx.strokeStyle=conic;ctx.globalAlpha=.5;ctx.stroke();
+    ctx.restore();
+    ctx.beginPath();ctx.arc(x,y,r+.7,0,Math.PI*2);
+    ctx.lineWidth=2.1;ctx.strokeStyle=conic;ctx.stroke();
+  }catch(e){/* conic gradients unsupported — prism sliver skipped, sphere still renders fine */}
 
   ctx.save();
   ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.clip();
   const glow2=ctx.createRadialGradient(x-r*.15,y-r*.2,0,x-r*.15,y-r*.2,r*.9);
-  glow2.addColorStop(0,'rgba(255,255,255,.3)');glow2.addColorStop(1,'rgba(255,255,255,0)');
+  glow2.addColorStop(0,'rgba(255,255,255,.2)');glow2.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=glow2;ctx.fillRect(x-r,y-r,r*2,r*2);
   const hi=ctx.createRadialGradient(lightX,lightY,0,lightX,lightY,r*.36);
-  hi.addColorStop(0,'rgba(255,255,255,.95)');hi.addColorStop(1,'rgba(255,255,255,0)');
+  hi.addColorStop(0,'rgba(255,255,255,.8)');hi.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=hi;ctx.beginPath();ctx.arc(lightX,lightY,r*.36,0,Math.PI*2);ctx.fill();
   ctx.restore();
 
   ctx.restore();
 }
+
 const STRAT_COLORS=['#34d399','#f87171','#fbbf24'];
 const STRAT_LABELS=['A','B','C'];
 function drawCombinedChart(cv,legendEl){
@@ -1539,7 +1573,7 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
     const lbl1=`$${fmt(last.cap,0)}`,lbl2=`${last.sh.toLocaleString()}sh`;
     ctx.font='9px IBM Plex Mono';
     const lw=Math.max(ctx.measureText(lbl1).width,ctx.measureText(lbl2).width);
-    glassLabelBox(ctx,ex+9,ey-16,lw+8,24,[r,g,b]);
+    glassLabelBox(ctx,ex+9,ey-16,lw+8,24,[r,g,b],ex<W*.5&&ey<H*.5);
     ctx.textAlign='left';ctx.fillStyle=s.color;
     ctx.fillText(lbl1,ex+13,ey-6);
     ctx.fillStyle='#8892a4';
@@ -1562,7 +1596,7 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
     ctx.font='9px IBM Plex Mono';ctx.textAlign='center';
     const dayText='Day '+hoverDay;
     const tw=ctx.measureText(dayText).width;
-    glassLabelBox(ctx,cx-tw/2-5,dayLabelY-9,tw+10,14,[34,211,238]);
+    glassLabelBox(ctx,cx-tw/2-5,dayLabelY-9,tw+10,14,[34,211,238],cx<st.pd.l+st.pw*.5&&dayLabelY<st.pd.t+st.ph*.5);
     ctx.fillStyle='#e2e6ed';ctx.fillText(dayText,cx,dayLabelY);
     for(const s of st.series){
       const ownFinalDay=s.pts[s.pts.length-1].day;
@@ -1577,7 +1611,7 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
         const label=`${s.label} $${fmt(pt.cap,0)} · ${pt.sh.toLocaleString()}sh`;
         const lw=ctx.measureText(label).width;
         const labelX=Math.min(dotX+10,st.pd.l+st.pw-lw-6);
-        glassLabelBox(ctx,labelX-4,dotY-16,lw+8,14,[r,g,b]);
+        glassLabelBox(ctx,labelX-4,dotY-16,lw+8,14,[r,g,b],dotX<st.pd.l+st.pw*.5&&dotY<st.pd.t+st.ph*.5);
         ctx.fillStyle=s.color;ctx.fillText(label,labelX,dotY-6);
       }
     }
