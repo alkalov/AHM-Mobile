@@ -63,7 +63,7 @@ html,body{height:100%;background:#0a0d13;color:#e2e6ed;font-family:'IBM Plex Mon
 .fc,.chart-panel,.diag,.grade-card,.jsec,.vs-card,.gauge-row,.wrc,
 .circ-panel-inner,.stats-inp,.stats-grid .sg,.log-info,.inp-grp,
 .spark-cell,.jhist,.friction-breakdown,.sbar,.tbl-controls,.dv-half,
-.disc,.mbox,.ibox,.global-capital,.sc-s,.mode-row,.sim-row{
+.mbox,.ibox,.global-capital,.sc-s,.mode-row,.sim-row,.tb-card{
   background-color:rgba(18,23,33,.42) !important;
   background-image:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,0) 55%) !important;
   -webkit-backdrop-filter:blur(26px) saturate(1.7);
@@ -135,6 +135,27 @@ html,body{height:100%;background:#0a0d13;color:#e2e6ed;font-family:'IBM Plex Mon
 .circ-btn.sel{
   box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(var(--glow-rgb),.15);
 }
+/* Sim tab only: the selected circle's glow (and its label) pick up
+   THIS strategy's own identity colour instead of the app's generic
+   blue/cyan accent — every other surface in a strategy's own pane
+   already carries that colour (tab underline, Simulate button, now the
+   equity curve itself), so the one neutral-blue circle glow read as a
+   mismatch sitting in the middle of an otherwise green/red/amber
+   context. Scoped to #sp0/#sp1/#sp2 specifically so the Log and Stats
+   tabs' own circle navs (same shared classes, no strategy concept) are
+   completely unaffected. */
+#sp0 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(56,189,248,.18);}
+#sp1 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(251,146,60,.18);}
+#sp2 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(167,139,250,.18);}
+#sp3 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(132,204,22,.18);}
+#sp4 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(239,68,68,.18);}
+#sp5 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(236,72,153,.18);}
+#sp0 .circ-btn.sel+.circ-label{color:#38bdf8;}
+#sp1 .circ-btn.sel+.circ-label{color:#fb923c;}
+#sp2 .circ-btn.sel+.circ-label{color:#a78bfa;}
+#sp3 .circ-btn.sel+.circ-label{color:#84cc16;}
+#sp4 .circ-btn.sel+.circ-label{color:#ef4444;}
+#sp5 .circ-btn.sel+.circ-label{color:#ec4899;}
 
 /* Press bloom: fast "hot" glow the instant a control is pressed, eased
    back to resting state on release. Trigger is a JS-added .pressed
@@ -188,11 +209,14 @@ tr.sel-day{transition:background .5s ease;}
 .nb-pip{position:absolute;top:4px;right:calc(50% - 13px);width:5px;height:5px;border-radius:50%;background:var(--accent);display:none;}
 .nb-pip.on{display:block;}
 .slbl{padding:5px 16px 4px;font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.2em;border-bottom:1px solid #232b3d;background:#0a0d13;position:sticky;top:0;z-index:20;}
-.sbar{display:flex;border-bottom:1px solid #232b3d;background:#10141c;}
+.sbar{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #232b3d;background:#10141c;}
 .sbtn{flex:1;height:34px;background:none;border:none;border-bottom:1px solid transparent;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#4d5a6e;cursor:pointer;transition:color .12s,border-color .12s;}
-.sbtn.on{color:#34d399;border-color:#34d399;}
-.sbtn.on.sc-b{color:#f87171;border-color:#f87171;}
-.sbtn.on.sc-c{color:#fbbf24;border-color:#fbbf24;}
+.sbtn.on{color:#38bdf8;border-color:#38bdf8;}
+.sbtn.on.sc-b{color:#fb923c;border-color:#fb923c;}
+.sbtn.on.sc-c{color:#a78bfa;border-color:#a78bfa;}
+.sbtn.on.sc-d{color:#84cc16;border-color:#84cc16;}
+.sbtn.on.sc-e{color:#ef4444;border-color:#ef4444;}
+.sbtn.on.sc-f{color:#ec4899;border-color:#ec4899;}
 .ovr-badge{font-size:7px;background:rgba(251,191,36,.1);color:#fbbf24;padding:1px 6px;border-radius:2px;letter-spacing:.1em;text-transform:uppercase;display:none;border:1px solid rgba(251,191,36,.2);}
 .ovr-badge.on{display:block;}
 
@@ -243,6 +267,12 @@ tr.sel-day{transition:background .5s ease;}
 .stp-btn:active{background:#1c2333;color:var(--accent-solid);}
 .stp-val{flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:16px !important;color:#e2e6ed;background:#161b26;border:none;outline:none;height:32px;padding:0 4px;min-width:0;}
 .stp-unit{font-size:8px;color:#4d5a6e;padding-right:7px;flex-shrink:0;background:#161b26;}
+/* Sim tab only (this same .stp component is reused for the Table tab's
+   interval stepper too) — bumps every hand-entered number to the same
+   700-weight tabular mono as .cmv/.dval above, so a value the user typed
+   in and a value the app computed back read as one consistent "number"
+   language throughout this tab. */
+#scr-sim .stp-val{font-weight:700;font-variant-numeric:tabular-nums;}
 .fc-sel{width:100%;background:#161b26;border:1px solid #232b3d;color:#e2e6ed;font-family:'IBM Plex Mono',monospace;font-size:11px !important;height:32px;padding:0 8px;outline:none;border-radius:3px;margin-top:4px;}
 .ro-pill{display:inline-flex;align-items:center;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:2px;padding:2px 8px;margin-top:4px;}
 .ro-pill span{font-size:11px;color:#f87171;}
@@ -254,16 +284,19 @@ tr.sel-day{transition:background .5s ease;}
 .dist-labels{display:flex;justify-content:space-between;margin-top:5px;}
 .dist-labels span{font-size:8px;}
 .sim-row{padding:9px 16px;border-bottom:1px solid #232b3d;display:flex;gap:7px;}
-.sim-btn{flex:1;height:48px;background:#34d399;color:#0a0d13;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.15em;text-transform:uppercase;border:none;cursor:pointer;border-radius:3px;touch-action:manipulation;transition:opacity .1s;}
+.sim-btn{flex:1;height:48px;background:#38bdf8;color:#0a0d13;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.15em;text-transform:uppercase;border:none;cursor:pointer;border-radius:3px;touch-action:manipulation;transition:opacity .1s;}
 .sim-btn:active{opacity:.82;}
-.sim-btn.sc-b{background:#f87171;color:#0a0d13;}
-.sim-btn.sc-c{background:#fbbf24;color:#0a0d13;}
+.sim-btn.sc-b{background:#fb923c;color:#0a0d13;}
+.sim-btn.sc-c{background:#a78bfa;color:#0a0d13;}
+.sim-btn.sc-d{background:#84cc16;color:#0a0d13;}
+.sim-btn.sc-e{background:#ef4444;color:#0a0d13;}
+.sim-btn.sc-f{background:#ec4899;color:#0a0d13;}
 .exp-btn{height:42px;padding:0 12px;background:transparent;border:1px solid #232b3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;touch-action:manipulation;}
 .exp-btn:active{border-color:var(--accent-solid);color:var(--accent-solid);}
 .mode-row{padding:5px 16px 7px;border-bottom:1px solid #232b3d;display:flex;align-items:center;gap:8px;background:#10141c;}
 .mode-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;white-space:nowrap;}
 .mode-sel{flex:1;background:#161b26;border:1px solid #232b3d;color:#8892a4;font-family:'IBM Plex Mono',monospace;font-size:11px !important;height:28px;padding:0 7px;outline:none;border-radius:3px;}
-.chart-panel{margin:8px 16px;background:#10141c;border:1px solid #232b3d;border-radius:3px;overflow:hidden;}
+.chart-panel{margin:8px 0;background:#10141c;border:1px solid #232b3d;border-radius:3px;overflow:hidden;}
 .chart-hd{display:flex;align-items:center;justify-content:space-between;padding:7px 12px 3px;}
 .chart-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;}
 .chart-tt{font-size:10px;color:#34d399;min-height:14px;text-align:right;font-weight:500;}
@@ -351,41 +384,64 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
 .dv-dt-label{font-size:5.85px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:rgba(226,230,237,.55);line-height:1;}
 .dv-dt-num{font-size:14.4px;font-weight:700;line-height:1.05;}
 .dv-dt-cal{font-size:7.2px;font-weight:500;color:rgba(226,230,237,.72);line-height:1;}
-.chart-metrics{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #232b3d;}
-.cm{padding:7px 10px;border-right:1px solid #232b3d;border-bottom:1px solid #232b3d;}
+.chart-metrics{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(255,255,255,.08);}
+.cm{padding:7px 10px;border-right:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);}
 .cm:nth-child(even){border-right:none;}
 .cm:nth-last-child(-n+2){border-bottom:none;}
 .cml{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-.cmv{font-size:13px;font-weight:600;}
+/* Bumped to the same 700-weight IBM Plex Mono + tabular figures used on
+   the Table tab's share gauges/capital tallies, so this tab's own summary
+   numbers read as the same "material" instead of a plain lighter-weight
+   readout. */
+.cmv{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
 .cms{font-size:8px;color:#4d5a6e;margin-top:2px;}
 .cmv.go{color:#34d399;}.cmv.stop{color:#f87171;}.cmv.amb{color:#fbbf24;}.cmv.steel{color:#60a5fa;}
-.diag{margin:8px 16px;border-radius:3px;overflow:hidden;display:none;border:1px solid #232b3d;}
+.diag{margin:8px 0;border-radius:3px;overflow:hidden;display:none;border:1px solid #232b3d;}
 .diag.show{display:block;}
 .diag-hd{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #232b3d;}
 .diag-title{font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
 .diag-badge{font-size:8px;padding:2px 8px;border-radius:2px;font-weight:600;letter-spacing:.1em;}
-.diag.vi .diag-hd{background:rgba(52,211,153,.06);}
-.diag.vi .diag-title{color:#34d399;}
+/* Only the badge (the actual outcome - VIABLE/MARGINAL/FAILING) carries
+   status colour. The header itself (background + "Diagnostics" title)
+   stays neutral regardless of status - it used to pick up a faint status
+   tint too, which read as the whole card going green/amber/red and
+   muddying the app's grey + two-blues palette instead of just flagging
+   the one outcome word. */
 .diag.vi .diag-badge{background:rgba(52,211,153,.12);color:#34d399;}
-.diag.mg .diag-hd{background:rgba(251,191,36,.05);}
-.diag.mg .diag-title{color:#fbbf24;}
 .diag.mg .diag-badge{background:rgba(251,191,36,.1);color:#fbbf24;}
-.diag.ng .diag-hd{background:rgba(248,113,113,.06);}
-.diag.ng .diag-title{color:#f87171;}
 .diag.ng .diag-badge{background:rgba(248,113,113,.12);color:#f87171;}
-.diag-body{padding:4px 12px 6px;background:#10141c;}
+/* Was a solid opaque backing painted over the parent .diag's own glass
+   background, so the header read as frosted glass but the body (most of
+   the card's visible area) read as a flat opaque panel underneath it.
+   .diag is already in the shared card-glass rule above, so simply not
+   overriding it here lets that same translucent/blurred/glossed surface
+   show through the body too — header and body now read as one
+   continuous glass card instead of glass-on-top-of-solid. */
+.diag-body{padding:4px 12px 6px;background:transparent;}
 .diag-row{font-size:11px;color:#8892a4;line-height:1.8;padding:1px 0;border-bottom:1px solid #1c2333;}
 .diag-row:last-child{border:none;}
-.dpos{color:#34d399;font-weight:600;}
-.dneg{color:#f87171;font-weight:600;}
-.dneu{color:#fbbf24;font-weight:600;}
-.dval{color:#e2e6ed;font-weight:600;}
+/* Same 700-weight tabular mono bump as .cmv above — these rows are the
+   other place this tab states a hard number back to you, so they share
+   the one "answer" typography instead of their own lighter 600 weight. */
+.dpos{color:#34d399;font-weight:700;font-variant-numeric:tabular-nums;}
+.dneg{color:#f87171;font-weight:700;font-variant-numeric:tabular-nums;}
+.dneu{color:#fbbf24;font-weight:700;font-variant-numeric:tabular-nums;}
+.dval{color:#e2e6ed;font-weight:700;font-variant-numeric:tabular-nums;}
 .dnote{font-size:9px;color:#4d5a6e;}
-.disc{margin:8px 16px 16px;padding:7px 10px;background:#10141c;border:1px solid #232b3d;border-radius:3px;}
+.disc{margin:8px 16px 16px;}
 .disc p{font-size:9px;color:#4d5a6e;line-height:1.6;}
 .tbl-controls{display:flex;gap:8px;padding:8px 16px;border-bottom:1px solid #232b3d;align-items:center;background:#10141c;}
 .tc-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap;}
 .tc-stp{flex:1;}
+/* Share gauges used to be drawn on-canvas inside the race chart itself,
+   docked bottom-right during a hover. With six strategies now instead of
+   three, that many gauges crowded into the chart's own corner read as
+   cluttered - moved into their own fixed-height strip here instead, right
+   above the data table. The table's own flex:1 sizing (see .tbl-scroll)
+   absorbs the height this strip takes, which is what naturally condenses
+   the table's visible row count. */
+.dv-gauge-row{height:64px;flex-shrink:0;padding:4px 10px;background:transparent;}
+#dv-gauge-cv{width:100%;height:100%;display:block;}
 /* ── Table tab: flat split-screen, no nested scroll chains ── */
 .dv-half{flex:1 1 0;min-height:0;display:flex;flex-direction:column;border-bottom:1px solid #232b3d;overflow:hidden;}
 .dv-half:last-child{border-bottom:none;}
@@ -418,14 +474,28 @@ tr.sel-day{background:rgba(var(--glow-rgb),.08) !important;}tr.sel-day td{color:
 td{padding:5px 7px;text-align:right;font-size:10px;white-space:nowrap;color:#e2e6ed;}
 td:nth-child(1),td:nth-child(2){text-align:center;color:#4d5a6e;font-size:9px;}
 td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
-.global-capital{background:#10141c;border-bottom:2px solid #34d399;padding-top:2px;}
-.gc-hd{display:flex;align-items:center;gap:6px;padding:9px 12px 6px;}
-.gc-hd span{font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#e2e6ed;}
-.gc-body{padding:0 12px 6px;}
+/* Capital used to read as just another settings row (same 32px stepper
+   every field elsewhere uses) despite being the one number every one of
+   the six strategies shares and compares against - given real card
+   treatment (margin/radius/border like the rest of the app's cards,
+   instead of a flush edge-to-edge strip) and its own oversized hero
+   stepper (scoped to #gc-stepper so every other stepper in the app is
+   untouched) so it reads as the first, most important thing on the tab. */
+.global-capital{margin:10px 16px 14px;padding:14px 16px 12px;border-radius:6px;border:1px solid rgba(52,211,153,.3);background:#10141c;position:relative;overflow:hidden;box-shadow:0 14px 32px -18px rgba(52,211,153,.35);}
+.global-capital::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#34d399,transparent);}
+.gc-hd{display:flex;align-items:center;gap:7px;padding:0 0 10px;}
+.gc-hd span{font-family:'Cabinet Grotesk',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#e2e6ed;}
+.gc-body{padding:0;}
+#gc-stepper .stp{height:58px;background:transparent;border:1px solid rgba(52,211,153,.22);border-radius:6px;overflow:hidden;}
+#gc-stepper .stp-btn{width:48px;height:58px;font-size:22px;background:rgba(52,211,153,.07);color:#34d399;border-right:1px solid rgba(52,211,153,.18);}
+#gc-stepper .stp-btn:last-child{border-right:none;border-left:1px solid rgba(52,211,153,.18);}
+#gc-stepper .stp-val{font-family:'IBM Plex Mono',monospace;font-size:28px !important;font-weight:800;color:#e2e6ed;background:transparent;}
+#gc-stepper .stp-unit{font-size:14px;font-weight:700;color:#34d399;background:transparent;padding-right:12px;}
 .tbl-empty{padding:32px;text-align:center;font-size:10px;color:#4d5a6e;}
 .log-body{padding:8px 16px;}
 .log-info{font-size:9px;color:#4d5a6e;text-align:center;margin-bottom:6px;letter-spacing:.07em;}
-.inp-grp{background:#10141c;border-radius:3px;margin-bottom:7px;overflow:hidden;border:1px solid #232b3d;}
+.inp-grp{background:#10141c;border-radius:3px;margin:0 -16px 7px;overflow:hidden;border:1px solid #232b3d;}
+.tb-card{border:1px solid #232b3d;border-radius:3px;padding:7px 10px;margin:0 -16px 7px;}
 .inp-row{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:1px solid #1c2333;}
 .inp-row:last-child{border:none;}
 .inp-row label{font-size:10px;color:#8892a4;}
@@ -439,14 +509,14 @@ td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
 .sess-btn{flex:1;height:36px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:3px;border:1px solid;touch-action:manipulation;}
 .sess-btn.log{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3);color:var(--accent-solid);}
 .sess-btn.clr{background:transparent;border-color:#232b3d;color:#4d5a6e;}
-.grade-card{background:#10141c;border:1px solid #232b3d;border-radius:3px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.grade-card{background:#10141c;border:1px solid #232b3d;border-radius:3px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;margin:0 -16px 10px;}
 .grade-info .gt{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px;}
 .grade-info .gs{font-size:10px;color:#8892a4;}
 .grade-big{font-family:'Cabinet Grotesk',sans-serif;font-size:40px;font-weight:800;line-height:1;color:#e2e6ed;}
 .log-divider{border-top:1px solid #232b3d;margin:4px 0 8px;}
 .jdate{font-size:9px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;text-align:center;margin-bottom:7px;}
 .jsec{background:#10141c;border-radius:3px;margin-bottom:6px;overflow:hidden;border:1px solid #232b3d;}
-.jsec-hd{padding:5px 12px;font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.15em;border-bottom:1px solid #232b3d;background:#161b26;}
+.jsec-hd{padding:5px 12px;font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.15em;border-bottom:1px solid #232b3d;background:transparent;}
 .jrow{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:1px solid #1c2333;}
 .jrow:last-child{border:none;}
 .jrow label{font-size:10px;color:#8892a4;}
@@ -463,8 +533,8 @@ td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
 .spark-cell{background:#10141c;padding:7px 9px;border-radius:3px;border:1px solid #232b3d;}
 .spark-lbl{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
 canvas.spark{width:100%;height:34px;display:block;}
-.jhist{background:#10141c;border-radius:3px;overflow:hidden;border:1px solid #232b3d;}
-.jhist-hd{padding:5px 12px;font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.15em;border-bottom:1px solid #232b3d;background:#161b26;}
+.jhist{background:#10141c;border-radius:3px;overflow:hidden;border:1px solid #232b3d;margin:0 -16px;}
+.jhist-hd{padding:5px 12px;font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.15em;border-bottom:1px solid #232b3d;background:transparent;}
 .jentry{padding:7px 12px;border-bottom:1px solid #1c2333;}
 .jentry:last-child{border:none;}
 .jentry-date{font-size:8px;color:#4d5a6e;margin-bottom:3px;}
@@ -474,7 +544,18 @@ canvas.spark{width:100%;height:34px;display:block;}
 .jentry-note{font-size:9px;color:#4d5a6e;margin-top:4px;border-left:1px solid #232b3d;padding-left:8px;font-style:italic;}
 .stats-body{padding:8px 16px;}
 .vs-card{background:#10141c;border-radius:3px;margin-bottom:7px;overflow:hidden;border:1px solid #232b3d;}
-.vs-hd{padding:7px 12px;border-bottom:1px solid #232b3d;display:flex;align-items:center;justify-content:space-between;background:#161b26;}
+/* .vs-hd used to paint a solid #161b26 bar over its parent .vs-card,
+   which is already in the shared card-glass list (translucent/blurred/
+   glossed) — same fix/reasoning as .diag-body above, now applied to
+   BOTH tabs that use this card (Sim's Strategy Comparison, Stats' Real
+   vs Sim), so the base rule is edited directly instead of scoping. */
+.vs-hd{padding:7px 12px;border-bottom:1px solid #232b3d;display:flex;align-items:center;justify-content:space-between;background:transparent;}
+/* Stats tab only: .vs-card is shared with the Sim tab's Strategy
+   Comparison card, which already sits flush against .screen's own
+   zero horizontal padding there. .stats-body DOES have 16px horizontal
+   padding, so full-bleed here needs the negative-margin trick instead
+   of just removing margin. */
+#scr-stats .vs-card{margin:0 -16px 7px;}
 .vs-title{font-family:'Cabinet Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#8892a4;}
 .vs-badge{font-size:8px;padding:2px 8px;border-radius:2px;font-weight:600;letter-spacing:.08em;}
 .vs-badge.on-track{background:rgba(52,211,153,.1);color:#34d399;}
@@ -500,9 +581,9 @@ canvas.spark{width:100%;height:34px;display:block;}
 .sg{background:#10141c;padding:7px 9px;border-radius:3px;border:1px solid #232b3d;}
 .sgl{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
 .sgv{font-size:13px;font-weight:600;color:#e2e6ed;}
-.gauge-row{background:#10141c;border:1px solid #232b3d;border-radius:3px;padding:8px 10px;margin-bottom:6px;}
-.wrc{background:#10141c;border:1px solid #232b3d;border-radius:3px;overflow:hidden;margin-bottom:5px;}
-.wrc-hd{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #232b3d;background:#161b26;}
+.gauge-row{background:#10141c;border:1px solid #232b3d;border-radius:3px;padding:8px 10px;margin:0 -16px 6px;}
+.wrc{background:#10141c;border:1px solid #232b3d;border-radius:3px;overflow:hidden;margin:0 -16px 5px;}
+.wrc-hd{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #232b3d;background:transparent;}
 .wrc-title{font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#e2e6ed;}
 .wrc-grade{font-family:'Cabinet Grotesk',sans-serif;font-size:24px;font-weight:800;line-height:1;}
 .wrc-body{padding:8px 12px;}
@@ -561,26 +642,32 @@ canvas.spark{width:100%;height:34px;display:block;}
   <div class="screen active" id="scr-sim">
     <div class="global-capital">
       <div class="gc-hd">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        <span>Capital</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span>Starting Capital</span>
         <button class="ib" onclick="openInfo('globalcap')" style="margin-left:4px;">?</button>
       </div>
       <div class="gc-body" id="gc-stepper"></div>
-      <div class="fc-note" style="padding:0 12px 8px;">Shared starting capital across all three strategies — makes A/B/C directly comparable on the same account size. Each strategy still sets its own ticker, price, and share count.</div>
+      <div class="fc-note" style="padding:0 12px 8px;">Shared starting capital across all six strategies — makes A–F directly comparable on the same account size. Each strategy still sets its own ticker, price, and share count.</div>
     </div>
     <div class="sbar">
       <button class="sbtn on" id="stb0" onclick="switchStrat(0)">A</button>
       <button class="sbtn sc-b" id="stb1" onclick="switchStrat(1)">B</button>
       <button class="sbtn sc-c" id="stb2" onclick="switchStrat(2)">C</button>
+      <button class="sbtn sc-d" id="stb3" onclick="switchStrat(3)">D</button>
+      <button class="sbtn sc-e" id="stb4" onclick="switchStrat(4)">E</button>
+      <button class="sbtn sc-f" id="stb5" onclick="switchStrat(5)">F</button>
     </div>
     <div id="sp0"></div>
     <div id="sp1" style="display:none;"></div>
     <div id="sp2" style="display:none;"></div>
+    <div id="sp3" style="display:none;"></div>
+    <div id="sp4" style="display:none;"></div>
+    <div id="sp5" style="display:none;"></div>
   </div>
 
   <div class="screen" id="scr-tbl">
     <div class="dv-half">
-      <div class="chart-wrap" style="height:100%;">
+      <div class="chart-wrap" style="flex:1;min-height:0;">
         <canvas class="eqcv" id="dv-cv"></canvas>
         <div class="rg-overlay" id="rg-overlay">
           <span class="rg-time" id="rg-time">—</span>
@@ -592,18 +679,27 @@ canvas.spark{width:100%;height:34px;display:block;}
           <span class="dv-dt-cal" id="dv-dt-cal"></span>
         </div>
       </div>
+      <div class="dv-gauge-row">
+        <canvas id="dv-gauge-cv"></canvas>
+      </div>
     </div>
     <div class="dv-half">
       <div class="sbar">
         <button class="sbtn on" id="tsb0" onclick="switchTblStrat(0)">A</button>
         <button class="sbtn sc-b" id="tsb1" onclick="switchTblStrat(1)">B</button>
         <button class="sbtn sc-c" id="tsb2" onclick="switchTblStrat(2)">C</button>
+        <button class="sbtn sc-d" id="tsb3" onclick="switchTblStrat(3)">D</button>
+        <button class="sbtn sc-e" id="tsb4" onclick="switchTblStrat(4)">E</button>
+        <button class="sbtn sc-f" id="tsb5" onclick="switchTblStrat(5)">F</button>
       </div>
       <div class="tbl-controls">
         <span class="tc-lbl">Every</span>
         <div class="tc-stp" id="intv-wrap-0"></div>
         <div class="tc-stp" id="intv-wrap-1" style="display:none;"></div>
         <div class="tc-stp" id="intv-wrap-2" style="display:none;"></div>
+        <div class="tc-stp" id="intv-wrap-3" style="display:none;"></div>
+        <div class="tc-stp" id="intv-wrap-4" style="display:none;"></div>
+        <div class="tc-stp" id="intv-wrap-5" style="display:none;"></div>
         <span class="tc-lbl">days</span>
       </div>
       <div class="tbl-scroll" id="tbl-scroll">
@@ -642,7 +738,7 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="inp-row"><label>Net P&amp;L $</label><input class="ni" id="dPnl" type="number" step="0.01" placeholder="0.00" oninput="onDaily()" style="width:86px;"></div>
         <div class="inp-row"><label>Shares held</label><input class="ni" id="dShares" type="number" min="1" placeholder="100" oninput="onDaily()"></div>
       </div>
-      <div style="background:#10141c;border:1px solid #232b3d;border-radius:3px;padding:7px 10px;margin-bottom:7px;">
+      <div class="tb-card">
         <div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;margin-bottom:6px;">Trade Breakdown</div>
         <div class="inp-row" style="border-bottom:1px solid #1c2333;padding:5px 0;"><label style="font-size:9px;color:#34d399;">Profitable</label><div style="display:flex;gap:5px;"><input class="ni" id="dTotW" type="number" min="0" placeholder="0" oninput="onDaily()" style="width:50px;" title="Count"><input class="ni" id="dCapW" type="number" min="0" max="100" step="0.1" placeholder="%" oninput="onDaily()" style="width:56px;" title="% capture"></div></div>
         <div class="inp-row" style="border-bottom:1px solid #1c2333;padding:5px 0;"><label style="font-size:9px;color:#60a5fa;">Breakeven</label><div style="display:flex;gap:5px;"><input class="ni" id="dTotBE" type="number" min="0" placeholder="0" oninput="onDaily()" style="width:50px;" title="Count"><input class="ni" id="dCapBE" type="number" min="0" max="100" step="0.1" placeholder="%" oninput="onDaily()" style="width:56px;" title="% capture"></div></div>
@@ -693,17 +789,17 @@ canvas.spark{width:100%;height:34px;display:block;}
       <div id="gauge-wrap" style="padding-top:8px;"></div>
 
       <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Real Equity — All Time</div>
-      <div class="chart-panel" style="margin:8px 0;">
+      <div class="chart-panel" style="margin:8px -16px;">
         <div class="chart-hd"><span class="chart-lbl">Cumulative P&amp;L (Real)</span><span class="chart-tt" id="real-ct-all"></span></div>
         <div class="chart-wrap"><canvas class="eqcv" id="real-cv-all"></canvas></div>
       </div>
       <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Real Equity — Weekly Rollup</div>
-      <div class="chart-panel" style="margin:8px 0;">
+      <div class="chart-panel" style="margin:8px -16px;">
         <div class="chart-hd"><span class="chart-lbl">P&amp;L by Week</span><span class="chart-tt" id="real-ct-week"></span></div>
         <div class="chart-wrap"><canvas class="eqcv" id="real-cv-week"></canvas></div>
       </div>
       <div class="slbl" style="margin:8px -16px 0;padding-left:16px;">Real Equity — Monthly Rollup</div>
-      <div class="chart-panel" style="margin:8px 0;">
+      <div class="chart-panel" style="margin:8px -16px;">
         <div class="chart-hd"><span class="chart-lbl">P&amp;L by Month</span><span class="chart-tt" id="real-ct-month"></span></div>
         <div class="chart-wrap"><canvas class="eqcv" id="real-cv-month"></canvas></div>
       </div>
@@ -846,17 +942,17 @@ function switchScreen(n){
 }
 
 let activeStrat=0,activeTblStrat=0;
-const simResults=[null,null,null];
+const simResults=[null,null,null,null,null,null];
 function switchStrat(n){
   activeStrat=n;
-  [0,1,2].forEach(i=>{
+  [0,1,2,3,4,5].forEach(i=>{
     const b=$('stb'+i);if(!b)return;
     b.classList.toggle('on',i===n);
     $('sp'+i).style.display=i===n?'block':'none';
   });
   updateDist(n);
 }
-function switchTblStrat(n){activeTblStrat=n;[0,1,2].forEach(i=>{$('tsb'+i).classList.toggle('on',i===n);const iw=$('intv-wrap-'+i);if(iw)iw.style.display=i===n?'flex':'none';});renderTable(n);dvSyncTblScroll();}
+function switchTblStrat(n){activeTblStrat=n;[0,1,2,3,4,5].forEach(i=>{$('tsb'+i).classList.toggle('on',i===n);const iw=$('intv-wrap-'+i);if(iw)iw.style.display=i===n?'flex':'none';});renderTable(n);dvSyncTblScroll();}
 /* Keep the table scrolled to the same day across A/B/C switches, so
    flipping tabs compares the same point in time instead of landing
    wherever that strategy's own scrollTop last happened to be — each
@@ -1281,15 +1377,22 @@ function dvGlassGauge(ctx,cx,cyBase,r,frac,rgb,shareVal){
   // Number + caption sit low in the dome (close to the flat base, where
   // a half-circle is at its widest) rather than centred on the dome's
   // full height — keeps them clear of the arc above even when the arc
-  // sweeps most of the way round at a near-full fraction.
+  // sweeps most of the way round at a near-full fraction. Both scale
+  // with r (clamped at the low end to stay readable, and at the high end
+  // so it doesn't get cartoonish) instead of a fixed size — the gauge row
+  // now sizes each dome to fill whatever space it actually has rather
+  // than capping out around r=22, and a much bigger dome with the old
+  // fixed 7.2px number would just leave empty arc above tiny text.
+  const numSize=Math.max(7.2,Math.min(22,r*.33));
+  const capSize=Math.max(6,Math.min(15,r*.27));
   ctx.textAlign='center';
   ctx.fillStyle='rgba(226,230,237,.78)';
-  ctx.font='700 7.2px IBM Plex Mono';
-  ctx.fillText(Math.round(shareVal).toLocaleString(),cx,cyBase-8);
+  ctx.font=`700 ${numSize}px IBM Plex Mono`;
+  ctx.fillText(Math.round(shareVal).toLocaleString(),cx,cyBase-r*.36);
   ctx.fillStyle='rgba(163,173,190,.5)';
-  ctx.font='6px IBM Plex Mono';
+  ctx.font=`${capSize}px IBM Plex Mono`;
   ctx.textBaseline='alphabetic';
-  ctx.fillText('SHARES',cx,cyBase-1);
+  ctx.fillText('SHARES',cx,cyBase-r*.045);
 
   ctx.restore();
 }
@@ -1303,16 +1406,32 @@ function dvGlassGauge(ctx,cx,cyBase,r,frac,rgb,shareVal){
    marker bleeds a glow past its own silhouette) plus a frosted-glass
    annulus between two radii with a bright-highlight-to-shadow gradient
    fill and a soft edge stroke on each boundary circle. */
-function drawGlassRing(ctx,x,y,r,rgb){
+function drawGlassRing(ctx,x,y,r,rgb,boost,glowMul){
+  // boost: optional intensity multiplier, default 1 (every existing call
+  // site — hover dots, table endpoint triangles' shared recipe, the Sim
+  // tab's own per-strategy growth markers — is untouched by this). Used
+  // by the Race to Goal chart's FASTEST PATH marker specifically, which
+  // needs to stay readable against up to six competing curves rather
+  // than the one or two this material was originally tuned against.
+  boost=boost||1;
+  // glowMul: separate multiplier that only touches the bloom (the halo
+  // escaping past the ring's own edge - "glow" in this app's own terms,
+  // see the design-system note distinguishing glow from contained
+  // diffusion) without dimming or shrinking the ring/dot themselves.
+  // Default 1 leaves every existing call site pixel-identical.
+  glowMul=glowMul==null?1:glowMul;
   const [cr,cg,cb]=rgb;
   const lightX=x-r*0.35,lightY=y-r*0.4;
 
-  /* tight, dim bloom — just enough to lift the ring off the chart. */
-  const bloom=ctx.createRadialGradient(x,y,0,x,y,r*1.7);
-  bloom.addColorStop(0,`rgba(${cr},${cg},${cb},.0104)`);
+  /* tight, dim bloom — just enough to lift the ring off the chart.
+     Boosted requests get a wider, brighter bloom so the marker reads as
+     a genuine glow rather than just a slightly stronger ring. */
+  const bloomR=r*(boost>1?1.7+boost*0.55:1.7)*glowMul;
+  const bloom=ctx.createRadialGradient(x,y,0,x,y,bloomR);
+  bloom.addColorStop(0,`rgba(${cr},${cg},${cb},${Math.min(1,.0104*boost*boost*glowMul)})`);
   bloom.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=bloom;
-  ctx.beginPath();ctx.arc(x,y,r*1.7,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,bloomR,0,Math.PI*2);ctx.fill();
 
   /* outer ring: frosted glass annulus (gradient fill between two radii)
      plus a soft gradient-toned edge stroke on each boundary circle */
@@ -1323,16 +1442,16 @@ function drawGlassRing(ctx,x,y,r,rgb){
   ctx.arc(x,y,ringInner,0,Math.PI*2,true);
   ctx.clip('evenodd');
   const ringFill=ctx.createRadialGradient(lightX,lightY,0,x,y,ringOuter*1.15);
-  ringFill.addColorStop(0,`rgba(${Math.min(255,cr+100)},${Math.min(255,cg+100)},${Math.min(255,cb+100)},.0424)`);
-  ringFill.addColorStop(.6,`rgba(${cr},${cg},${cb},.256)`);
-  ringFill.addColorStop(1,`rgba(${Math.round(cr*.4)},${Math.round(cg*.4)},${Math.round(cb*.4)},.216)`);
+  ringFill.addColorStop(0,`rgba(${Math.min(255,cr+100)},${Math.min(255,cg+100)},${Math.min(255,cb+100)},${Math.min(1,.0424*boost)})`);
+  ringFill.addColorStop(.6,`rgba(${cr},${cg},${cb},${Math.min(1,.256*boost)})`);
+  ringFill.addColorStop(1,`rgba(${Math.round(cr*.4)},${Math.round(cg*.4)},${Math.round(cb*.4)},${Math.min(1,.216*boost)})`);
   ctx.fillStyle=ringFill;
   ctx.fillRect(x-ringOuter-2,y-ringOuter-2,(ringOuter+2)*2,(ringOuter+2)*2);
   ctx.restore();
-  ctx.lineWidth=.8;
-  ctx.strokeStyle=`rgba(${cr},${cg},${cb},.424)`;
+  ctx.lineWidth=boost>1?1.4:.8;
+  ctx.strokeStyle=`rgba(${cr},${cg},${cb},${Math.min(1,.424*boost)})`;
   ctx.beginPath();ctx.arc(x,y,ringOuter,0,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle=`rgba(${cr},${cg},${cb},.272)`;
+  ctx.strokeStyle=`rgba(${cr},${cg},${cb},${Math.min(1,.272*boost)})`;
   ctx.beginPath();ctx.arc(x,y,ringInner,0,Math.PI*2);ctx.stroke();
 }
 
@@ -1352,21 +1471,33 @@ function drawGlassCircle(ctx,x,y,r){
    shared drawGlassRing above; only the centre dot below is unique to
    this marker. Ring and dot are both translucent so the curve/gridlines
    underneath still show through. */
-function drawGlassBullseye(ctx,x,y,r,rgb){
+function drawGlassBullseye(ctx,x,y,r,rgb,boost,flatDot,glowMul){
+  boost=boost||1;
   const [cr,cg,cb]=rgb;
   const lightX=x-r*0.35,lightY=y-r*0.4;
   ctx.save();
 
-  drawGlassRing(ctx,x,y,r,rgb);
+  drawGlassRing(ctx,x,y,r,rgb,boost,glowMul);
 
-  /* centre dot: a small glass sphere, not a flat fill */
+  /* centre dot: a small glass sphere by default (bright near the light
+     source, dimming toward the true centre — the classic "3D bead"
+     look). flatDot swaps that for a uniform fill matching the ring's own
+     brightest tone instead, for a marker that needs to read as evenly
+     bright/pronounced rather than dim in the middle (see the Sim tab's
+     own growth marker, which asked for exactly this). */
   const dotR=r*.34;
-  const body=ctx.createRadialGradient(lightX,lightY,dotR*.1,x,y,dotR*1.05);
-  body.addColorStop(0,`rgba(${Math.min(255,cr+130)},${Math.min(255,cg+130)},${Math.min(255,cb+130)},.0712)`);
-  body.addColorStop(.5,`rgba(${cr},${cg},${cb},.592)`);
-  body.addColorStop(1,`rgba(${Math.round(cr*.4)},${Math.round(cg*.4)},${Math.round(cb*.4)},.504)`);
-  ctx.beginPath();ctx.arc(x,y,dotR,0,Math.PI*2);
-  ctx.fillStyle=body;ctx.fill();
+  if(flatDot){
+    ctx.beginPath();ctx.arc(x,y,dotR,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${cr},${cg},${cb},${Math.min(1,.75*boost)})`;
+    ctx.fill();
+  }else{
+    const body=ctx.createRadialGradient(lightX,lightY,dotR*.1,x,y,dotR*1.05);
+    body.addColorStop(0,`rgba(${Math.min(255,cr+130)},${Math.min(255,cg+130)},${Math.min(255,cb+130)},${Math.min(1,.0712*boost)})`);
+    body.addColorStop(.5,`rgba(${cr},${cg},${cb},${Math.min(1,.592*boost)})`);
+    body.addColorStop(1,`rgba(${Math.round(cr*.4)},${Math.round(cg*.4)},${Math.round(cb*.4)},${Math.min(1,.504*boost)})`);
+    ctx.beginPath();ctx.arc(x,y,dotR,0,Math.PI*2);
+    ctx.fillStyle=body;ctx.fill();
+  }
 
   ctx.restore();
 }
@@ -1462,9 +1593,17 @@ function drawGlassTriangle(ctx,x,y,r,rgb,gradTop,gradBottom){
 
 function drawChart(equity,acct0,tab){
   const s=tab===0?'':'_'+tab;const cv=$('cv'+s);if(!cv)return;
-  _drawChart(cv,equity,acct0);
+  // Sim tab's own equity chart now renders with the same "glass tube"
+  // material as the Table tab's combined Race to Goal chart, in this
+  // strategy's own identity colour, instead of the plain pnl-sign
+  // flat stroke — see _drawChart's optional trailing rgb arg. Stashed on
+  // the canvas itself (cv._simRgb) so the hover-redraw path in wireChart
+  // and the window-resize redraw loop both pick it back up without
+  // needing to be told the tab/strategy again.
+  cv._simRgb=hexToRgb(STRAT_COLORS[tab]);
+  _drawChart(cv,equity,acct0,cv._simRgb);
 }
-function _drawChart(cv,equity,acct0){
+function _drawChart(cv,equity,acct0,rgb){
   if(!cv||!cv.getContext||!equity||equity.length<2)return;
   const dpr=window.devicePixelRatio||1;
   const W=cv.offsetWidth,H=cv.offsetHeight;if(!W||!H)return;
@@ -1491,19 +1630,60 @@ function _drawChart(cv,equity,acct0){
   ctx.fillStyle=gr;ctx.fill();
   ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;ctx.setLineDash([3,4]);
   ctx.beginPath();ctx.moveTo(pd.l,zy);ctx.lineTo(pd.l+pw,zy);ctx.stroke();ctx.setLineDash([]);
-  ctx.beginPath();ctx.moveTo(xS(0),yS(pnls[0]));
-  for(let i=1;i<pnls.length;i++){const cpx=(xS(i-1)+xS(i))/2;ctx.bezierCurveTo(cpx,yS(pnls[i-1]),cpx,yS(pnls[i]),xS(i),yS(pnls[i]));}
-  ctx.strokeStyle=pnls[pnls.length-1]>=0?'#34d399':'#f87171';ctx.lineWidth=2;ctx.stroke();
+  if(rgb){
+    // Glass-tube stroke — same shared material (dvBuildCurvePath +
+    // dvStrokeGlassCurve) as the Table tab's combined equity chart, just
+    // in this canvas's own strategy colour. Real-equity charts on the
+    // Stats tab never pass rgb, so they fall through to the original
+    // flat pnl-sign stroke below, untouched.
+    const path=dvBuildCurvePath(xS,i=>yS(pnls[i]),pnls.length);
+    dvStrokeGlassCurve(ctx,path,rgb,pd.t,pd.t+ph);
+    // Growth marker — the same single-strategy rapid-growth detector
+    // used to anchor the Race to Goal chart's FASTEST PATH marker
+    // (dvStrategyRapidGrowth), run here against just this one curve so
+    // each strategy's own pane shows where ITS OWN compounding visibly
+    // took off. No text callout — the chart is tiny and the same figure
+    // is spelled out as "Rapid Growth Threshold" in this strategy's
+    // Diagnostics card just below. Deliberately pronounced rather than
+    // subtle: sized up well past the original r=5.2 (read as a barely-
+    // visible speck), boosted for a genuine glow (glow itself trimmed
+    // 15% off that boosted level — the ring/dot stay at full strength,
+    // only the halo escaping past the ring's edge backs off), neutral
+    // white instead of the strategy's own colour (only one curve on this
+    // chart, so there's nothing to disambiguate), and flatDot so the
+    // centre reads as evenly bright instead of dimming toward the true
+    // centre the way the default "glass sphere" dot does.
+    const growthPts=equity.map(p=>({day:p.day,cap:acct0+p.cumPnl}));
+    const growthHit=dvStrategyRapidGrowth(growthPts);
+    if(growthHit){
+      const gi=growthPts.findIndex(p=>p.day===growthHit.day);
+      if(gi>=0)drawGlassBullseye(ctx,xS(gi),yS(pnls[gi]),11,[255,255,255],3,true,.85);
+    }
+  }else{
+    ctx.beginPath();ctx.moveTo(xS(0),yS(pnls[0]));
+    for(let i=1;i<pnls.length;i++){const cpx=(xS(i-1)+xS(i))/2;ctx.bezierCurveTo(cpx,yS(pnls[i-1]),cpx,yS(pnls[i]),xS(i),yS(pnls[i]));}
+    ctx.strokeStyle=pnls[pnls.length-1]>=0?'#34d399':'#f87171';ctx.lineWidth=2;ctx.stroke();
+  }
   cv._cs={equity,acct0,pd,pw,ph,W,H,pnls,mn,rng,xS,yS};
 }
 /* Combined multi-strategy comparison overlay — shared y-scale so magnitude
    is directly comparable; each series keeps its own true x-length, so a
    strategy that finishes faster visibly ends sooner on the chart. */
-const STRAT_COLORS=['#34d399','#f87171','#fbbf24'];
-const STRAT_LABELS=['A','B','C'];
+/* Strategy identity colours: spread across the full hue wheel for maximum
+   mutual distinctness (blue/orange/violet/lime/red/pink), rather than
+   clustering several in the same purple-to-pink family. Red and green ARE
+   used here (D=lime, E=red) but each is a visibly different SHADE from the
+   diagnostics status palette's own red/green (#f87171/#34d399) - lime
+   leans yellow where the diagnostic green leans cyan/emerald, and this red
+   is a deeper, more saturated true red rather than the diagnostic's light
+   pastel coral - so neither is mistakable for a pass/fail verdict color
+   even though both are technically "in the red/green family." A stays the
+   app's own theme blue (--accent-solid). */
+const STRAT_COLORS=['#38bdf8','#fb923c','#a78bfa','#84cc16','#ef4444','#ec4899'];
+const STRAT_LABELS=['A','B','C','D','E','F'];
 function drawCombinedChart(cv,legendEl){
   if(!cv||!cv.getContext)return;
-  const active=[0,1,2].filter(i=>simResults[i]&&simResults[i].equity&&simResults[i].equity.length>1);
+  const active=[0,1,2,3,4,5].filter(i=>simResults[i]&&simResults[i].equity&&simResults[i].equity.length>1);
   const dpr=window.devicePixelRatio||1;
   const W=cv.offsetWidth,H=cv.offsetHeight;if(!W||!H)return;
   cv.width=W*dpr;cv.height=H*dpr;
@@ -1557,7 +1737,7 @@ function wireChart(cv,tt){
     tt.textContent=`Day ${pt.day} · ${time} · ${pnl>=0?'+$':'−$'}${fmt(Math.abs(pnl))}`;
     tt.style.color=pnl>=0?'#34d399':'#f87171';
     const dpr=window.devicePixelRatio||1;cv.width=cv.offsetWidth*dpr;cv.height=cv.offsetHeight*dpr;
-    const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);_drawChart(cv,st.equity,st.acct0);
+    const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);_drawChart(cv,st.equity,st.acct0,cv._simRgb);
     const cx2=st.xS(idx),cy2=st.yS(st.pnls[idx]);
     ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;ctx.setLineDash([2,3]);
     ctx.beginPath();ctx.moveTo(cx2,st.pd.t);ctx.lineTo(cx2,st.pd.t+st.ph);ctx.stroke();
@@ -1566,9 +1746,9 @@ function wireChart(cv,tt){
     drawGlassCircle(ctx,cx2,cy2,8.25);
   }
   cv.addEventListener('mousemove',e=>onX(e.clientX));
-  cv.addEventListener('mouseleave',()=>{tt.textContent='';_drawChart(cv,cv._cs?.equity,cv._cs?.acct0);});
+  cv.addEventListener('mouseleave',()=>{tt.textContent='';_drawChart(cv,cv._cs?.equity,cv._cs?.acct0,cv._simRgb);});
   cv.addEventListener('touchmove',e=>{e.preventDefault();onX(e.touches[0].clientX);},{passive:false});
-  cv.addEventListener('touchend',()=>{tt.textContent='';_drawChart(cv,cv._cs?.equity,cv._cs?.acct0);});
+  cv.addEventListener('touchend',()=>{tt.textContent='';_drawChart(cv,cv._cs?.equity,cv._cs?.acct0,cv._simRgb);});
 }
 
 function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,tab){
@@ -1582,7 +1762,13 @@ function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,
   // average — matches the chart's "$/mo" figures rather than diluting
   // the number with the strategy's early ramp-up days.
   const _res=simResults[tab];
-  const mo=_res&&_res.rows&&_res.rows.length>1?dvPlateauMoRate(_res.rows.map(r=>({day:r.day,cap:acct0+r.cumPnl}))):c.evNet*21;
+  const _pts=_res&&_res.rows&&_res.rows.length>1?_res.rows.map(r=>({day:r.day,cap:acct0+r.cumPnl})):null;
+  const mo=_pts?dvPlateauMoRate(_pts):c.evNet*21;
+  // Same single-strategy rapid-growth detector anchoring the Race to Goal
+  // chart's FASTEST PATH marker and this strategy's own Sim-tab chart
+  // marker (see _drawChart) — surfaced here as a plain calendar ETA so
+  // it's readable without having to eyeball the chart.
+  const growthHit=_pts?dvStrategyRapidGrowth(_pts):null;
   const evTr=c.evDol-c.frTr;
   const dts=c.evNet>0?Math.ceil(c.avgPr/c.evNet):null;const wrOk=c.wr>=minWR;
   const rCapS=+$('rCapS').value||0;
@@ -1675,6 +1861,7 @@ function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,
     rows.push(row('EV/trade',evTr>=0?'+$'+fmt(evTr):'−$'+fmt(Math.abs(evTr)),evTr>0?'pos':'neg'));
     rows.push(row('Monthly est',sgn(mo),mo>0?'pos':'neg',  '',hasReal&&realMo!==null?rv(realMo,sgn(realMo)):null,mo,'higher'));
     rows.push(row('Time to goal',cal(calMo),'neu',days.toLocaleString()+' trading days',hasReal&&realTTG?rv(0,realTTG):null,null,null));
+    rows.push(row('Rapid Growth Threshold',growthHit?cal((growthHit.day/252)*12):'—',growthHit?'pos':'neu',growthHit?'day '+growthHit.day+' — compounding visibly takes off':'no rapid-growth point detected yet'));
     rows.push(row('R:R',actRR.toFixed(2)+':1',actRR>=1.5?'pos':actRR>=1?'neu':'neg','',hasReal&&realRR!==null?rv(realRR,realRR.toFixed(2)+':1'):null,actRR,'higher'));
     rows.push(row('Min WR to BE',(minWR*100).toFixed(1)+'%',wrOk?'pos':'neg'));
     rows.push(row('WR',         (c.wr*100).toFixed(1)+'%',wrOk?'pos':'neg','',hasReal&&realWR!==null?rv(realWR*100,(realWR*100).toFixed(1)+'%'):null,c.wr*100,'higher'));
@@ -1692,7 +1879,7 @@ function buildDiag(c,cumPnl,days,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,
     }
     rows.push(row('Status',wrOk&&c.evNet>0?'PROFITABLE':c.evNet>0?'MARGINAL':'NEGATIVE',wrOk&&c.evNet>0?'pos':c.evNet>0?'neu':'neg'));
     // ── Which strategy is faster / better, if others have been simulated ──
-    const others=[0,1,2].filter(i=>i!==tab&&simResults[i]&&simResults[i].rows&&simResults[i].rows.length);
+    const others=[0,1,2,3,4,5].filter(i=>i!==tab&&simResults[i]&&simResults[i].rows&&simResults[i].rows.length);
     if(others.length){
       const myDays=days,myEV=c.evNet;
       const cmp=others.map(i=>{
@@ -1833,15 +2020,29 @@ function dvStrategyRapidGrowth(pts){
   return null;
 }
 function dvFindRapidGrowth(series){
-  // Earliest point, across all ACTIVE strategies (checked individually via
-  // dvStrategyRapidGrowth — never against some blended/combined curve).
-  // Exactly one strategy can "own" the overall earliest point.
-  let best=null;
+  // Every active strategy's own earliest rapid-growth hit, checked
+  // individually via dvStrategyRapidGrowth (never against some blended/
+  // combined curve). Strategies that land within 10% of the single
+  // earliest day are close enough to call a practical tie — rather than
+  // crowning one arbitrary "winner" off what's essentially noise, their
+  // day/cap get averaged into one marker. That averaged marker is left
+  // uncoloured (neutral, same convention as the real-log line) rather
+  // than blended, since it no longer speaks for one specific strategy —
+  // don't colour-code an average. A clear single earliest point (nothing
+  // else within 10%) still returns that one strategy's own true colour.
+  const hits=[];
   for(const s of series){
     const hit=dvStrategyRapidGrowth(s.pts);
-    if(hit&&(!best||hit.day<best.day))best={...hit,idx:s.idx,color:s.color};
+    if(hit)hits.push({...hit,idx:s.idx,color:s.color});
   }
-  return best;
+  if(!hits.length)return null;
+  const minDay=Math.min(...hits.map(h=>h.day));
+  const tol=Math.max(minDay*0.1,1);
+  const tied=hits.filter(h=>h.day-minDay<=tol);
+  if(tied.length===1)return tied[0];
+  const day=tied.reduce((a,h)=>a+h.day,0)/tied.length;
+  const cap=tied.reduce((a,h)=>a+h.cap,0)/tied.length;
+  return{day,cap,idx:null,color:'#e2e6ed',tiedIdxs:tied.map(h=>h.idx)};
 }
 // Near-plateau monthly rate: average daily capital growth over just the
 // TRAILING slice of a strategy's run (last ~15%, min 5 points), times 21
@@ -1877,9 +2078,114 @@ function dvUpdateRapidOverlay(rapid,dayToCal,series){
   requestAnimationFrame(()=>el.classList.add('show'));
 }
 
+// The per-line endpoint figures (shares, capital, near-plateau $/mo,
+// calendar time-to-goal) float directly above each triangle marker —
+// back to the app's original per-triangle treatment (a brief detour
+// through a fixed corner dock didn't stick). Two or more lines finishing
+// within 10% of each other's final capital are close enough that
+// showing every one separately is just noise — merged into a single
+// averaged, UNCOLOURED stack (day/cap/mo/sh mean-averaged, centred over
+// the group) instead of crowning any one of them, same "average it,
+// don't colour-code it" rule used elsewhere. Sorts by capital to find
+// the close-together runs, then restores the original real/A-F order
+// (via each entry's own index) — display position itself is driven by
+// each (merged) entry's own screen x/y, this ordering is just for stable
+// iteration.
+function dvGroupEndpoints(endpoints){
+  const withIdx=endpoints.map((e,i)=>({...e,_i:i}));
+  const sorted=[...withIdx].sort((a,b)=>a.cap-b.cap);
+  const groups=[];
+  for(const ep of sorted){
+    const last=groups[groups.length-1];
+    if(last){
+      const ref=last[0].cap;
+      const tol=Math.max(Math.abs(ref)*0.1,1);
+      if(Math.abs(ep.cap-ref)<=tol){last.push(ep);continue;}
+    }
+    groups.push([ep]);
+  }
+  const out=groups.map(g=>{
+    const order=Math.min(...g.map(h=>h._i));
+    if(g.length===1)return{...g[0],_order:order,members:[g[0]._i]};
+    const x=g.reduce((a,h)=>a+h.x,0)/g.length;
+    const y=g.reduce((a,h)=>a+h.y,0)/g.length;
+    const cap=g.reduce((a,h)=>a+h.cap,0)/g.length;
+    const mo=g.reduce((a,h)=>a+h.mo,0)/g.length;
+    const day=g.reduce((a,h)=>a+h.day,0)/g.length;
+    const shVals=g.filter(h=>h.sh!=null).map(h=>h.sh);
+    const sh=shVals.length?shVals.reduce((a,b)=>a+b,0)/shVals.length:null;
+    return{x,y,cap,mo,day,sh,color:null,merged:true,count:g.length,_order:order,members:g.map(h=>h._i)};
+  });
+  out.sort((a,b)=>a._order-b._order);
+  return out;
+}
+// Linear-interpolated capital at an arbitrary day along one curve's own
+// sampled points — used to check whether some OTHER curve is passing
+// directly through the space a label stack would otherwise occupy.
+function dvCapAtDay(pts,day){
+  if(!pts.length||day<pts[0].day||day>pts[pts.length-1].day)return null;
+  for(let i=1;i<pts.length;i++){
+    if(pts[i].day>=day){
+      const p0=pts[i-1],p1=pts[i];
+      const t=(day-p0.day)/((p1.day-p0.day)||1);
+      return p0.cap+(p1.cap-p0.cap)*t;
+    }
+  }
+  return pts[pts.length-1].cap;
+}
+
+/* Shared "glass tube" curve material — path builder + stroke renderer.
+   Originally built as a closure inside dvDrawRaceChart for the Race to
+   Goal chart; pulled out to global scope (same reasoning as drawGlassRing
+   above) so the Sim tab's own per-strategy equity chart (_drawChart, see
+   drawChart()) can render with the exact same material in that
+   strategy's own colour, instead of the separate flat stroke it used to
+   draw. getX/getY are plain (i)=>x / (i)=>y accessors so each caller can
+   feed in whatever point shape it already has (the race chart's {cap}
+   points vs. the sim chart's raw cumulative-P&L numbers) without this
+   caring; gradTopY/gradBottomY are the caller's own plot-area vertical
+   extent for the main stroke's lighter-at-top gradient. */
+function dvBuildCurvePath(getX,getY,n){
+  const path=new Path2D();
+  path.moveTo(getX(0),getY(0));
+  for(let i=1;i<n;i++){
+    const cpx=(getX(i-1)+getX(i))/2;
+    path.bezierCurveTo(cpx,getY(i-1),cpx,getY(i),getX(i),getY(i));
+  }
+  return path;
+}
+function dvStrokeGlassCurve(ctx,path,rgb,gradTopY,gradBottomY){
+  const [r,g,b]=rgb;
+  // Glow (the two soft under-strokes) and flare (the thin top specular
+  // highlight below) both cut 30% from their original alphas (see the
+  // round that tuned these on the race chart). The main gradient stroke
+  // in between is the curve's own visible line, not glow/flare, so its
+  // alpha is untouched.
+  ctx.save();
+  ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.lineWidth=7;ctx.strokeStyle=`rgba(${r},${g},${b},.0392)`;ctx.stroke(path);
+  ctx.lineWidth=4.5;ctx.strokeStyle=`rgba(${r},${g},${b},.0651)`;ctx.stroke(path);
+  ctx.restore();
+
+  ctx.save();
+  ctx.lineJoin='round';ctx.lineCap='round';
+  const grad=ctx.createLinearGradient(0,gradTopY,0,gradBottomY);
+  grad.addColorStop(0,`rgba(${Math.min(255,r+70)},${Math.min(255,g+70)},${Math.min(255,b+70)},.92)`);
+  grad.addColorStop(1,`rgba(${r},${g},${b},.85)`);
+  ctx.strokeStyle=grad;ctx.lineWidth=2;
+  ctx.stroke(path);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(0,-1.1);
+  ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.strokeStyle='rgba(255,255,255,.112)';ctx.lineWidth=.7;
+  ctx.stroke(path);
+  ctx.restore();
+}
 function dvDrawRaceChart(cv,legendEl,hoverDay){
   if(!cv||!cv.getContext)return;
-  const active=[0,1,2].filter(i=>simResults[i]&&simResults[i].rows&&simResults[i].rows.length>1);
+  const active=[0,1,2,3,4,5].filter(i=>simResults[i]&&simResults[i].rows&&simResults[i].rows.length>1);
   const dpr=window.devicePixelRatio||1;
   const W=cv.offsetWidth,H=cv.offsetHeight;if(!W||!H)return;
   cv.width=W*dpr;cv.height=H*dpr;
@@ -1914,13 +2220,6 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
   if(hasReal)allCaps=allCaps.concat(realPts.map(p=>p.cap));
   const dataMaxCap=allCaps.length?Math.max(...allCaps):0;
   const dataMinCap=allCaps.length?Math.min(0,...allCaps):0;
-  // Same 20%-headroom convention as the capital range below, applied to
-  // share counts for the share gauges further down — a stable ceiling
-  // across the whole batch rather than whatever's active at a given
-  // hover moment.
-  const allShares=series.flatMap(s=>s.pts.map(p=>p.sh));
-  const dataMaxSh=allShares.length?Math.max(...allShares):0;
-  const shRange=Math.max(dataMaxSh*1.2,1);
   const dataMaxDay=active.length?Math.max(...series.map(s=>s.pts[s.pts.length-1].day)):(hasReal?realPts.length:1);
 
   // ── Scale ──
@@ -1985,50 +2284,13 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
   // along the top edge. This is the reference treatment — the endpoint
   // triangles' borders below reuse the same three-part recipe (glow,
   // gradient stroke, highlight) rather than a separate style of their own.
-  function dvBuildCurvePath(getX,pts){
-    const path=new Path2D();
-    path.moveTo(getX(0),yS(pts[0].cap));
-    for(let i=1;i<pts.length;i++){
-      const cpx=(getX(i-1)+getX(i))/2;
-      path.bezierCurveTo(cpx,yS(pts[i-1].cap),cpx,yS(pts[i].cap),getX(i),yS(pts[i].cap));
-    }
-    return path;
-  }
-  function dvStrokeGlassCurve(path,rgb){
-    const [r,g,b]=rgb;
-    // Glow (the two soft under-strokes) and flare (the thin top specular
-    // highlight below) both cut 30% this round. The main gradient stroke
-    // in between is the curve's own visible line, not glow/flare, so its
-    // alpha is untouched.
-    ctx.save();
-    ctx.lineJoin='round';ctx.lineCap='round';
-    ctx.lineWidth=7;ctx.strokeStyle=`rgba(${r},${g},${b},.0392)`;ctx.stroke(path);
-    ctx.lineWidth=4.5;ctx.strokeStyle=`rgba(${r},${g},${b},.0651)`;ctx.stroke(path);
-    ctx.restore();
-
-    ctx.save();
-    ctx.lineJoin='round';ctx.lineCap='round';
-    const grad=ctx.createLinearGradient(0,pd.t,0,pd.t+ph);
-    grad.addColorStop(0,`rgba(${Math.min(255,r+70)},${Math.min(255,g+70)},${Math.min(255,b+70)},.92)`);
-    grad.addColorStop(1,`rgba(${r},${g},${b},.85)`);
-    ctx.strokeStyle=grad;ctx.lineWidth=2;
-    ctx.stroke(path);
-    ctx.restore();
-
-    ctx.save();
-    ctx.translate(0,-1.1);
-    ctx.lineJoin='round';ctx.lineCap='round';
-    ctx.strokeStyle='rgba(255,255,255,.112)';ctx.lineWidth=.7;
-    ctx.stroke(path);
-    ctx.restore();
-  }
   if(hasReal){
-    const path=dvBuildCurvePath(i=>xS(i),realPts);
-    dvStrokeGlassCurve(path,hexToRgb('#e2e6ed'));
+    const path=dvBuildCurvePath(i=>xS(i),i=>yS(realPts[i].cap),realPts.length);
+    dvStrokeGlassCurve(ctx,path,hexToRgb('#e2e6ed'),pd.t,pd.t+ph);
   }
   for(const s of series){
-    const path=dvBuildCurvePath(i=>xS(s.pts[i].day),s.pts);
-    dvStrokeGlassCurve(path,hexToRgb(s.color));
+    const path=dvBuildCurvePath(i=>xS(s.pts[i].day),i=>yS(s.pts[i].cap),s.pts.length);
+    dvStrokeGlassCurve(ctx,path,hexToRgb(s.color),pd.t,pd.t+ph);
   }
 
   // On-chart marker for the rapid-growth point found above, drawn after
@@ -2044,7 +2306,17 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
     ctx.setLineDash([]);
     ctx.restore();
     const RG_MK_R=14.2; // 10.92 × 1.3 — 30% bigger
-    drawGlassBullseye(ctx,mx,my,RG_MK_R,[255,255,255]);
+    // Marker itself is tinted in the winning strategy's own identity
+    // colour (rapid.color, set in dvFindRapidGrowth) so it's identifiable
+    // at a glance — the dashed lead-in line and "FASTEST PATH" text below
+    // stay neutral white on purpose, unchanged. Boosted (brighter ring +
+    // wider bloom + more opaque centre) specifically here — with up to
+    // six strategies' worth of curves crossing right through this point,
+    // the original subtle-glass tuning (rounds 25-27) was easy to lose
+    // among them. Every other drawGlassBullseye/drawGlassRing call site
+    // (Sim tab's own per-strategy markers, hover dots) omits the boost
+    // arg and renders exactly as before.
+    drawGlassBullseye(ctx,mx,my,RG_MK_R,hexToRgb(rapid.color),3.2);
 
     // "Fastest path" annotation — a single straight leader at the
     // marker's own 10-o'clock angle running all the way out to the text,
@@ -2087,177 +2359,150 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
   // ── Endpoints: upside-down glass triangles marking the final point of
   // each curve, muted to match the app's own frosted panels (see
   // drawGlassTriangle) rather than a saturated colour shape. Each gets a
-  // boxless label stack above it — share count (neutral) on top, capital
+  // boxless label stack — share count (neutral) on top, capital
   // (strategy colour) under it, near-plateau monthly estimate under
-  // that, calendar duration at the bottom. Shares moved here from a
-  // dedicated on-chart gauge — position sizing already determines share
-  // count, so it only really matters relative to capital, which this
-  // stack already shows right below it; no dark outline stroke (the
-  // panels behind are dark enough without it). Text is 20% smaller than
-  // the original pass (9px/11px line-gap -> 7.2px/8.8px). One shared
-  // collision pool keeps stacks that finish close together from
-  // overlapping each other; a second curve-avoidance pass keeps a stack
-  // from sitting on top of (or getting crossed by) a DIFFERENT line that
-  // is still rising through that point in time.
+  // that, calendar duration at the bottom — centred directly above it,
+  // same typography as the app's original per-triangle treatment.
+  // Triangles/lines finishing within 10% of each other's capital merge
+  // into one averaged, uncoloured stack centred over the group
+  // (dvGroupEndpoints) rather than stacking separate near-duplicate
+  // labels. When a stack's default spot directly above its triangle
+  // would sit on top of a DIFFERENT curve still passing through that
+  // point in time, it moves to whichever side of the triangle has more
+  // room instead of fighting that curve for the same vertical space.
   const TRI_R=6.5,TRI_H=TRI_R*2.1;
-  const TRI_LBL_GAP=9; // breathing room between the triangle's top edge and the label stack above it (was 4 — too tight)
-  const LBL_SIZE=7.2,LBL_GAP=8.8;
-  // Share-count line: same size/weight as the capital line just below it
-  // (it's a peer numeric fact, not a footnote) but neutral-coloured, and
-  // real-log points never get one (no share concept there).
-  const SHR_GAP=8.8;
-  // Third line added under the $/mo value: the same calendar ("1y 6mo")
-  // formatting used by the rapid-growth callout and the hover day-tally,
-  // applied to each strategy's own endpoint day. Smaller and dimmer than
-  // the two lines above it since it's supplementary context, not a
-  // headline figure.
-  const CAL_SIZE=6.4,CAL_GAP=7.4;
-  const endpoints=[];
+  const TRI_LBL_GAP=9,LBL_SIZE=7.2,LBL_GAP=8.8,SHR_GAP=8.8,CAL_SIZE=6.4,CAL_GAP=7.4;
+  const rawEndpoints=[],curveList=[];
   if(hasReal){
     const lastR=realPts[realPts.length-1];
     const realAsPts=realPts.map((p,i)=>({day:i,cap:p.cap}));
-    endpoints.push({x:Math.min(Math.max(xS(realPts.length-1),pd.l+24),pd.l+pw-24),y:yS(lastR.cap)-TRI_H-TRI_LBL_GAP-CAL_GAP,color:'#e2e6ed',cap:lastR.cap,mo:dvPlateauMoRate(realAsPts),day:realPts.length-1});
+    rawEndpoints.push({x:xS(realPts.length-1),y:yS(lastR.cap),color:'#e2e6ed',cap:lastR.cap,mo:dvPlateauMoRate(realAsPts),day:realPts.length-1,sh:null});
+    curveList.push(realAsPts);
   }
   for(const s of series){
     const last=s.pts[s.pts.length-1];
-    // Share count deliberately left off this stack (ep.sh stays
-    // undefined, which every downstream check below already guards on) —
-    // it's back in its own dedicated gauge below the chart, and showing
-    // it in both places was exactly the kind of redundant duplicate
-    // figure this app avoids elsewhere.
-    endpoints.push({x:Math.min(Math.max(xS(last.day),pd.l+24),pd.l+pw-24),y:yS(last.cap)-TRI_H-TRI_LBL_GAP-CAL_GAP,color:s.color,cap:last.cap,mo:dvPlateauMoRate(s.pts),day:last.day});
+    rawEndpoints.push({x:xS(last.day),y:yS(last.cap),color:s.color,cap:last.cap,mo:dvPlateauMoRate(s.pts),day:last.day,sh:last.sh});
+    curveList.push(s.pts);
   }
-  // Measure each stack's footprint up front (same font used to draw it
-  // below) so both anti-overlap passes can reason about actual width,
-  // not just a point.
-  ctx.font=`bold ${LBL_SIZE}px IBM Plex Mono`;
-  for(const ep of endpoints){
-    const capTxt='$'+fmt(ep.cap,0);
-    const moTxt=(ep.mo>=0?'+$':'−$')+fmt(Math.abs(ep.mo),0)+'/mo';
-    ep.lw=Math.max(ctx.measureText(capTxt).width,ctx.measureText(moTxt).width);
-    if(ep.sh!=null){
+  const labelGroups=dvGroupEndpoints(rawEndpoints);
+  const halfW=44;
+  // Every already-placed label's own footprint, so a LATER group's
+  // obstruction check also avoids landing on top of an EARLIER group's
+  // stack — not just curve lines and the rapid-growth overlay. With
+  // several endpoints bunched close together (steep, near-simultaneous
+  // curves) their default centre-top spots can overlap each other even
+  // when no curve or overlay is anywhere near.
+  const placedBoxes=[];
+  // True if the given rectangle collides with the rapid-growth overlay,
+  // any OTHER curve's line, or any already-placed label - the one check
+  // shared by both the default centre-top test and the two side
+  // candidates below, so all three obstruction sources are always
+  // considered together rather than the overlay/curve check on the
+  // default spot and something looser on the fallback.
+  function boxHits(x0,x1,y0,y1,excludeMembers,includeOverlay){
+    // The overlay's own box is huge (76%x47% of the whole chart) so it
+    // only ever gets to veto the DEFAULT centre-top spot (includeOverlay
+    // left at its default true there) - if it also vetoed the two small
+    // +/-side candidates below, a triangle anywhere under that box could
+    // never shift far enough left or right to escape it (the shift is
+    // only ~90px, nowhere near the box's own width), so EVERY candidate
+    // would read "still blocked" and fall back to the old half-of-chart
+    // guess without ever actually checking whether that guess dodges the
+    // curves/labels it's really meant to dodge. Curves and already-placed
+    // labels stay checked for every candidate regardless.
+    if(includeOverlay!==false&&rapid&&x0<W*.76&&y0<H*.47)return true;
+    for(let ci=0;ci<curveList.length;ci++){
+      if(excludeMembers.includes(ci))continue;
+      const pts=curveList[ci];
+      for(let k=0;k<=6;k++){
+        const sx=x0+(x1-x0)*(k/6);
+        const day=Math.max(0,Math.min(maxDay,((sx-pd.l)/pw)*maxDay));
+        const cap=dvCapAtDay(pts,day);
+        if(cap==null)continue;
+        const cy=yS(cap);
+        if(cy>y0&&cy<y1)return true;
+      }
+    }
+    for(const b of placedBoxes){
+      if(x0<b.x1&&x1>b.x0&&y0<b.y1&&y1>b.y0)return true;
+    }
+    return false;
+  }
+  for(const grp of labelGroups){
+    const capTxt='$'+fmt(grp.cap,0);
+    const moTxt=(grp.mo>=0?'+$':'−$')+fmt(Math.abs(grp.mo),0)+'/mo';
+    const calTxt=cal(dayToCal(grp.day));
+    const shTxt=grp.sh!=null?Math.round(grp.sh).toLocaleString()+' sh':null;
+    const [cr,cg,cb]=grp.color?hexToRgb(grp.color):[163,173,190];
+    const capAlpha=grp.color?.8:.75,calAlpha=grp.color?.55:.5;
+    const moFill=grp.color?'rgba(255,255,255,.8)':'rgba(226,230,237,.85)';
+
+    const anchorX=Math.min(Math.max(grp.x,pd.l+24),pd.l+pw-24);
+    const moLyDefault=grp.y-TRI_H-TRI_LBL_GAP-CAL_GAP;
+    const topGap=shTxt!=null?(LBL_GAP+SHR_GAP):LBL_GAP;
+    const stackTop=moLyDefault-topGap-LBL_SIZE-2,stackBot=moLyDefault+CAL_GAP+CAL_SIZE+2;
+    const obstructed=boxHits(anchorX-halfW,anchorX+halfW,stackTop,stackBot,grp.members);
+
+    let lx,moLy,boxX0,boxX1,boxY0,boxY1;
+    if(!obstructed){
+      ctx.textAlign='center';
+      lx=anchorX;moLy=moLyDefault;
+      boxX0=anchorX-halfW;boxX1=anchorX+halfW;boxY0=stackTop;boxY1=stackBot;
+    }else{
+      // No clean room directly above — try both sides and take whichever
+      // is actually clear, rather than always guessing from which half
+      // of the chart the triangle sits in. Curves/other-labels are the
+      // decisive check here (includeOverlay:false) - the overlay's own
+      // box is huge (76%x47% of the whole chart) so a small +/-side
+      // shift can almost never fully escape it; letting it veto BOTH
+      // side candidates the way it vetoes the default spot would just
+      // mean every candidate under that box reads "still blocked" and
+      // this whole side-vs-side comparison never gets to run, falling
+      // straight back to the old half-of-chart guess regardless of
+      // which side the curves actually favour. The overlay still gets a
+      // say when curves leave both sides open: prefer whichever of those
+      // also clears the overlay. Only when curves themselves are a wash
+      // (both or neither side clear) does the old half-of-chart guess
+      // decide, same fallback as before.
+      const sideTop=grp.y-topGap-LBL_SIZE-2,sideBot=grp.y+CAL_GAP+CAL_SIZE+2;
+      const rightLx=Math.min(grp.x+TRI_R+8,pd.l+pw-6);
+      const leftLx=Math.max(grp.x-TRI_R-8,pd.l+6);
+      const rightClear=!boxHits(rightLx,rightLx+halfW*2,sideTop,sideBot,grp.members,false);
+      const leftClear=!boxHits(leftLx-halfW*2,leftLx,sideTop,sideBot,grp.members,false);
+      let side;
+      if(rightClear&&!leftClear)side='right';
+      else if(leftClear&&!rightClear)side='left';
+      else if(rightClear&&leftClear){
+        const rightAlsoOverlay=boxHits(rightLx,rightLx+halfW*2,sideTop,sideBot,grp.members);
+        const leftAlsoOverlay=boxHits(leftLx-halfW*2,leftLx,sideTop,sideBot,grp.members);
+        if(!rightAlsoOverlay&&leftAlsoOverlay)side='right';
+        else if(!leftAlsoOverlay&&rightAlsoOverlay)side='left';
+        else side=grp.x<(pd.l+pw/2)?'right':'left';
+      }else side=grp.x<(pd.l+pw/2)?'right':'left';
+      ctx.textAlign=side==='right'?'left':'right';
+      lx=side==='right'?rightLx:leftLx;
+      moLy=grp.y;
+      boxY0=sideTop;boxY1=sideBot;
+      if(side==='right'){boxX0=lx;boxX1=lx+halfW*2;}else{boxX0=lx-halfW*2;boxX1=lx;}
+    }
+    placedBoxes.push({x0:boxX0,x1:boxX1,y0:boxY0,y1:boxY1});
+    const capLy=moLy-LBL_GAP,calLy=moLy+CAL_GAP;
+    if(shTxt!=null){
       ctx.font=`${LBL_SIZE}px IBM Plex Mono`;
-      ep.shTxt=ep.sh.toLocaleString()+' sh';
-      ep.lw=Math.max(ep.lw,ctx.measureText(ep.shTxt).width);
+      ctx.fillStyle='rgba(226,230,237,.7)';
+      ctx.fillText(shTxt,lx,capLy-SHR_GAP);
     }
-    ctx.font=`${CAL_SIZE}px IBM Plex Mono`;
-    ep.calTxt=cal(dayToCal(ep.day));
-    ep.lw=Math.max(ep.lw,ctx.measureText(ep.calTxt).width);
+    ctx.font=`${LBL_SIZE}px IBM Plex Mono`;
+    ctx.fillStyle=`rgba(${cr},${cg},${cb},${capAlpha})`;
+    ctx.fillText(capTxt,lx,capLy);
     ctx.font=`bold ${LBL_SIZE}px IBM Plex Mono`;
+    ctx.fillStyle=moFill;
+    ctx.fillText(moTxt,lx,moLy);
+    ctx.font=`${CAL_SIZE}px IBM Plex Mono`;
+    ctx.fillStyle=`rgba(${cr},${cg},${cb},${calAlpha})`;
+    ctx.fillText(calTxt,lx,calLy);
   }
-  // Every plotted line, in day-domain points, so a label can be checked
-  // against lines OTHER than the one it belongs to.
-  const avoidCurves=series.map(s=>s.pts);
-  if(hasReal)avoidCurves.push(realPts.map((p,i)=>({day:i,cap:p.cap})));
-  // Each endpoint's TRUE (unclamped) triangle position, for a separate
-  // obstacle check below — a curve's sampled path stops at its own last
-  // day (dvCapAtDay returns null past it), so a strategy that finishes
-  // EARLY wouldn't otherwise register as an obstacle for a label stack
-  // anchored further right at a still-running strategy's endpoint, even
-  // though that early-finisher's triangle marker is sitting right there.
-  const triObstacles=endpoints.map(e=>({x:xS(e.day),y:yS(e.cap)}));
-  function dvCapAtDay(pts,day){
-    if(!pts.length||day<pts[0].day||day>pts[pts.length-1].day)return null;
-    for(let i=1;i<pts.length;i++){
-      if(pts[i].day>=day){
-        const p0=pts[i-1],p1=pts[i];
-        const t=(day-p0.day)/((p1.day-p0.day)||1);
-        return p0.cap+(p1.cap-p0.cap)*t;
-      }
-    }
-    return pts[pts.length-1].cap;
-  }
-  function dvAvoidCurves(){
-    let moved=false;
-    endpoints.forEach((ep,epI)=>{
-      const topGap=ep.sh!=null?(LBL_GAP+SHR_GAP):LBL_GAP;
-      const blockBot=ep.labelY+CAL_GAP+CAL_SIZE+2,blockTop=ep.labelY-topGap-LBL_SIZE-2;
-      const halfW=ep.lw/2+3;
-      for(const pts of avoidCurves){
-        for(const sx of[ep.x-halfW,ep.x,ep.x+halfW]){
-          const day=Math.max(0,Math.min(maxDay,((sx-pd.l)/pw)*maxDay));
-          const cap=dvCapAtDay(pts,day);
-          if(cap==null)continue;
-          const cy=yS(cap);
-          if(cy>blockTop&&cy<blockBot+4){
-            const req=cy-7;
-            if(req<ep.labelY){ep.labelY=req;moved=true;}
-          }
-        }
-      }
-      // A finished strategy's triangle sits at a fixed point past where
-      // its own curve stops being sampled above, so it needs its own
-      // direct box-vs-box check against every OTHER label's box — using
-      // the triangle's own full vertical span (its flat top edge sits
-      // TRI_H above the actual data point, per drawGlassTriangle) and
-      // horizontal half-width, not just its single apex coordinate,
-      // since the apex can clear a label's box while the wider top edge
-      // above it still pokes into it.
-      triObstacles.forEach((ob,obI)=>{
-        if(obI===epI)return;
-        if(ob.x<ep.x-halfW-TRI_R||ob.x>ep.x+halfW+TRI_R)return;
-        const obTop=ob.y-TRI_H,obBot=ob.y;
-        if(obBot>blockTop&&obTop<blockBot+4){
-          const req=obTop-7;
-          if(req<ep.labelY){ep.labelY=req;moved=true;}
-        }
-      });
-    });
-    return moved;
-  }
-  // minGap raised again, 30 -> 39, now that simulated points anchor a
-  // four-line stack (shares, $ value, $/mo, calendar value) instead of
-  // three — the extra shares line adds roughly SHR_GAP+LBL_SIZE (~16px)
-  // of footprint, so the three-line-tuned gap would let neighbouring
-  // four-line stacks visibly overlap even though their anchors were
-  // technically far enough apart under the old rule. Alternate the two
-  // anti-overlap passes a couple of times so a stack pushed up to clear a
-  // curve, or to clear another label, doesn't quietly reintroduce the
-  // other kind of collision.
-  for(let round=0;round<6;round++){
-    dvResolveLabelCollisions(endpoints,39);
-    if(!dvAvoidCurves())break;
-  }
-  // Hard floor at the canvas's own top edge: with several curves finishing
-  // close together right near the top of the frame, dvAvoidCurves can run
-  // out of room and keep pushing a stack up past pd.t entirely off-canvas
-  // (invisible, which is worse than a little crowding). Never let a
-  // stack's topmost line clear the visible top edge.
-  for(const ep of endpoints){
-    const topGap=ep.sh!=null?(LBL_GAP+SHR_GAP):LBL_GAP;
-    const minLabelY=pd.t+4+topGap+LBL_SIZE+2;
-    if(ep.labelY<minLabelY)ep.labelY=minLabelY;
-  }
-  // Last resort, horizontal: when several curves finish close together
-  // near the top of the frame, vertical room can run out entirely even
-  // with the floor above in place — several stacks end up pinned to
-  // (near) the same row with nowhere left to go vertically. Spread only
-  // the ones that are genuinely box-overlapping (both axes) apart along
-  // x instead; two stacks at a similar row height but already clear of
-  // each other horizontally are left alone.
-  endpoints.forEach(ep=>{if(ep.labelX===undefined)ep.labelX=ep.x;});
-  for(let pass=0;pass<6;pass++){
-    let moved=false;
-    for(let i=0;i<endpoints.length;i++){
-      for(let j=i+1;j<endpoints.length;j++){
-        const a=endpoints[i],b=endpoints[j];
-        const aTopGap=a.sh!=null?(LBL_GAP+SHR_GAP):LBL_GAP;
-        const bTopGap=b.sh!=null?(LBL_GAP+SHR_GAP):LBL_GAP;
-        const aTop=a.labelY-aTopGap-LBL_SIZE-2,aBot=a.labelY+CAL_GAP+CAL_SIZE+2;
-        const bTop=b.labelY-bTopGap-LBL_SIZE-2,bBot=b.labelY+CAL_GAP+CAL_SIZE+2;
-        if(aBot<bTop||bBot<aTop)continue;
-        const minSep=a.lw/2+b.lw/2+6;
-        const dx=b.labelX-a.labelX;
-        const sep=Math.abs(dx);
-        if(sep<minSep){
-          const push=(minSep-sep)/2,dir=dx>=0?1:-1;
-          a.labelX-=push*dir;b.labelX+=push*dir;
-          moved=true;
-        }
-      }
-    }
-    if(!moved)break;
-  }
+  ctx.textAlign='center';
   for(const s of series){
     const last=s.pts[s.pts.length-1];
     const [r,g,b]=hexToRgb(s.color);
@@ -2267,29 +2512,6 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
     const lastR=realPts[realPts.length-1];
     const [r,g,b]=hexToRgb('#e2e6ed');
     drawGlassTriangle(ctx,xS(realPts.length-1),yS(lastR.cap),TRI_R,[r,g,b],pd.t,pd.t+ph);
-  }
-  ctx.textAlign='center';
-  for(const ep of endpoints){
-    const moLy=ep.labelY!==undefined?ep.labelY:ep.y;
-    const capLy=moLy-LBL_GAP;
-    const calLy=moLy+CAL_GAP;
-    const [cr,cg,cb]=hexToRgb(ep.color);
-    const lx=ep.labelX!==undefined?ep.labelX:ep.x;
-    if(ep.sh!=null){
-      const shrLy=capLy-SHR_GAP;
-      ctx.font=`${LBL_SIZE}px IBM Plex Mono`;
-      ctx.fillStyle='rgba(226,230,237,.7)';
-      ctx.fillText(ep.shTxt,lx,shrLy);
-    }
-    ctx.font=`${LBL_SIZE}px IBM Plex Mono`;
-    ctx.fillStyle=`rgba(${cr},${cg},${cb},.8)`;
-    ctx.fillText('$'+fmt(ep.cap,0),lx,capLy);
-    ctx.font=`bold ${LBL_SIZE}px IBM Plex Mono`;
-    ctx.fillStyle='rgba(255,255,255,.8)';
-    ctx.fillText((ep.mo>=0?'+$':'−$')+fmt(Math.abs(ep.mo),0)+'/mo',lx,moLy);
-    ctx.font=`${CAL_SIZE}px IBM Plex Mono`;
-    ctx.fillStyle=`rgba(${cr},${cg},${cb},.55)`;
-    ctx.fillText(ep.calTxt,lx,calLy);
   }
 
   cv._race={series,realPts,hasReal,pd,pw,ph,xS,yS,maxDay,dayToCal};
@@ -2339,107 +2561,100 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
     for(const hp of hoverPts){
       drawGlassCircle(ctx,hp.dotX,hp.dotY,7.15);
     }
-
-    // Share-count gauges + capital tallies: one fixed stat block, docked
-    // bottom-right, independent of the hover day. The capital number's
-    // baseline is pinned FIRST — flush with the lowest $ gridline (the
-    // plot's own bottom edge, pd.t+ph — the same line the date labels sit
-    // just below), and the gauge's base (gY) is derived backward from that
-    // with a small fixed gap, so the gauge and its number sit close enough
-    // to read as one cohesive widget rather than a gauge with a separate
-    // tally floating underneath it.
-    const gR=22,gGap=10;
-    const gRowW=hoverPts.length*gR*2+Math.max(0,hoverPts.length-1)*gGap;
-    const gMarginR=(pd.l+pw+pd.r)*.05;
-    const tallyGap=8;
-    const tallyY=pd.t+ph;
-    const gY=tallyY-tallyGap;
-    const gXStart=(pd.l+pw+pd.r)-gMarginR-gRowW+gR;
-    const gX=hoverPts.map((hp,i)=>gXStart+i*(gR*2+gGap));
-    for(let i=0;i<hoverPts.length;i++){
-      const hp=hoverPts[i];
-      dvGlassGauge(ctx,gX[i],gY,gR,hp.sh/shRange,hexToRgb(hp.color),hp.sh);
-    }
-
-    // Capital tallies: docked flush underneath the share gauges now, one
-    // per strategy directly below its own gauge, instead of floating near
-    // each strategy's own highlight dot — the floating version chased
-    // curves and dodged obstacle boxes all over the chart as the hover day
-    // changed, which read as sporadic and didn't hold a stable left-to-
-    // right A/B/C order. A fixed dock under an already-fixed row is
-    // stable by construction: always the same order the gauges are
-    // already in, no avoidance/collision logic needed at all — including
-    // no longer stepping around the FASTEST PATH marker, which is fine to
-    // be crossed. No pill body or border either — just the number,
-    // colour-coded directly in the strategy's own colour (the border used
-    // to be the only thing carrying that colour; the text carries it
-    // now). The highest-capital marker stays, same small triangle,
-    // sitting beside the number instead of inside a pill.
-    const leaderCap=hoverPts.length?Math.max(...hoverPts.map(hp=>hp.cap)):null;
-    ctx.textAlign='center';
-    // Same size as the gauges' own share-count number (7.2px, matching
-    // this chart's other small-label size) rather than sized on its own —
-    // reads as one consistent stat block with the gauges above it instead
-    // of the capital line stepping up in prominence over the share count.
-    ctx.font='700 7.2px IBM Plex Mono';
-    for(let i=0;i<hoverPts.length;i++){
-      const hp=hoverPts[i];
-      const [tr,tg,tb]=hexToRgb(hp.color);
-      const txt='$'+fmt(hp.cap,0);
-      ctx.fillStyle=`rgba(${tr},${tg},${tb},.9)`;
-      ctx.fillText(txt,gX[i],tallyY);
-      if(hp.cap>=leaderCap){
-        const tw=ctx.measureText(txt).width;
-        const mx=gX[i]+tw/2+8,my=tallyY-3;
-        ctx.beginPath();
-        ctx.moveTo(mx,my-3.2);
-        ctx.lineTo(mx-3,my+2.4);
-        ctx.lineTo(mx+3,my+2.4);
-        ctx.closePath();
-        ctx.fillStyle='rgba(255,255,255,.82)';
-        ctx.fill();
-      }
-    }
   }else if(dtEl){
     dtEl.classList.remove('show');
   }
 }
 
-// Magnetic label collision resolution: given a list of {y, ...} points with
-// a shared minimum vertical spacing, nudge any pair closer than that apart
-// (moving both away from each other) until none overlap or the safety cap
-// is reached. Sets point.labelY to the resolved position; leaves point.y
-// untouched (that's still the true data position, used for the dot itself).
-function dvResolveLabelCollisions(points,minGap){
-  points.forEach(p=>{if(p.labelY===undefined)p.labelY=p.y+3;});
-  for(let pass=0;pass<12;pass++){
-    let moved=false;
-    const sorted=[...points].sort((a,b)=>a.labelY-b.labelY);
-    for(let i=0;i<sorted.length-1;i++){
-      const a=sorted[i],b=sorted[i+1];
-      const gap=b.labelY-a.labelY;
-      if(gap<minGap){
-        const shift=(minGap-gap)/2;
-        a.labelY-=shift;b.labelY+=shift;
-        moved=true;
-      }
+/* Share gauges + capital tallies — pulled out of the race chart itself
+   (see .dv-gauge-row above) into their own small canvas so a sixth strategy
+   doesn't crowd the chart's own corner the way three did. Same "one
+   cohesive widget" idea as before (gauge, then its capital number directly
+   underneath, in the strategy's own colour, no separate floating pieces),
+   just laid out as a full-width row instead of a bottom-right dock. Unlike
+   the old dock, this has its own dedicated real estate at all times, so it
+   defaults to each strategy's FINAL day (rather than sitting empty) until
+   the user actually hovers/drags/taps a day — at which point it live-
+   updates to match, same as the main chart's crosshair. */
+function dvDrawGaugeRow(cv,hoverDay){
+  if(!cv||!cv.getContext)return;
+  const active=[0,1,2,3,4,5].filter(i=>simResults[i]&&simResults[i].rows&&simResults[i].rows.length>1);
+  const dpr=window.devicePixelRatio||1;
+  const W=cv.offsetWidth,H=cv.offsetHeight;if(!W||!H)return;
+  cv.width=W*dpr;cv.height=H*dpr;
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+  if(!active.length){
+    ctx.fillStyle='#4d5a6e';ctx.font='9px IBM Plex Mono';ctx.textAlign='center';
+    ctx.fillText('Share gauges appear once a strategy is simulated',W/2,H/2);
+    return;
+  }
+  const series=active.map(i=>{
+    const rows=simResults[i].rows;
+    const acct0=simResults[i].acct0;
+    const pts=rows.map(r=>({day:r.day,sh:r.shares,cap:acct0+r.cumPnl,cumPnl:r.cumPnl}));
+    return{idx:i,pts,color:STRAT_COLORS[i],label:STRAT_LABELS[i]};
+  });
+  const allShares=series.flatMap(s=>s.pts.map(p=>p.sh));
+  const dataMaxSh=allShares.length?Math.max(...allShares):0;
+  const shRange=Math.max(dataMaxSh*1.2,1);
+  const day=hoverDay!=null?hoverDay:Math.max(...series.map(s=>s.pts[s.pts.length-1].day));
+  const hoverPts=[];
+  for(const s of series){
+    const ownFinalDay=s.pts[s.pts.length-1].day;
+    const clampedDay=Math.min(day,ownFinalDay);
+    let pt=null;
+    for(const p of s.pts){if(p.day<=clampedDay)pt=p;else break;}
+    if(pt)hoverPts.push({color:s.color,label:s.label,cap:pt.cap,sh:pt.sh});
+  }
+  const n=hoverPts.length;
+  // Margin/gap pulled in to a hairline (just enough that domes read as
+  // distinct circles, not fused into one shape) so the gauges claim as
+  // much of the row as the space allows — basically touching the panel's
+  // own edges and each other, per spec, rather than leaving visible
+  // breathing room on either side.
+  const marginX=3;
+  const availW=W-marginX*2;
+  const gGap=3;
+  const gY=H-16; // dome base, leaves room for the capital tally below it
+  // No letter row above the gauge any more — the strategy letter now
+  // prefixes the capital tally text below instead (see txt below), and
+  // the gauge claims that reclaimed headroom. Sized to fill whatever
+  // space it actually has — bounded only by the row's own height and how
+  // many gauges need to fit side by side — rather than an arbitrary cap.
+  const rMaxByHeight=gY-4;
+  const rMaxByWidth=(availW-(n-1)*gGap)/(n*2);
+  const gR=Math.max(13,Math.min(rMaxByHeight,rMaxByWidth));
+  const rowW=n*gR*2+(n-1)*gGap;
+  const startX=(W-rowW)/2+gR;
+  const gX=hoverPts.map((hp,i)=>startX+i*(gR*2+gGap));
+  const leaderCap=n?Math.max(...hoverPts.map(hp=>hp.cap)):null;
+  ctx.textAlign='center';
+  for(let i=0;i<n;i++){
+    const hp=hoverPts[i];
+    const [r,g,b]=hexToRgb(hp.color);
+    dvGlassGauge(ctx,gX[i],gY,gR,hp.sh/shRange,[r,g,b],hp.sh);
+    const txt=hp.label+'  $'+fmt(hp.cap,0);
+    ctx.font='700 7.2px IBM Plex Mono';
+    ctx.fillStyle=`rgba(${r},${g},${b},.9)`;
+    ctx.fillText(txt,gX[i],gY+11);
+    if(hp.cap>=leaderCap){
+      const tw=ctx.measureText(txt).width;
+      const mx=gX[i]+tw/2+8,my=gY+8;
+      ctx.beginPath();
+      ctx.moveTo(mx,my-3.2);
+      ctx.lineTo(mx-3,my+2.4);
+      ctx.lineTo(mx+3,my+2.4);
+      ctx.closePath();
+      ctx.fillStyle='rgba(255,255,255,.82)';
+      ctx.fill();
     }
-    // Re-clamped every pass (not just once at the end) so this floor and
-    // the mutual-spacing pass above converge together instead of one
-    // undoing the other: never let a point drift down past its own
-    // untouched default (`y`, already tuned to clear ITS OWN triangle by
-    // TRI_LBL_GAP) just to make room for a neighbour above it — that
-    // trade was landing a label back on top of its own marker.
-    for(const p of points){
-      if(p.labelY>p.y){p.labelY=p.y;moved=true;}
-    }
-    if(!moved)break;
   }
 }
 
 function dvRedrawChart(){
-  const cv=$('dv-cv');if(!cv)return;
-  dvDrawRaceChart(cv,null,dvSelDay);
+  const cv=$('dv-cv');if(cv)dvDrawRaceChart(cv,null,dvSelDay);
+  const gcv=$('dv-gauge-cv');if(gcv)dvDrawGaugeRow(gcv,dvSelDay);
 }
 
 /* Axis-lock the table scroll: touch devices (iOS Safari especially)
@@ -2509,7 +2724,7 @@ function dvWireTableScroll(){
 
 function exportData(tab){
   const res=simResults[tab];if(!res||!res.rows.length){alert('Run a simulation first.');return;}
-  const {rows,acct0,c,msp}=res;const names=['Strat-A','Strat-B','Strat-C'];
+  const {rows,acct0,c,msp}=res;const names=STRAT_LABELS.map(l=>'Strat-'+l);
   const L=['AHM v39 — '+names[tab],'Generated,'+new Date().toLocaleString(),'','Day,Cal,Mo P&L,Label,Shares,Result,WR%,Trades,Ticks,Day%,P&L,Ret%,Fees,Surplus,+Sh,Cumul'];
   const show=new Set([0,rows.length-1]);rows.forEach((r,i)=>{if(r.isMilestone||r.day%c.intv===0)show.add(i);});
   for(const idx of [...show].sort((a,b)=>a-b)){const r=rows[idx];const mo=r.cumPnl-((msp||{})[r.mIdx]||0);const dp=r.dayPct!=null?r.dayPct.toFixed(2)+'%':'—';let lbl='';if(r.isMilestone)lbl='Milestone '+r.msVal;else if(r.day===1)lbl='Start';else if(idx===rows.length-1)lbl='Goal';const tt=r.dayWinCt+r.dayLoseCt+r.dayBECt;const wrp=tt>0?((r.dayWinCt/tt)*100).toFixed(0)+'%':'—';L.push([r.day,cal(r.calMo),mo.toFixed(2),lbl,r.shares,r.outcome,wrp,r.numTr||0,r.dayTicks,dp,r.dayPnl.toFixed(2),(r.cumPnl/acct0*100).toFixed(2)+'%',(r.dayFees||0).toFixed(2),r.surplus.toFixed(2),r.newSh,r.cumPnl.toFixed(2)].join(','));}
@@ -3174,8 +3389,8 @@ function renderEquityCurves(){
 }
 
 function renderStratComparison(){
-  const COLS=['#34d399','#f87171','#fbbf24'];
-  const NAMES=['Strat A','Strat B','Strat C'];
+  const COLS=STRAT_COLORS;
+  const NAMES=STRAT_LABELS.map(l=>'Strat '+l);
   const active=simResults.map((r,i)=>r?i:-1).filter(i=>i>=0);
   // Comparison content is identical regardless of which strategy tab is
   // active — it compares all of them — so compute once, write into all
@@ -3200,12 +3415,21 @@ function renderStratComparison(){
     metrics.forEach(m=>{
       const vals=active.map(i=>({i,v:m.get(simResults[i])}));
       const best=m.better==='higher'?Math.max(...vals.map(r=>r.v)):Math.min(...vals.map(r=>r.v));
-      html+=`<div style="background:#161b26;border-radius:3px;padding:7px 10px;margin-bottom:5px;">`;
+      // Was a solid opaque #161b26 row background — same issue as the
+      // .diag-body/.vs-hd fix the round before, just built as an inline
+      // style in JS instead of a CSS rule since this whole comparison
+      // table is generated as raw HTML strings: a flat opaque fill
+      // sitting inside the already-translucent .vs-card, reading as a
+      // stack of solid dark rectangles rather than glass. Dropped to
+      // transparent so the card's own blur/gloss shows through each row
+      // the same way it now does everywhere else on this card.
+      html+=`<div style="background:transparent;border-radius:3px;padding:7px 10px;margin-bottom:5px;">`;
       html+=`<div style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px;">${m.lbl}</div>`;
-      html+=`<div style="display:flex;gap:6px;">`;
+      html+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">`;
       vals.forEach(({i,v})=>{
         const isBest=Math.abs(v-best)<1e-9;
-        const bg=isBest?`rgba(${i===0?'52,211,153':i===1?'248,113,113':'251,191,36'},.1)`:'transparent';
+        const [br,bgc,bb]=hexToRgb(COLS[i]);
+        const bg=isBest?`rgba(${br},${bgc},${bb},.1)`:'transparent';
         const border=isBest?`1px solid ${COLS[i]}`:'1px solid #232b3d';
         html+=`<div style="flex:1;background:${bg};border:${border};border-radius:3px;padding:5px 7px;text-align:center;">`;
         html+=`<div style="font-size:7px;color:${COLS[i]};letter-spacing:.08em;margin-bottom:2px;">${NAMES[i]}</div>`;
@@ -3216,7 +3440,7 @@ function renderStratComparison(){
     });
     bodyHtml=html;
   }
-  [0,1,2].forEach(tab=>{
+  [0,1,2,3,4,5].forEach(tab=>{
     const s=tab===0?'':'_'+tab;
     const body=$('strat-cmp-body'+s),badge=$('strat-cmp-badge'+s);
     if(body)body.innerHTML=bodyHtml;
@@ -3363,11 +3587,10 @@ const INFO={
 const SDEFS=[['minP',15,'t'],['maxP',30,'t'],['minL',5,'t'],['maxL',15,'t'],['minWR',55,'%'],['maxWR',65,'%'],['minBE',10,'%'],['maxBE',20,'%'],['minT',2,''],['maxT',5,''],['sh',100,''],['goal',500,''],['minPr',43,''],['maxPr',47,''],['spread',1,'t'],['slip',1,'t'],['buf',1,''],['cap',0,'t'],['disc',85,'%'],['bf',3,'%'],['bs',2,'%'],['gf',3,'%'],['gs_',2,'%'],['minPB',3,'t'],['maxPB',8,'t'],['minEO',1,'t'],['maxEO',4,'t'],['minSw',15,'t'],['maxSw',40,'t'],['rrSlider',0,''],['tickSz',1,'¢'],['minDp',-2,'%'],['maxDp',3,'%'],['bias',50,'%'],['intv',5,''],['volCeil',0,'sh'],['vwFH_min',60000,'/m'],['vwFH_max',120000,'/m'],['vwMD_min',15000,'/m'],['vwMD_max',40000,'/m'],['vwLH_min',30000,'/m'],['vwLH_max',70000,'/m'],['partRate',10,'%']];
 
 function buildPanes(){
-  [0,1,2].forEach(n=>{
+  [0,1,2,3,4,5].forEach(n=>{
     const pane=$('sp'+n);if(!pane)return;
-    const s=n===0?'':'_'+n;const L=['A','B','C'][n];
-    const SCOL=['#34d399','#f87171','#fbbf24'][n];
-    const SCLS=['','sc-b','sc-c'][n];
+    const s=n===0?'':'_'+n;const L=STRAT_LABELS[n];
+    const SCLS=['','sc-b','sc-c','sc-d','sc-e','sc-f'][n];
     function tog(id,checked=true){const tid='tog-'+id+s;return`<label class="tog-wrap"><input type="checkbox" class="tog" id="${tid}"${checked?' checked':''} onchange="onTog(this,'fc-${id}${s}',${n})"><span class="tog-lbl" id="${tid}-l">${checked?'ON':'OFF'}</span></label>`;}
     function fc(id,lbl,bc,ik,body,hasTog=true,checked=true){
       const t=hasTog?tog(id,checked):'';
@@ -3507,7 +3730,7 @@ function buildPanes(){
 // Does not touch the other two strategies or the shared Capital field.
 const TOG_DEFAULTS=[['dist',false],['dp',false],['fees',true],['rr',false],['swing',true],['volceil',false],['vw',false]];
 function clearStrategy(tab){
-  const L=['A','B','C'][tab];
+  const L=STRAT_LABELS[tab];
   if(!confirm('Clear Strategy '+L+' back to defaults? This wipes its settings and any simulation results.'))return;
   const s=tab===0?'':'_'+tab;
   SDEFS.forEach(([id,defV])=>setV(id,tab,defV));
@@ -3537,7 +3760,7 @@ function clearStrategy(tab){
 }
 
 function wirePanes(){
-  [0,1,2].forEach(tab=>{
+  [0,1,2,3,4,5].forEach(tab=>{
     const s=tab===0?'':'_'+tab;
     SDEFS.forEach(([id,defV,unit])=>{
       const phid='sph-'+id+s;const ph=$(phid);if(!ph)return;
@@ -3545,7 +3768,7 @@ function wirePanes(){
     });
     const cv=$('cv'+s),tt=$('ct'+s);if(cv&&tt)wireChart(cv,tt);
   });
-  [0,1,2].forEach(tab=>{
+  [0,1,2,3,4,5].forEach(tab=>{
     const iw=$('intv-wrap-'+tab);if(!iw)return;
     const el=mkStp('intv',tab,'');iw.replaceWith(el);el.id='intv-wrap-'+tab;
     if(tab!==0)el.style.display='none';
@@ -3561,7 +3784,7 @@ function wirePanes(){
     const inp=el.querySelector('.stp-val');
     inp.value=0;
     // Global capital affects every strategy's cfg() — refresh all three, not just tab 0.
-    const refreshAll=()=>{[0,1,2].forEach(t=>{updateDist(t);updateFrictionBreakdown(t);updateDerivedShares(t);});save();};
+    const refreshAll=()=>{[0,1,2,3,4,5].forEach(t=>{updateDist(t);updateFrictionBreakdown(t);updateDerivedShares(t);});save();};
     inp.removeEventListener?.('change',null);
     // mkStp already wired change/blur/click to call onSlider(0); override with a
     // handler that also updates B and C, since this field is shared.
@@ -3572,9 +3795,9 @@ function wirePanes(){
 }
 
 const SK='ahm-v39';
-function getStpIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;SDEFS.forEach(([id])=>ids.push(id+s));});return ids;}
+function getStpIds(){const ids=[];[0,1,2,3,4,5].forEach(t=>{const s=t===0?'':'_'+t;SDEFS.forEach(([id])=>ids.push(id+s));});return ids;}
 const TOG_BASE=['tog-wr','tog-be','tog-p','tog-l','tog-t','tog-cap','tog-sp','tog-sl','tog-fees','tog-pr','tog-buf','tog-tk','tog-bd','tog-gd','tog-cs','tog-bias','tog-rr','tog-dp','tog-pb','tog-eo','tog-swing','tog-dist','tog-volceil','tog-vw'];
-function getTogIds(){const ids=[];[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;TOG_BASE.forEach(id=>ids.push(id+s));});return ids;}
+function getTogIds(){const ids=[];[0,1,2,3,4,5].forEach(t=>{const s=t===0?'':'_'+t;TOG_BASE.forEach(id=>ids.push(id+s));});return ids;}
 const SEL_BASE=['curve','mode'];
 const REAL_IDS=['rCapS','rCapC','rTrades','rDays','rWR','rBE','rTickW','rTickL','rPnlTotal','rDayPnl'];
 
@@ -3582,7 +3805,7 @@ function save(){
   try{
     const st={};getStpIds().forEach(id=>{const e=$(id);if(e)st[id]=e.value;});
     const tg={};getTogIds().forEach(id=>{const e=$(id);if(e)tg[id]=e.checked;});
-    const sl={};[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;SEL_BASE.forEach(id=>{const e=$(id+s);if(e)sl[id+s]=e.value;});});
+    const sl={};[0,1,2,3,4,5].forEach(t=>{const s=t===0?'':'_'+t;SEL_BASE.forEach(id=>{const e=$(id+s);if(e)sl[id+s]=e.value;});});
     const rl={};REAL_IDS.forEach(id=>{const e=$(id);if(e)rl[id]=e.value;});
     const data=JSON.stringify({st,tg,sl,rl,sessionLog,journalLog});
     if(window.storage)window.storage.set(SK,data);else localStorage.setItem(SK,data);
@@ -3600,7 +3823,7 @@ async function load(){
       if(ctrl){if(e.checked)ctrl.classList.remove('off');else ctrl.classList.add('off');}
       if(lbl)lbl.textContent=e.checked?'ON':'OFF';
     });
-    if(d.sl)[0,1,2].forEach(t=>{const s=t===0?'':'_'+t;SEL_BASE.forEach(id=>{const e=$(id+s);if(e&&d.sl[id+s])e.value=d.sl[id+s];});});
+    if(d.sl)[0,1,2,3,4,5].forEach(t=>{const s=t===0?'':'_'+t;SEL_BASE.forEach(id=>{const e=$(id+s);if(e&&d.sl[id+s])e.value=d.sl[id+s];});});
     if(d.rl)REAL_IDS.forEach(id=>{const e=$(id);if(e&&d.rl[id]!==undefined)e.value=d.rl[id];});
     if(d.sessionLog&&Array.isArray(d.sessionLog))sessionLog=d.sessionLog;
     if(d.journalLog&&Array.isArray(d.journalLog))journalLog=d.journalLog;
@@ -3627,7 +3850,7 @@ async function init(){
   buildJournalCircles();
   buildStatsCircle();
   const loaded=await load();
-  [0,1,2].forEach(n=>{updateDist(n);updateFrictionBreakdown(n);updateVolWindowSummary(n);updateDerivedShares(n);});
+  [0,1,2,3,4,5].forEach(n=>{updateDist(n);updateFrictionBreakdown(n);updateVolWindowSummary(n);updateDerivedShares(n);});
   const allCv=$('real-cv-all'),allTt=$('real-ct-all');if(allCv&&allTt)wireChart(allCv,allTt);
   const wkCv=$('real-cv-week'),wkTt=$('real-ct-week');if(wkCv&&wkTt)wireChart(wkCv,wkTt);
   const moCv=$('real-cv-month'),moTt=$('real-ct-month');if(moCv&&moTt)wireChart(moCv,moTt);
@@ -3655,13 +3878,15 @@ function wireGlobalResize(){
     _resizeTimer=setTimeout(()=>{
       // Sim tab per-strategy charts + Stats tab real equity charts —
       // all driven by _drawChart, all cache their state on cv._cs.
-      ['cv','cv_1','cv_2','real-cv-all','real-cv-week','real-cv-month'].forEach(id=>{
+      ['cv','cv_1','cv_2','cv_3','cv_4','cv_5','real-cv-all','real-cv-week','real-cv-month'].forEach(id=>{
         const cv=$(id);
-        if(cv&&cv._cs)_drawChart(cv,cv._cs.equity,cv._cs.acct0);
+        if(cv&&cv._cs)_drawChart(cv,cv._cs.equity,cv._cs.acct0,cv._simRgb);
       });
-      // Table tab combined race chart
+      // Table tab combined race chart + its share-gauge row
       const dvCv=$('dv-cv');
       if(dvCv)dvDrawRaceChart(dvCv,null,dvSelDay);
+      const dvGcv=$('dv-gauge-cv');
+      if(dvGcv)dvDrawGaugeRow(dvGcv,dvSelDay);
     },150);
   };
   window.addEventListener('resize',onResize);
