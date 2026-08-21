@@ -1148,6 +1148,35 @@ canvas.spark{width:100%;height:34px;display:block;}
 .ibox h2{font-family:'Inter',sans-serif;font-size:10px;color:#fbbf24;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
 .ibox p,.ibox li{font-size:11px;color:#8892a4;line-height:1.65;margin-bottom:3px;}
 .ibox ul{padding-left:14px;}
+
+/* ONBOARDING SYSTEM (round 85) — welcome screen + coachmark tour +
+   persistent checklist. See the JS block above initOnboarding() for the
+   full design rationale; this is just the visual layer for it. */
+#ob-checklist-host:empty{display:none;}
+.gscard{margin:12px 16px 0;padding:12px 14px 10px;border-radius:11px;background:rgba(18,23,33,.5);backdrop-filter:blur(14px);border:1px solid rgba(56,189,248,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+.gs-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.gs-title{font-family:'Inter',sans-serif;font-size:9px;color:var(--accent-solid);font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.gs-x{width:16px;height:16px;border-radius:4px;border:1px solid #232b3d;color:#4d5a6e;font-size:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;}
+.gs-row{display:flex;align-items:center;gap:9px;padding:5px 0;}
+.gs-chk{width:16px;height:16px;border-radius:50%;border:1.5px solid #2a3446;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#0a0d13;}
+.gs-row.done .gs-chk{background:var(--accent-solid);border-color:var(--accent-solid);}
+.gs-row.done .gs-lbl{color:#5c6779;text-decoration:line-through;text-decoration-color:#2a3446;}
+.gs-lbl{font-family:'Inter',sans-serif;font-size:10.5px;color:#c3cbd8;font-weight:500;}
+.ob-scrim{position:fixed;inset:0;background:rgba(4,6,10,.72);backdrop-filter:blur(3px);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;}
+.ob-wcard{width:100%;max-width:320px;background:#0d121b;border:1px solid #202a3d;border-radius:18px;padding:28px 24px 24px;box-shadow:0 0 0 1px rgba(56,189,248,.08),0 20px 50px -12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);text-align:center;}
+.ob-wmark{width:44px;height:44px;border-radius:50%;margin:0 auto 16px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.5),rgba(56,189,248,.15) 60%),rgb(20,30,42);border:1px solid rgba(56,189,248,.35);display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px -2px rgba(56,189,248,.5);}
+.ob-wtitle{font-family:'Inter',sans-serif;font-size:17px;font-weight:800;color:#f2f4f7;letter-spacing:-.01em;margin-bottom:10px;}
+.ob-wbody{font-size:11.5px;color:#95a1b5;line-height:1.6;margin-bottom:22px;}
+.ob-wbtn{width:100%;height:42px;border-radius:9px;background:radial-gradient(ellipse 130% 150% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(56,189,248);color:#0a0d13;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border:none;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.ob-wskip{font-family:'Inter',sans-serif;font-size:9.5px;color:#4d5a6e;text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
+.ob-dim{position:fixed;inset:0;background:rgba(4,6,10,.55);z-index:340;pointer-events:none;}
+.ob-ring{position:fixed;border-radius:11px;border:2px solid var(--accent-solid);box-shadow:0 0 0 4px rgba(56,189,248,.15),0 0 18px rgba(56,189,248,.5);pointer-events:none;z-index:345;}
+.ob-coach{position:fixed;z-index:350;padding:12px 14px 13px;border-radius:10px;background:radial-gradient(ellipse 120% 90% at 50% 0%,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 60%),rgb(15,20,29);border:1px solid rgba(56,189,248,.4);box-shadow:0 10px 26px -8px rgba(0,0,0,.6),0 0 0 1px rgba(56,189,248,.08),inset 0 1px 0 rgba(255,255,255,.14);}
+.ob-coach-step{font-family:'Inter',sans-serif;font-size:8px;color:var(--accent-solid);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px;}
+.ob-coach-txt{font-family:'Inter',sans-serif;font-size:11px;color:#dbe1ea;line-height:1.5;margin-bottom:10px;}
+.ob-coach-row{display:flex;align-items:center;justify-content:space-between;}
+.ob-coach-next{font-family:'Inter',sans-serif;font-size:9px;color:var(--accent-solid);font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;}
+.ob-coach-skip{font-family:'Inter',sans-serif;font-size:8.5px;color:#4d5a6e;text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
 .friction-breakdown{background:#161b26;border:1px solid #232b3d;border-radius:3px;padding:6px 8px;margin-top:6px;}
 .fb-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #1c2333;}
 .fb-row:last-child{border:none;}
@@ -1176,6 +1205,7 @@ canvas.spark{width:100%;height:34px;display:block;}
 <div class="screens">
 
   <div class="screen active" id="scr-sim">
+    <div id="ob-checklist-host"></div>
     <div class="global-capital">
       <div class="gc-hd">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1511,6 +1541,7 @@ function switchScreen(n){
   if(n==='log'){$('jdate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});renderJournal();}
   if(n==='tbl'){renderTable(activeTblStrat);tcSyncQuickUI(activeTblStrat);}
   if(n==='stats')onReal();
+  obTourRender();
 }
 
 let activeStrat=0,activeTblStrat=0;
@@ -1523,6 +1554,7 @@ function switchStrat(n){
     $('sp'+i).style.display=i===n?'block':'none';
   });
   updateDist(n);
+  obTourRender();
 }
 // Keeps a strategy tab's ring (has this been simulated?) and mini-stat
 // (final capital, K-abbreviated via fmtK — same convention the endpoint
@@ -1622,7 +1654,7 @@ function dvSyncTblScroll(){
   bloomRow(closest);
 }
 
-function openGuide(){$('gmodal').classList.add('open');}
+function openGuide(){$('gmodal').classList.add('open');obNotify('guide');if(ob.tourActive)obTourEnd();}
 function closeGuide(){$('gmodal').classList.remove('open');}
 function openInfo(k){const d=INFO[k];if(!d)return;$('ititle').textContent=d.t;$('ibody').innerHTML=d.b;$('imodal').classList.add('open');}
 function closeInfo(){$('imodal').classList.remove('open');}
@@ -1650,6 +1682,15 @@ function circSelect(tab,catKey){
     p.style.display=(!deselecting&&p.dataset.cat===catKey)?'block':'none';
   });
   if(panelWrap)panelWrap.classList.toggle('open',!deselecting);
+  // Advance after the panel's own open/close transition has settled, not
+  // right after the class toggle above — .circ-panel-wrap.open animates
+  // max-height over .38s (not an instant display change), so the tour's
+  // next anchor (the Simulate button, pushed down by this panel opening)
+  // is still mid-animation for a moment. Measuring immediately would
+  // capture a stale, pre-expansion position; waiting out the transition
+  // also avoids the coachmark visibly snapping to place while the panel
+  // underneath it is still growing.
+  if(tab===0)setTimeout(()=>obTourAdvance('cat'),400);
 }
 
 
@@ -1825,7 +1866,7 @@ function updateFrictionBreakdown(tab){
   if(tierEl)tierEl.textContent=c.sh<100?'Under 100 shares: $0.35 flat round trip':'100+ shares: $0.0035/share × 2 legs';
 }
 
-function simulate(tab){try{_sim(tab);}catch(e){console.error(e);}}
+function simulate(tab){try{_sim(tab);obNotify('sim');obTourAdvance('sim');}catch(e){console.error(e);}}
 
 function _sim(tab){
   const c=cfg(tab);const MAX=10000,HOR=365;
@@ -4630,6 +4671,7 @@ function capSyncQuickUI(){
   });
   const cb=$('cap-qcustom');
   if(cb){cb.classList.toggle('on',!isPreset);cb.textContent=isPreset?'···':fmtCapK(v);}
+  if(v>0){obNotify('cap');obTourAdvance('cap');}
 }
 function capQuickPick(v){
   const inp=$('gcStartCap');if(!inp)return;
@@ -4664,7 +4706,7 @@ function save(){
     const tg={};getTogIds().forEach(id=>{const e=$(id);if(e)tg[id]=e.checked;});
     const sl={};[0,1,2,3,4,5].forEach(t=>{const s=t===0?'':'_'+t;SEL_BASE.forEach(id=>{const e=$(id+s);if(e)sl[id+s]=e.value;});});
     const rl={};REAL_IDS.forEach(id=>{const e=$(id);if(e)rl[id]=e.value;});
-    const data=JSON.stringify({st,tg,sl,rl,sessionLog,journalLog});
+    const data=JSON.stringify({st,tg,sl,rl,sessionLog,journalLog,ob});
     if(window.storage)window.storage.set(SK,data);else localStorage.setItem(SK,data);
   }catch(e){}
 }
@@ -4684,9 +4726,165 @@ async function load(){
     if(d.rl)REAL_IDS.forEach(id=>{const e=$(id);if(e&&d.rl[id]!==undefined)e.value=d.rl[id];});
     if(d.sessionLog&&Array.isArray(d.sessionLog))sessionLog=d.sessionLog;
     if(d.journalLog&&Array.isArray(d.journalLog))journalLog=d.journalLog;
+    if(d.ob)ob=Object.assign({},ob,d.ob,{checklist:Object.assign({},ob.checklist,d.ob.checklist||{})});
     return true;
   }catch(e){return false;}
 }
+
+/* ══════════════════════════════════════════════════════════════
+   ONBOARDING SYSTEM (round 85)
+   First-run experience for brand-new installs only. Anyone who
+   already has saved data — i.e. was already a real user before this
+   feature ever shipped — is silently marked fully graduated the
+   moment their save loads and never sees any of this; see
+   initOnboarding() below. The app already has a full reference doc
+   (the "Guide" button -> openGuide()/gmodal) and per-field "?"
+   tooltips (openInfo()/INFO), so this system's job isn't to explain
+   anything new — it's to surface what already exists, once, at the
+   moment it's relevant, without ever blocking or nagging a returning
+   user. Three pieces, all gated off one persisted `ob` object:
+
+   1. A single welcome screen (obWelcomeShow/Go/Skip) — shown once,
+      states the one-line premise ("this is simulated, not real
+      money"), then launches the tour.
+   2. A 3-step coachmark tour over the REAL Sim-tab controls
+      (obTourRender/Advance/End/Skip) — Starting Capital -> category
+      picker -> Simulate. Only ever visible on Strategy A's Sim
+      screen; hides itself (without ending) if the user navigates
+      away, and resumes at the same step if they come back. A
+      completed simulation always ends the tour outright regardless
+      of which step it's nominally on, since that's the actual goal
+      and a stale "set your capital" bubble after a real result would
+      just look broken. A manual "Got it"/"Skip guide" escape is
+      always available so nobody's forced through it.
+   3. A persistent "Getting Started" checklist card
+      (obChecklistRender/Dismiss) pinned above Starting Capital —
+      3 sticky, one-way flags (cap/sim/guide) that check off the
+      first time each milestone genuinely happens, driven by real
+      app state/actions rather than tour progress, so it stays
+      correct even if the user skips the tour entirely or does things
+      out of order (e.g. simulates before touching capital). Fully
+      removed — not collapsed — once all 3 are checked or the user
+      dismisses it via its own ✕.
+   ══════════════════════════════════════════════════════════════ */
+let ob={welcomed:false,tourActive:false,tourStep:0,checklistDismissed:false,checklist:{cap:false,sim:false,guide:false}};
+
+const OB_TOUR_STEPS=[
+  {key:'cap',anchor:()=>document.querySelector('.global-capital'),txt:'Start here — pick what you\'re working with. It\'s the shared account size every strategy gets tested against.'},
+  {key:'cat',anchor:()=>$('seg-bar'),txt:'Configure your strategy here — five short sections. Core has the essentials; the rest are optional.'},
+  {key:'sim',anchor:()=>document.querySelector('#sp0 .sim-btn'),txt:'When you\'re ready, hit Simulate. You\'ll get a chart, key metrics, and a plain-language verdict.'},
+];
+
+// One-way: a checklist item that's already true never reverts (e.g.
+// hitting Reset after a first successful sim shouldn't un-check "run
+// your first simulation" — that milestone genuinely already happened).
+function obNotify(key){
+  if(ob.checklist[key])return;
+  ob.checklist[key]=true;
+  obChecklistRender();
+  save();
+}
+function obTourAdvance(key){
+  if(!ob.tourActive)return;
+  // A completed simulation always ends the tour, regardless of which
+  // step it's nominally sitting on — see the header comment above.
+  if(key==='sim'){obTourEnd();return;}
+  if(OB_TOUR_STEPS[ob.tourStep]?.key!==key)return;
+  ob.tourStep++;
+  if(ob.tourStep>=OB_TOUR_STEPS.length)obTourEnd();
+  else{obTourRender();save();}
+}
+function obTourEnd(){
+  ob.tourActive=false;
+  ['ob-coach','ob-dim','ob-ring'].forEach(id=>{const el=$(id);if(el)el.remove();});
+  save();
+}
+function obTourSkip(){obTourEnd();}
+// Coachmark bubbles are positioned relative to their anchor, but on a
+// dense mobile layout there's often no genuinely empty space near it —
+// the anchor's neighbours sit flush against it (e.g. Starting Capital's
+// card and the A-F switcher share a border with zero gap). Rather than
+// chase ever-more-specific position math to dodge every neighbour, this
+// dims the whole screen and draws a highlight ring around just the
+// anchor (same treatment shown in the concept mockups) — any overlap
+// with a dimmed neighbour then reads as an intentional spotlight rather
+// than a glitch. Nothing here blocks clicks (dim/ring are both
+// pointer-events:none) so the real UI underneath, including whatever's
+// dimmed, stays fully usable — a user can still jump ahead at any time.
+function obTourRender(){
+  let el=$('ob-coach'),dim=$('ob-dim'),ring=$('ob-ring');
+  if(!ob.tourActive||activeScreen!=='sim'||activeStrat!==0){
+    [el,dim,ring].forEach(e=>{if(e)e.style.display='none';});
+    return;
+  }
+  const step=OB_TOUR_STEPS[ob.tourStep];
+  const anchor=step&&step.anchor();
+  if(!step||!anchor){[el,dim,ring].forEach(e=>{if(e)e.style.display='none';});return;}
+  if(!dim){dim=document.createElement('div');dim.id='ob-dim';dim.className='ob-dim';document.body.appendChild(dim);}
+  if(!ring){ring=document.createElement('div');ring.id='ob-ring';ring.className='ob-ring';document.body.appendChild(ring);}
+  if(!el){
+    el=document.createElement('div');el.id='ob-coach';el.className='ob-coach';
+    el.innerHTML='<div class="ob-coach-step" id="ob-coach-step"></div><div class="ob-coach-txt" id="ob-coach-txt"></div><div class="ob-coach-row"><span class="ob-coach-next" id="ob-coach-next">Got it →</span><span class="ob-coach-skip" onclick="obTourSkip()">Skip guide</span></div>';
+    document.body.appendChild(el);
+  }
+  dim.style.display='block';ring.style.display='block';el.style.display='block';
+  $('ob-coach-step').textContent='Step '+(ob.tourStep+1)+' of '+OB_TOUR_STEPS.length;
+  $('ob-coach-txt').textContent=step.txt;
+  $('ob-coach-next').onclick=()=>obTourAdvance(step.key);
+  const ar=anchor.getBoundingClientRect();
+  const vw=window.innerWidth,vh=window.innerHeight;
+  ring.style.top=(ar.top-4)+'px';ring.style.left=(ar.left-4)+'px';
+  ring.style.width=(ar.width+8)+'px';ring.style.height=(ar.height+8)+'px';
+  const elW=Math.min(vw-32,320);
+  el.style.width=elW+'px';
+  let top=ar.bottom+16;
+  const approxH=110;
+  if(top+approxH>vh-20)top=Math.max(10,ar.top-approxH-16);
+  el.style.top=top+'px';
+  el.style.left=Math.max(16,Math.min(ar.left,vw-elW-16))+'px';
+}
+
+function obChecklistRender(){
+  const host=$('ob-checklist-host');if(!host)return;
+  const c=ob.checklist;
+  if(ob.checklistDismissed||(c.cap&&c.sim&&c.guide)){host.innerHTML='';return;}
+  const row=(done,label)=>'<div class="gs-row'+(done?' done':'')+'"><div class="gs-chk">'+(done?'✓':'')+'</div><div class="gs-lbl">'+label+'</div></div>';
+  const doneCount=[c.cap,c.sim,c.guide].filter(Boolean).length;
+  host.innerHTML='<div class="gscard"><div class="gs-hd"><span class="gs-title">Getting Started · '+doneCount+'/3</span><span class="gs-x" onclick="obChecklistDismiss()">✕</span></div>'
+    +row(c.cap,'Set your starting capital')+row(c.sim,'Run your first simulation')+row(c.guide,'Peek at the Guide for key terms')+'</div>';
+}
+function obChecklistDismiss(){ob.checklistDismissed=true;obChecklistRender();save();}
+
+function obWelcomeGo(){ob.welcomed=true;$('ob-welcome')?.remove();ob.tourActive=true;ob.tourStep=0;obTourRender();save();}
+function obWelcomeSkip(){ob.welcomed=true;$('ob-welcome')?.remove();save();}
+function obWelcomeShow(){
+  const el=document.createElement('div');el.id='ob-welcome';el.className='ob-scrim';
+  el.innerHTML='<div class="ob-wcard">'
+    +'<div class="ob-wmark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg></div>'
+    +'<div class="ob-wtitle">Welcome to the<br>Anti-Hope Machine</div>'
+    +'<div class="ob-wbody">Turn a trading idea into a number — before you risk it for real. Build a strategy, hit Simulate, see what the numbers actually say. Every result here is simulated, never real money.</div>'
+    +'<button class="ob-wbtn" onclick="obWelcomeGo()">Let\'s go</button>'
+    +'<div class="ob-wskip" onclick="obWelcomeSkip()">Skip intro</div></div>';
+  document.body.appendChild(el);
+}
+
+// Called once from init(), right after load() resolves. `hadSave` is
+// load()'s own return value: true means this device already had data
+// before this feature ever shipped, so we treat that as a graduated
+// existing user and never show a first-run experience to someone who's
+// already using the app for real — only a genuinely empty install gets
+// the welcome screen and tour.
+function initOnboarding(hadSave){
+  if(hadSave&&!ob.welcomed){
+    ob.welcomed=true;ob.checklistDismissed=true;
+    ob.checklist={cap:true,sim:true,guide:true};
+    save();
+  }
+  obChecklistRender();
+  if(!ob.welcomed)obWelcomeShow();
+  else if(ob.tourActive)obTourRender();
+}
+
 /* Press-bloom trigger: a JS-added/removed .pressed class is the reliable
    mobile trigger for the fast-glow-then-settle button feedback (CSS
    :active alone is unreliable for quick taps on iOS/Android). Delegated
@@ -4717,6 +4915,7 @@ async function init(){
   if(loaded){if(sessionLog.length)$('log-info').textContent=sessionLog.length+' days logged';if(journalLog.length)renderJournal();}
   wireGlobalResize();
   initPressBloom();
+  initOnboarding(loaded);
 }
 
 // Canvases size themselves from offsetWidth/offsetHeight at draw time —
@@ -4745,6 +4944,7 @@ function wireGlobalResize(){
       if(dvCv)dvDrawRaceChart(dvCv,null,dvSelDay);
       const dvGcv=$('dv-gauge-cv');
       if(dvGcv)dvDrawGaugeRow(dvGcv,dvSelDay);
+      obTourRender();
     },150);
   };
   window.addEventListener('resize',onResize);
