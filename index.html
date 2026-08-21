@@ -1160,14 +1160,23 @@ canvas.spark{width:100%;height:34px;display:block;}
 </style>
 
 <!-- ══════════════════════════════════════════════════════════════
-     FIRST-RUN WIZARD (round 86, expanded round 87) — a self-contained
-     onboarding module with its own stylesheet and its own script
-     (below, after the app's own closing </script>), its own
-     localStorage key. Round 86 kept this at ZERO app coupling beyond a
-     read-only existing-user check. Round 87 deliberately added a small
-     number of well-scoped couplings because the wizard now
-     interactively builds the user's real first strategy instead of
-     just describing the app:
+     FIRST-RUN WIZARD (round 86, expanded round 87, reworked round 88)
+     — a self-contained onboarding module with its own stylesheet and
+     its own script (below, after the app's own closing </script>),
+     its own localStorage key. Round 86 kept this at ZERO app coupling
+     beyond a read-only existing-user check. Round 87 added real
+     write-back. Round 88 corrected two things about that write-back
+     after direct feedback: (1) the wizard no longer NARRATES the
+     plain-English-to-jargon connection anywhere ("the app calls this
+     X" is gone, and so is the paired said/jargon recap table) — the
+     real field label + value now only ever appear quietly, as an
+     accumulating row of small pills in the footer, so the user makes
+     the connection themselves rather than being told it; (2) the
+     risk:reward question no longer targets the opt-in, default-OFF
+     "R:R Override" field (rrSlider/tog-rr) — it now targets the
+     always-on, always-visible Profit Target and Stop Loss fields
+     (minP/maxP/minL/maxL) that every strategy already uses, via a
+     fixed baseline-stop conversion (rrToTicks in the script below).
        - READS the app's save key (APP_SK in the script) to detect
          existing users and skip the wizard for them entirely (round
          86, unchanged).
@@ -1176,17 +1185,17 @@ canvas.spark{width:100%;height:34px;display:block;}
          continuity in the ambient background animation — no behavior
          depends on it.
        - WRITES, exactly once, at the final "Enter the Machine" tap:
-         calls the app's own real setter functions (capQuickPick, setV,
-         onTog) to apply the four plain-English answers collected in
-         the wizard to Strategy A's real fields, then switches to the
-         real Sim screen. This is the same one-directional path a
-         user's own taps on the real UI would take — the wizard never
-         reads app state back out, never measures live app elements,
-         and never runs this path unless the user reaches the final
-         page and taps Finish (Skip, at any point, bails with zero
-         writes). If the app's field ids or setter functions are ever
-         renamed, applyAnswersToApp() in the script below is the one
-         place that needs updating.
+         calls the app's own real setter functions (capQuickPick, setV)
+         to apply the four plain-English answers collected in the
+         wizard to Strategy A's real fields, then switches to the real
+         Sim screen. This is the same one-directional path a user's
+         own taps on the real UI would take — the wizard never reads
+         app state back out, never measures live app elements, and
+         never runs this path unless the user reaches the final page
+         and taps Finish (Skip, at any point, bails with zero writes).
+         If the app's field ids or setter functions are ever renamed,
+         applyAnswersToApp() in the script below is the one place that
+         needs updating.
      ══════════════════════════════════════════════════════════════ -->
 <style>
 .aw-root{position:fixed;inset:0;z-index:1000;overflow:hidden;background:radial-gradient(ellipse 140% 100% at 50% -10%,rgba(56,189,248,.10) 0%,rgba(4,6,10,0) 55%) ,#04060a;display:flex;flex-direction:column;font-family:'Inter',sans-serif;color:#e2e6ed;}
@@ -1233,23 +1242,25 @@ canvas.spark{width:100%;height:34px;display:block;}
 .aw-chip{padding:11px 18px;border-radius:14px;background:rgba(18,23,33,.5);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,.09);color:#c7d0de;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;transition:background .18s,color .18s,transform .12s,border-color .18s;}
 .aw-chip:active{transform:scale(.96);}
 .aw-chip.on{background:radial-gradient(ellipse 130% 150% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(56,189,248);color:#0a0d13;border-color:transparent;box-shadow:0 4px 14px -4px rgba(56,189,248,.5),inset 0 1px 0 rgba(255,255,255,.5);}
-.aw-aka{font-size:11px;color:#5c6779;letter-spacing:.02em;margin-top:14px;}
-.aw-aka b{color:var(--accent-solid);font-weight:700;}
-.aw-aka-val{color:#93a0b4;}
+/* Footer thread — the ONLY place a real field label + value ever
+   appears. No narrating sentence anywhere: just the app's own label
+   and the resulting value, accumulating one bead per question as the
+   user moves forward. Positional/visual proximity to what they just
+   tapped is the whole mechanism — the connection is theirs to notice,
+   not spelled out. Echoes the "one strategy becomes six" thread motif
+   from the intro's strands background. */
+.aw-thread{display:none;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:14px;min-height:22px;}
+.aw-thread-bead{display:flex;align-items:center;gap:5px;background:rgba(18,23,33,.5);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:4px 8px;opacity:0;animation:awBeadIn .3s ease forwards;}
+@keyframes awBeadIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.aw-thread-lbl{font-size:8px;color:#5c6779;text-transform:uppercase;letter-spacing:.06em;}
+.aw-thread-val{font-size:10px;color:var(--accent-solid);font-weight:700;font-family:'Roboto Mono',monospace;}
+.aw-thread-burst{gap:10px;}
+.aw-thread-spark{width:8px;height:8px;border-radius:50%;opacity:0;animation:awSpark .5s ease forwards;}
+@keyframes awSpark{0%{opacity:0;transform:scale(.3) translateY(4px);}60%{opacity:1;transform:scale(1.15) translateY(-2px);}100%{opacity:1;transform:scale(1) translateY(0);}}
 
 /* Recap page */
 .aw-recap-title{font-size:19px;font-weight:800;color:#f5f7fa;margin-bottom:18px;}
-.aw-recap-rows{display:flex;flex-direction:column;gap:8px;width:100%;max-width:310px;}
-.aw-rrow{display:flex;align-items:center;gap:8px;background:rgba(18,23,33,.4);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:9px 10px;opacity:0;transform:translateY(8px);}
-.aw-rrow.aw-anim{animation:awRowIn .45s ease forwards;}
-@keyframes awRowIn{to{opacity:1;transform:translateY(0);}}
-.aw-rrow-said{flex:1;display:flex;flex-direction:column;text-align:left;min-width:0;}
-.aw-rrow-said-lbl{font-size:8px;color:#5c6779;text-transform:uppercase;letter-spacing:.08em;}
-.aw-rrow-said-val{font-size:12px;color:#c7d0de;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.aw-rrow-arrow{color:var(--accent-solid);font-size:16px;flex-shrink:0;}
-.aw-rrow-real{flex:1;display:flex;flex-direction:column;text-align:right;min-width:0;}
-.aw-rrow-real-lbl{font-size:8px;color:#5c6779;text-transform:uppercase;letter-spacing:.08em;}
-.aw-rrow-real-val{font-size:12px;color:var(--accent-solid);font-weight:700;font-family:'Roboto Mono',monospace;}
+.aw-recap-prose{font-size:14px;line-height:1.7;color:#c7d0de;max-width:300px;margin-bottom:6px;}
 .aw-recap-chart-wrap{width:100%;max-width:310px;height:86px;margin-top:20px;border-radius:12px;overflow:hidden;background:rgba(18,23,33,.3);border:1px solid rgba(255,255,255,.06);}
 .aw-recap-chart-wrap canvas{width:100%;height:100%;display:block;}
 .aw-recap-chart-lbl{font-size:9px;color:#5c6779;margin-top:8px;text-align:center;max-width:310px;}
@@ -4891,28 +4902,46 @@ var ICON_LAYERS='<svg width="36" height="36" viewBox="0 0 24 24" fill="none" str
 var ICON_FLAG='<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4"/><path d="M4 4h11l-1.5 4L15 12H4"/></svg>';
 
 // ── Content: 3 intro/bridge pages, 4 plain-English question pages,
-// 1 recap page. Each question's `said`/`aka` pair is exactly the
-// "plain English ↔ jargon" association the user asked for — shown
-// live as each chip is tapped, then all four together on the recap
-// page.
+// 1 recap page. Each question is asked purely in plain English — the
+// real field(s) it maps to (q.terms) surface only as small, unlabeled-
+// as-such pills accumulating in the footer thread as the user moves
+// forward. Nothing on screen ever says "this means that" — the recap
+// page reflects the user's own words back at them in prose, and the
+// technical side lives quietly in the thread for them to connect on
+// their own.
 var INTRO=[
   {kind:'intro',bg:'curve',icon:ICON_CURVE,title:'Test it before you trust it',body:'Run your trading idea through thousands of simulated days before a single real dollar is on the line.'},
   {kind:'intro',bg:'strands',icon:ICON_LAYERS,title:'Shape up to six strategies',body:'Compare tickers, targets, and risk rules side-by-side — see which idea actually holds up.'},
   {kind:'bridge',bg:'particles',icon:ICON_FLAG,title:'Let’s build your first one',body:'Four quick questions, plain English — no jargon required. We’ll show you the real setting behind each answer as you go.'}
 ];
+// Fixed baseline stop (in ticks) that the risk:reward question's ratio
+// is applied against, matching the shipped default strategy's own
+// Stop Loss midpoint (minL 5 / maxL 15 → avg 10). Profit Target is
+// just that stop scaled by the ratio the user picked. This targets the
+// app's always-on Risk fields (Profit Target / Stop Loss) rather than
+// the opt-in, default-OFF "R:R Override" — every strategy already has
+// a stop and a target, so no toggle ever needs flipping.
+function rrToTicks(ratio){
+  var stop=10;
+  return {stop:stop,profit:Math.round(stop*ratio)};
+}
 var QUESTIONS=[
-  {key:'capital',q:'How much money are you starting with?',jargon:'Starting Capital',
+  {key:'capital',q:'How much money are you starting with?',
     chips:[{v:5000,l:'$5,000'},{v:10000,l:'$10,000'},{v:25000,l:'$25,000'},{v:50000,l:'$50,000'}],
-    def:25000,aka:function(v){return '$'+v.toLocaleString();},said:function(v){return '"$'+v.toLocaleString()+'"';}},
-  {key:'winrate',q:'How often do you win?',jargon:'Win Rate',
+    def:25000,
+    terms:function(v){return [{label:'Starting Capital',value:'$'+v.toLocaleString()}];}},
+  {key:'winrate',q:'How often do you win?',
     chips:[{v:30,l:'3 in 10'},{v:50,l:'5 in 10'},{v:60,l:'6 in 10'},{v:80,l:'8 in 10'}],
-    def:60,aka:function(v){return v+'%';},said:function(v){return '"'+Math.round(v/10)+' in 10"';}},
-  {key:'rr',q:'For every $1 you risk, how many do you want to make?',jargon:'R:R Override',
+    def:60,
+    terms:function(v){return [{label:'Win Rate %',value:v+'%'}];}},
+  {key:'rr',q:'For every $1 you risk, how many do you want to make?',
     chips:[{v:1,l:'$1 → $1'},{v:2,l:'$1 → $2'},{v:3,l:'$1 → $3'}],
-    def:2,aka:function(v){return v.toFixed(1);},said:function(v){return '"$1 → $'+v+'"';}},
-  {key:'trades',q:'About how many trades do you make a day?',jargon:'Trades / Day',
+    def:2,
+    terms:function(v){var t=rrToTicks(v);return [{label:'Profit Target',value:t.profit+'t'},{label:'Stop Loss',value:t.stop+'t'}];}},
+  {key:'trades',q:'About how many trades do you make a day?',
     chips:[{v:1,l:'1'},{v:3,l:'3'},{v:5,l:'5'},{v:10,l:'10'}],
-    def:3,aka:function(v){return v+' / day';},said:function(v){return '"'+v+' a day"';}}
+    def:3,
+    terms:function(v){return [{label:'Trades / Day',value:v+'/day'}];}}
 ];
 var PAGES=INTRO.concat(QUESTIONS.map(function(q){return {kind:'question',q:q};})).concat([{kind:'recap'}]);
 var answers={capital:QUESTIONS[0].def,winrate:QUESTIONS[1].def,rr:QUESTIONS[2].def,trades:QUESTIONS[3].def};
@@ -4942,12 +4971,17 @@ function drawCurve(ctx,w,h,t){
 function drawStrands(ctx,w,h,t){
   ctx.clearRect(0,0,w,h);
   var midY=h*0.5;
+  // Slow breathing fan-out: every ~52s the six strands drift from
+  // nearly-merged (echoing the single curve on intro page 1 - "one
+  // strategy") out to fully separated ("becomes six"), then back in,
+  // as a continuous ambient loop rather than a one-shot reveal.
+  var fan=0.15+0.85*(0.5+0.5*Math.sin(t*0.12));
   PALETTE.forEach(function(col,ci){
     ctx.beginPath();
     var freq=1.3+ci*0.14,ph=t*0.5+ci*0.8,ampY=h*0.14*(0.6+0.4*Math.sin(ci*1.7));
     for(var i=0;i<=40;i++){
       var x=i/40*w;
-      var y=midY+ampY*Math.sin(i/40*Math.PI*2*freq+ph)+(ci-2.5)*h*0.05;
+      var y=midY+ampY*Math.sin(i/40*Math.PI*2*freq+ph)+(ci-2.5)*h*0.05*fan;
       if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
     }
     ctx.strokeStyle=col;ctx.globalAlpha=.5;ctx.lineWidth=2;
@@ -5026,12 +5060,11 @@ function pageHtml(p){
       '<div class="aw-content"><div class="aw-qtext">'+q.q+'</div>'+
       '<div class="aw-preview" id="aw-prev-'+q.key+'"></div>'+
       '<div class="aw-chips" id="aw-chips-'+q.key+'">'+chips+'</div>'+
-      '<div class="aw-aka">The app calls this <b>'+q.jargon+'</b><span class="aw-aka-val" id="aw-aka-'+q.key+'"></span></div>'+
       '</div></div>';
   }
   return '<div class="aw-page aw-recap" style="width:'+pct+'%">'+
     '<div class="aw-content"><div class="aw-recap-title">Here’s your first strategy</div>'+
-    '<div class="aw-recap-rows" id="aw-recap-rows"></div>'+
+    '<div class="aw-recap-prose" id="aw-recap-prose"></div>'+
     '<div class="aw-recap-chart-wrap"><canvas id="aw-recap-cv"></canvas></div>'+
     '<div class="aw-recap-chart-lbl">A rough preview — real math kicks in once you hit Simulate</div>'+
     '</div></div>';
@@ -5044,6 +5077,7 @@ function build(){
     '<div class="aw-track" id="aw-track">'+PAGES.map(pageHtml).join('')+'</div>'+
     '<div class="aw-footer">'+
       '<div class="aw-dots" id="aw-dots">'+PAGES.map(function(){return '<div class="aw-dot"></div>';}).join('')+'</div>'+
+      '<div class="aw-thread" id="aw-thread"></div>'+
       '<div class="aw-nav"><button class="aw-back" id="aw-back">Back</button><button class="aw-next" id="aw-next">Next</button></div>'+
     '</div>';
   document.body.appendChild(root);
@@ -5060,12 +5094,11 @@ function build(){
   QUESTIONS.forEach(function(q){
     var wrap=root.querySelector('#aw-chips-'+q.key);
     var prevEl=root.querySelector('#aw-prev-'+q.key);
-    var akaEl=root.querySelector('#aw-aka-'+q.key);
     function select(v){
       answers[q.key]=v;
       wrap.querySelectorAll('.aw-chip').forEach(function(b){b.classList.toggle('on',+b.dataset.v===v);});
-      akaEl.textContent=' — '+q.aka(v);
       renderPreview(q.key,prevEl,v);
+      renderThread();
     }
     wrap.querySelectorAll('.aw-chip').forEach(function(b){
       // Chips live inside the swipeable track, so a tap must not be
@@ -5093,17 +5126,39 @@ function render(){
   var isLast=idx===PAGES.length-1;
   nextBtn.textContent=isLast?'Enter the Machine':'Next';
   skipBtn.style.display=isLast?'none':'block';
+  renderThread();
   if(isLast)renderRecap();
 }
+// The footer thread: one accumulating row of small pills, each just a
+// real field's own label + the value the user's answer produced. No
+// sentence ever explains the connection - the pill simply appears
+// right after the chip that produced it, so proximity in time and
+// place is the only link offered. Shows nothing before the first
+// question, accumulates one question's terms at a time, and shows all
+// of them together once the recap page is reached.
+function renderThread(){
+  var threadEl=root.querySelector('#aw-thread');
+  if(!threadEl)return;
+  var qStart=INTRO.length;
+  var doneCount;
+  if(idx<qStart)doneCount=0;
+  else if(idx<qStart+QUESTIONS.length)doneCount=idx-qStart+1;
+  else doneCount=QUESTIONS.length;
+  threadEl.style.display=doneCount>0?'flex':'none';
+  var html='';
+  for(var i=0;i<doneCount;i++){
+    var q=QUESTIONS[i];
+    q.terms(answers[q.key]).forEach(function(term){
+      html+='<div class="aw-thread-bead"><span class="aw-thread-lbl">'+term.label+'</span><span class="aw-thread-val">'+term.value+'</span></div>';
+    });
+  }
+  threadEl.innerHTML=html;
+}
 function renderRecap(){
-  var rowsEl=root.querySelector('#aw-recap-rows');
-  if(!rowsEl)return;
-  rowsEl.innerHTML=QUESTIONS.map(function(q,i){
-    return '<div class="aw-rrow" style="animation-delay:'+(i*90)+'ms"><div class="aw-rrow-said"><span class="aw-rrow-said-lbl">You said</span><span class="aw-rrow-said-val">'+q.said(answers[q.key])+'</span></div><div class="aw-rrow-arrow">›</div><div class="aw-rrow-real"><span class="aw-rrow-real-lbl">'+q.jargon+'</span><span class="aw-rrow-real-val">'+q.aka(answers[q.key])+'</span></div></div>';
-  }).join('');
-  rowsEl.querySelectorAll('.aw-rrow').forEach(function(el){
-    el.classList.remove('aw-anim');void el.offsetWidth;el.classList.add('aw-anim');
-  });
+  var proseEl=root.querySelector('#aw-recap-prose');
+  if(!proseEl)return;
+  var a=answers,winIn10=Math.round(a.winrate/10);
+  proseEl.textContent="You're starting with $"+a.capital.toLocaleString()+". You win about "+winIn10+" in 10 trades, aiming to make $"+a.rr+" for every $1 you risk. That's roughly "+a.trades+" trade"+(a.trades===1?'':'s')+" a day.";
   drawRecapChart();
 }
 function drawRecapChart(){
@@ -5149,13 +5204,36 @@ function drawRecapChart(){
 function finish(applyData){
   stopBgLoop();
   markSeen();
-  if(applyData)applyAnswersToApp();
-  if(root){root.remove();root=null;}
+  if(applyData){
+    burstThread(function(){
+      applyAnswersToApp();
+      if(root){root.remove();root=null;}
+    });
+  }else{
+    if(root){root.remove();root=null;}
+  }
 }
-// Round 87's one write-coupling: calls the app's own real setter
-// functions (the same ones its own live UI uses) to apply the four
-// collected answers to Strategy A, then hands off to the real Sim
-// screen. Wrapped defensively so a future rename in the app never
+// The closing "one becomes six" payoff: the accumulated thread pills
+// turn into six sparks, one per real strategy color, right at the
+// moment of handoff into the real app's six-strategy workspace.
+function burstThread(cb){
+  var threadEl=root?root.querySelector('#aw-thread'):null;
+  if(!threadEl){cb();return;}
+  var html='';
+  PALETTE.forEach(function(col,i){
+    html+='<div class="aw-thread-spark" style="background:'+col+';box-shadow:0 0 8px '+col+';animation-delay:'+(i*40)+'ms"></div>';
+  });
+  threadEl.innerHTML=html;
+  threadEl.classList.add('aw-thread-burst');
+  setTimeout(cb,550);
+}
+// Round 87's one write-coupling (refined round 88): calls the app's
+// own real setter functions (the same ones its own live UI uses) to
+// apply the four collected answers to Strategy A, then hands off to
+// the real Sim screen. The risk:reward answer now targets Profit
+// Target/Stop Loss (always-on fields every strategy already has)
+// instead of the opt-in R:R Override, so no toggle ever needs
+// flipping. Wrapped defensively so a future rename in the app never
 // blocks handoff - the wizard just quietly skips whatever step it
 // can't find and still closes normally.
 function applyAnswersToApp(){
@@ -5164,15 +5242,11 @@ function applyAnswersToApp(){
     if(typeof setV==='function'){
       setV('minWR',0,answers.winrate);setV('maxWR',0,answers.winrate);
       setV('minT',0,answers.trades);setV('maxT',0,answers.trades);
-      setV('rrSlider',0,answers.rr*10);
+      var t=rrToTicks(answers.rr);
+      setV('minL',0,t.stop);setV('maxL',0,t.stop);
+      setV('minP',0,t.profit);setV('maxP',0,t.profit);
     }
-    var rrTog=document.getElementById('tog-rr');
-    if(rrTog){
-      rrTog.checked=true;
-      if(typeof onTog==='function')onTog(rrTog,'fc-rr',0);
-    }else if(typeof onSlider==='function'){
-      onSlider(0);
-    }
+    if(typeof onSlider==='function')onSlider(0);
     if(typeof switchScreen==='function')switchScreen('sim');
     if(typeof switchStrat==='function')switchStrat(0);
     var simBtn=document.querySelector('#sp0 .sim-btn');
