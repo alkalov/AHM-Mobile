@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Anti-Hope Machine</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Cabinet+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --accent-blue:#3b82f6;
@@ -19,7 +19,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 input[type=number]{-moz-appearance:textfield;}
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-thumb{background:var(--accent-solid);opacity:.5;border-radius:2px;}
-html,body{height:100%;background:#0a0d13;color:#e2e6ed;font-family:'IBM Plex Mono',monospace;font-size:13px;overflow:hidden;}
+html,body{height:100%;background:#0a0d13;color:#e2e6ed;font-family:'Inter',sans-serif;font-size:13px;overflow:hidden;}
 
 /* ══════════════════════════════════════════════════════════════
    GLASS / GLOSS / GLOW SYSTEM
@@ -61,7 +61,7 @@ html,body{height:100%;background:#0a0d13;color:#e2e6ed;font-family:'IBM Plex Mon
    applies cleanly to flex/table containers too without needing
    position/overflow tricks on each one. */
 .fc,.chart-panel,.diag,.grade-card,.jsec,.vs-card,.gauge-row,.wrc,
-.circ-panel-inner,.stats-inp,.stats-grid .sg,.log-info,.inp-grp,
+.circ-panel-inner,.stats-inp,.stats-grid .sg,.inp-grp,
 .spark-cell,.jhist,.friction-breakdown,.sbar,.tbl-controls,.dv-half,
 .mbox,.ibox,.global-capital,.sc-s,.mode-row,.sim-row,.tb-card{
   background-color:rgba(18,23,33,.42) !important;
@@ -90,12 +90,23 @@ html,body{height:100%;background:#0a0d13;color:#e2e6ed;font-family:'IBM Plex Mon
 }
 /* Nav-chrome bars: always-visible, thinner blur than floating cards
    so they read as a stable frame rather than another glass pane. */
-.topbar,.bnav{
+.topbar{
   background-color:rgba(16,20,28,.7) !important;
   background-image:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,0) 45%) !important;
   -webkit-backdrop-filter:blur(14px);
   backdrop-filter:blur(14px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.055),inset 0 0 0 1px rgba(255,255,255,.02);
+}
+/* Round 78: the floating island reads more transparent than the rest
+   of the nav-chrome family on purpose — thead/.slbl below sit at .48,
+   this is deliberately lighter (.38) since it floats over content
+   instead of sitting flush against an edge. box-shadow (incl. the
+   elevation drop-shadow) stays owned by the later layout .bnav rule. */
+.bnav{
+  background-color:rgba(16,20,28,.38) !important;
+  background-image:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,0) 45%) !important;
+  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(18px);
 }
 .slbl,.dv-diag,thead{
   background-color:rgba(18,23,33,.48) !important;
@@ -105,19 +116,20 @@ html,body{height:100%;background:#0a0d13;color:#e2e6ed;font-family:'IBM Plex Mon
 }
 /* Chrome buttons: same glassy lift, blurred and translucent instead
    of flat/opaque. */
-.exp-btn,.j-save-btn,.sess-btn{
+.exp-btn,.j-save-btn,.sess-btn,.stat-actbtn{
   background-color:rgba(18,23,33,.4) !important;
   -webkit-backdrop-filter:blur(20px);
   backdrop-filter:blur(20px);
   border-color:rgba(255,255,255,.1) !important;
 }
-/* Primary strategy button: flat solid fill (per reference — a native
-   control reads as a clean colour disc, not a glassy gloss card), just
-   a faint top edge lift and a tight, low-key drop shadow. No more
-   coloured ambient "halo" glow, and no diagonal gloss sheen. */
-.sim-btn{
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 14px -8px rgba(0,0,0,.4);
-}
+.stat-actbtn{width:100%;height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:10px;
+  color:var(--accent-solid);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14);touch-action:manipulation;}
+.stat-actbtn svg:not(.stat-actbtn-chev){filter:drop-shadow(0 0 3px rgba(var(--glow-rgb),.55));flex-shrink:0;}
+.stat-actbtn span{flex:1;text-align:left;}
+.stat-actbtn-chev{transition:transform .2s ease;flex-shrink:0;color:#4d5a6e;}
+.stat-actbtn.sel .stat-actbtn-chev{transform:rotate(180deg);}
+.stat-actbtn.sel{border-color:rgba(56,189,248,.4);}
 
 /* Circle buttons: same flat-first treatment — barely-there gloss (just
    enough to read as a lit surface, not a streak), resting glow off by
@@ -135,40 +147,37 @@ html,body{height:100%;background:#0a0d13;color:#e2e6ed;font-family:'IBM Plex Mon
 .circ-btn.sel{
   box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(var(--glow-rgb),.15);
 }
-/* Sim tab only: the selected circle's glow (and its label) pick up
-   THIS strategy's own identity colour instead of the app's generic
-   blue/cyan accent — every other surface in a strategy's own pane
-   already carries that colour (tab underline, Simulate button, now the
-   equity curve itself), so the one neutral-blue circle glow read as a
-   mismatch sitting in the middle of an otherwise green/red/amber
-   context. Scoped to #sp0/#sp1/#sp2 specifically so the Log and Stats
-   tabs' own circle navs (same shared classes, no strategy concept) are
-   completely unaffected. */
-#sp0 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(56,189,248,.18);}
-#sp1 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(251,146,60,.18);}
-#sp2 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(167,139,250,.18);}
-#sp3 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(132,204,22,.18);}
-#sp4 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(239,68,68,.18);}
-#sp5 .circ-btn.sel{box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08),0 0 14px 1px rgba(236,72,153,.18);}
-#sp0 .circ-btn.sel+.circ-label{color:#38bdf8;}
-#sp1 .circ-btn.sel+.circ-label{color:#fb923c;}
-#sp2 .circ-btn.sel+.circ-label{color:#a78bfa;}
-#sp3 .circ-btn.sel+.circ-label{color:#84cc16;}
-#sp4 .circ-btn.sel+.circ-label{color:#ef4444;}
-#sp5 .circ-btn.sel+.circ-label{color:#ec4899;}
+/* Sim tab's category selector is now the segmented glass bar below
+   (.seg-btn, replacing .circ-btn there — see the "Category selector"
+   comment near CATS/circBtn in buildPanes for the full rationale) so
+   the six per-strategy accent rules that used to live here target
+   .seg-btn.sel instead. #sp0-#sp5 scoping is preserved from the
+   original .circ-btn.sel rules this replaces — Journal/Stats never
+   sat inside #sp{n}, so they were never affected either version. */
+#sp0 .seg-btn.sel{background:radial-gradient(ellipse 130% 160% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(82,181,224);box-shadow:0 4px 14px -4px rgba(82,181,224,.5),inset 0 1px 0 rgba(255,255,255,.5);}
+#sp1 .seg-btn.sel{background:radial-gradient(ellipse 130% 160% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(227,148,84);box-shadow:0 4px 14px -4px rgba(227,148,84,.5),inset 0 1px 0 rgba(255,255,255,.5);}
+#sp2 .seg-btn.sel{background:radial-gradient(ellipse 130% 160% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(173,152,236);box-shadow:0 4px 14px -4px rgba(173,152,236,.5),inset 0 1px 0 rgba(255,255,255,.5);}
+#sp3 .seg-btn.sel{background:radial-gradient(ellipse 130% 160% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(126,180,44);box-shadow:0 4px 14px -4px rgba(126,180,44,.5),inset 0 1px 0 rgba(255,255,255,.5);}
+#sp4 .seg-btn.sel{background:radial-gradient(ellipse 130% 160% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(217,89,89);box-shadow:0 4px 14px -4px rgba(217,89,89,.5),inset 0 1px 0 rgba(255,255,255,.5);}
+#sp5 .seg-btn.sel{background:radial-gradient(ellipse 130% 160% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(215,91,153);box-shadow:0 4px 14px -4px rgba(215,91,153,.5),inset 0 1px 0 rgba(255,255,255,.5);}
+/* Journal's segmented picker (buildJournalCircles) isn't per-strategy,
+   so it gets no #sp{n}-style rotating identity colour - just the one
+   generic accent fill every non-strategy control in the app uses,
+   same recipe as #sp0's blue above. */
+#jcirc-mount .seg-btn.sel{background:radial-gradient(ellipse 130% 160% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(56,189,248);box-shadow:0 4px 14px -4px rgba(56,189,248,.5),inset 0 1px 0 rgba(255,255,255,.5);}
 
 /* Press bloom: fast "hot" glow the instant a control is pressed, eased
    back to resting state on release. Trigger is a JS-added .pressed
    class (initPressBloom below) since CSS :active alone is unreliable
    for quick taps on mobile Safari/Chrome — kept here too as a bonus
    for desktop mouse/trackpad. */
-.sim-btn,.j-save-btn,.sess-btn,.exp-btn,.guide-btn,.ib,.stp-btn,.nb,.tog,.sbtn,.scale-btn,.circ-btn,.dv-tbtn{
+.sim-btn,.j-save-btn,.sess-btn,.exp-btn,.guide-btn,.ib,.stp-btn,.nb,.tog,.sbtn,.scale-btn,.circ-btn,.seg-btn,.dv-tbtn,.tc-qbtn,.tc-close,.stat-actbtn,.cap-qbtn,.cap-close{
   transition:box-shadow .18s ease,transform .12s ease,background .18s ease,color .15s ease;
 }
 .sim-btn:active,.j-save-btn:active,.sess-btn:active,.exp-btn:active,.guide-btn:active,
-.ib:active,.stp-btn:active,.nb:active,.sbtn:active,.scale-btn:active,.circ-btn:active,.dv-tbtn:active,
+.ib:active,.stp-btn:active,.nb:active,.sbtn:active,.scale-btn:active,.circ-btn:active,.seg-btn:active,.dv-tbtn:active,.tc-qbtn:active,.tc-close:active,.stat-actbtn:active,.cap-qbtn:active,.cap-close:active,
 .sim-btn.pressed,.j-save-btn.pressed,.sess-btn.pressed,.exp-btn.pressed,.guide-btn.pressed,
-.ib.pressed,.stp-btn.pressed,.nb.pressed,.sbtn.pressed,.scale-btn.pressed,.circ-btn.pressed,.dv-tbtn.pressed{
+.ib.pressed,.stp-btn.pressed,.nb.pressed,.sbtn.pressed,.scale-btn.pressed,.circ-btn.pressed,.seg-btn.pressed,.dv-tbtn.pressed,.tc-qbtn.pressed,.tc-close.pressed,.stat-actbtn.pressed,.cap-qbtn.pressed,.cap-close.pressed{
   box-shadow:0 0 14px 1px rgba(var(--glow-rgb),.15);
   transform:scale(.97);
 }
@@ -185,49 +194,136 @@ tr.sel-day{transition:background .5s ease;}
 .app{display:flex;flex-direction:column;height:100%;}
 .topbar{height:48px;background:#10141c;border-bottom:1px solid #232b3d;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;z-index:50;}
 .brand{display:flex;align-items:baseline;gap:8px;}
-.brand-name{font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:800;color:#e2e6ed;text-transform:uppercase;letter-spacing:-.01em;}
+.brand-name{font-family:'Inter',sans-serif;font-size:14px;font-weight:800;color:#e2e6ed;text-transform:uppercase;letter-spacing:-.01em;}
 .brand-ver{font-size:8px;color:#4d5a6e;letter-spacing:.15em;text-transform:uppercase;}
 .top-r{display:flex;align-items:center;gap:10px;}
 .pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 3s infinite;}
 @keyframes blink{0%,90%,100%{opacity:1;}95%{opacity:.15;}}
-.guide-btn{height:24px;padding:0 10px;background:transparent;border:1px solid #232b3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;}
+.guide-btn{height:24px;padding:0 10px;background:transparent;border:1px solid #232b3d;color:#4d5a6e;font-family:'Inter',sans-serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;}
 .guide-btn:active{border-color:var(--accent-solid);color:var(--accent-solid);}
 .screens{flex:1;overflow:hidden;position:relative;}
-.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(60px + env(safe-area-inset-bottom,0px));display:none;}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px));display:none;}
 .screen.active{display:block;}
 /* Table tab only: flat flex column, no outer scroll — each .dv-half manages
    its own scroll independently. Deliberately avoids nested auto-overflow
    chains, since that pattern is what broke scrolling in a prior version. */
 #scr-tbl{padding-bottom:0;}
 #scr-tbl.active{display:flex;flex-direction:column;overflow:hidden;}
-.bnav{position:fixed;bottom:0;left:0;right:0;height:calc(56px + env(safe-area-inset-bottom,0px));background:#10141c;border-top:1px solid #232b3d;display:flex;align-items:flex-start;padding-top:4px;z-index:100;}
-.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:5px 0 0;position:relative;color:#4d5a6e;transition:color .12s;touch-action:manipulation;}
+/* Bottom nav, round 77: was a flush edge-to-edge bar with icon+label
+   columns and a thin top-border active indicator. Reimagined as a
+   compact floating "island" — centered, icon-only, pill-shaped, with
+   the active tab getting a circular glass badge (same selection
+   language as .seg-btn.sel elsewhere). Labels move to aria-label on
+   the <button> since they're visually hidden now (.nb span), so the
+   accessible name survives; icons alone (play/grid/doc/bars) carry it
+   visually. Clearance below screen content bumped from 56-60px to 84px
+   across .screen and #scr-tbl's .tbl-scroll to cover the island's
+   bottom offset + height + breathing room. */
+.bnav{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:auto;height:52px;background:#10141c;border:1px solid #232b3d;border-radius:26px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 10px;z-index:100;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.02),0 10px 28px -8px rgba(0,0,0,.6);}
+.nb{flex:0 0 44px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:0;position:relative;color:#4d5a6e;transition:color .12s;touch-action:manipulation;}
 .nb.on{color:var(--accent-solid);}
-.nb.on::before{content:'';position:absolute;top:0;left:26%;right:26%;height:1px;background:var(--accent);border-radius:0 0 1px 1px;}
-.nb svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
-.nb span{font-size:7px;letter-spacing:.1em;text-transform:uppercase;}
-.nb-pip{position:absolute;top:4px;right:calc(50% - 13px);width:5px;height:5px;border-radius:50%;background:var(--accent);display:none;}
+.nb.on::before{content:'';position:absolute;inset:4px;border-radius:50%;background:radial-gradient(ellipse 130% 160% at 50% 0%,rgba(255,255,255,.22) 0%,rgba(56,189,248,.22) 55%);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 12px -2px rgba(56,189,248,.4);z-index:0;}
+.nb svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;position:relative;z-index:1;}
+.nb.on svg{filter:drop-shadow(0 0 3px rgba(56,189,248,.6));}
+.nb span{display:none;}
+.nb-pip{position:absolute;top:4px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--accent);display:none;z-index:2;}
 .nb-pip.on{display:block;}
 .slbl{padding:5px 16px 4px;font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.2em;border-bottom:1px solid #232b3d;background:#0a0d13;position:sticky;top:0;z-index:20;}
 .sbar{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #232b3d;background:#10141c;}
-.sbtn{flex:1;height:34px;background:none;border:none;border-bottom:1px solid transparent;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#4d5a6e;cursor:pointer;transition:color .12s,border-color .12s;}
+.sbtn{flex:1;height:34px;background:none;border:none;border-bottom:1px solid transparent;font-family:'Inter',sans-serif;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#4d5a6e;cursor:pointer;transition:color .12s,border-color .12s;}
 .sbtn.on{color:#38bdf8;border-color:#38bdf8;}
 .sbtn.on.sc-b{color:#fb923c;border-color:#fb923c;}
 .sbtn.on.sc-c{color:#a78bfa;border-color:#a78bfa;}
 .sbtn.on.sc-d{color:#84cc16;border-color:#84cc16;}
 .sbtn.on.sc-e{color:#ef4444;border-color:#ef4444;}
 .sbtn.on.sc-f{color:#ec4899;border-color:#ec4899;}
+/* Strategy switcher redesign (mockup-picked: "B" — chip grid with a
+   status ring — plus "C"'s inline mini-stat, then toned down after a live
+   in-app check showed the first pass colouring every simulated tab all the
+   time read as "off theme" — this app's own convention is colour marks only
+   the ONE active/selected thing, everywhere else (circle-button glow, the
+   old plain underline this replaces). Idle tabs — even ones with real sim
+   data — stay neutral chrome; only the small ring dot carries identity +
+   "has this been simulated" state, and colour only fills the whole chip
+   once a tab is actually active, matching .sim-btn's own flat-fill "native
+   control reads as a clean colour disc" treatment one screen down.
+   Shipped #scr-sim-only first (the Sim tab's own A-F switcher, stb0-stb5)
+   specifically BECAUSE .sbar/.sbtn/.sc-b../.sc-f are the exact same
+   classes the Table tab's own parallel switcher (#scr-tbl, tsb0-tsb5)
+   reuses — confirmed via grep before touching anything, so an unscoped
+   edit would have silently redesigned that bar too. "Make the table
+   buttons match" briefly combined these into one shared selector list so
+   both looked and sized identically — then "the one row was just for the
+   table, keep the sim buttons as they were" un-combined them back into
+   two independent blocks below: same ring/stat/on-fill LANGUAGE and the
+   same underlying data (updateStratTab still updates both bars' ring+stat
+   from one simResults[tab]-driven call site, unchanged), but Sim keeps
+   its original 3-over-2 grid at 52px (base .sbar's own
+   display:grid;grid-template-columns:repeat(3,1fr) is what actually
+   produces that grid — never overridden here, just inherited) while
+   Table stays the smaller single-row layout ("so the table isn't so
+   crowded" — display:flex, 38px chips, 6 across one row) since that
+   space pressure is specific to the Table screen (chart + gauges + this
+   bar + the interval stepper + the data grid all sharing one screen)
+   and doesn't apply to Sim's own pane. */
+#scr-sim .sbar{gap:5px;padding:8px 16px;border-bottom:none;background:transparent;}
+#scr-sim .sbtn{
+  --rgb:82,181,224;
+  height:52px;border-radius:7px;border:1px solid #1c2333;background:rgba(255,255,255,.02);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-size:11px;font-weight:600;letter-spacing:.05em;color:#7d8699;
+}
+#scr-sim .sbtn.sc-b{--rgb:227,148,84;}
+#scr-sim .sbtn.sc-c{--rgb:173,152,236;}
+#scr-sim .sbtn.sc-d{--rgb:126,180,44;}
+#scr-sim .sbtn.sc-e{--rgb:217,89,89;}
+#scr-sim .sbtn.sc-f{--rgb:215,91,153;}
+#scr-sim .sb-top{display:flex;align-items:center;gap:6px;}
+#scr-sim .sb-ring{display:inline-block;width:6px;height:6px;border-radius:50%;border:1.4px solid #2a3244;background:transparent;}
+#scr-sim .sbtn.hasrun .sb-ring{background:rgba(var(--rgb),.85);border-color:rgba(var(--rgb),.85);}
+#scr-sim .sb-stat{font-family:'Roboto Mono',monospace;font-size:7.3px;font-weight:500;letter-spacing:.02em;color:#4d5a6e;font-variant-numeric:tabular-nums;}
+#scr-sim .sbtn.on{
+  border-color:rgba(var(--rgb),.9);
+  background:radial-gradient(ellipse 130% 150% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(var(--rgb));
+  box-shadow:0 4px 14px -4px rgba(var(--rgb),.5),inset 0 1px 0 rgba(255,255,255,.5);
+}
+#scr-sim .sbtn.on .sb-top{color:#0a0d13;font-weight:800;}
+#scr-sim .sbtn.on .sb-ring{background:#0a0d13;border-color:#0a0d13;}
+#scr-sim .sbtn.on .sb-stat{color:rgba(10,13,19,.75);font-weight:700;}
+#scr-tbl .sbar{display:flex;gap:4px;padding:6px 16px;border-bottom:none;background:transparent;}
+#scr-tbl .sbtn{
+  --rgb:82,181,224;
+  height:38px;border-radius:7px;border:1px solid #1c2333;background:rgba(255,255,255,.02);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  font-size:9.5px;font-weight:600;letter-spacing:.04em;color:#7d8699;
+}
+#scr-tbl .sbtn.sc-b{--rgb:227,148,84;}
+#scr-tbl .sbtn.sc-c{--rgb:173,152,236;}
+#scr-tbl .sbtn.sc-d{--rgb:126,180,44;}
+#scr-tbl .sbtn.sc-e{--rgb:217,89,89;}
+#scr-tbl .sbtn.sc-f{--rgb:215,91,153;}
+#scr-tbl .sb-top{display:flex;align-items:center;gap:4px;}
+#scr-tbl .sb-ring{display:inline-block;width:5px;height:5px;border-radius:50%;border:1.2px solid #2a3244;background:transparent;}
+#scr-tbl .sbtn.hasrun .sb-ring{background:rgba(var(--rgb),.85);border-color:rgba(var(--rgb),.85);}
+#scr-tbl .sb-stat{font-family:'Roboto Mono',monospace;font-size:6.3px;font-weight:500;letter-spacing:.02em;color:#4d5a6e;font-variant-numeric:tabular-nums;}
+#scr-tbl .sbtn.on{
+  border-color:rgba(var(--rgb),.9);
+  background:radial-gradient(ellipse 130% 150% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(var(--rgb));
+  box-shadow:0 4px 14px -4px rgba(var(--rgb),.5),inset 0 1px 0 rgba(255,255,255,.5);
+}
+#scr-tbl .sbtn.on .sb-top{color:#0a0d13;font-weight:800;}
+#scr-tbl .sbtn.on .sb-ring{background:#0a0d13;border-color:#0a0d13;}
+#scr-tbl .sbtn.on .sb-stat{color:rgba(10,13,19,.75);font-weight:700;}
 .ovr-badge{font-size:7px;background:rgba(251,191,36,.1);color:#fbbf24;padding:1px 6px;border-radius:2px;letter-spacing:.1em;text-transform:uppercase;display:none;border:1px solid rgba(251,191,36,.2);}
 .ovr-badge.on{display:block;}
 
 /* ══════════════════════════════════════════════════════════════
-   CIRCLE NAVIGATION — replaces the dropdown accordion. Same five
-   categories, same icons/colours, contained differently: idle state
-   is a 3-over-2 cluster of icon-only circles; selecting one animates
-   it to a single centred slot above the rest (which dim and shrink),
-   and its panel scale-emerges outward from that circle's own
-   position — motion stays circular even in the transition, not a
-   rectangular accordion drop.
+   CIRCLE NAVIGATION — Journal (category picker) and Stats (broker
+   select) only now. This used to also be the Sim tab's Core/Risk/
+   Ticker/Psych/Overrides selector, but that's a segmented glass bar
+   (.seg-bar/.seg-btn, further down) as of the redesign below — kept
+   here unmodified since Journal/Stats still build this exact circle+
+   sibling-label markup via their own circSelectJ()/circSelectS().
    ══════════════════════════════════════════════════════════════ */
 .circ-nav{padding:14px 16px 4px;}
 .circ-cluster{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:4px;}
@@ -240,19 +336,69 @@ tr.sel-day{transition:background .5s ease;}
 .circ-btn.sel svg{width:24px;height:24px;}
 .circ-cluster.has-sel{gap:6px;}
 .circ-cluster.has-sel .circ-row{gap:10px;}
-.circ-label{font-family:'Cabinet Grotesk',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;text-align:center;color:#e2e6ed;height:16px;opacity:1;margin-top:2px;overflow:hidden;transition:height .22s ease,opacity .18s ease,margin .22s ease;}
+.circ-label{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;text-align:center;color:#e2e6ed;height:16px;opacity:1;margin-top:2px;overflow:hidden;transition:height .22s ease,opacity .18s ease,margin .22s ease;}
 .circ-label.dim-out{height:0;opacity:0;margin-top:0;}
 .circ-panel-wrap{overflow:hidden;max-height:0;opacity:0;transform:scale(.94);transform-origin:top center;transition:max-height .38s cubic-bezier(.25,.46,.45,.94),opacity .3s ease,transform .34s cubic-bezier(.25,.46,.45,.94);}
 .circ-panel-wrap.open{max-height:9999px;opacity:1;transform:scale(1);}
 .circ-panel-inner{padding:10px 16px 14px;background:#161b26;border-radius:14px;margin:8px 0;}
 .circ-hint{text-align:center;font-size:9px;color:#4d5a6e;letter-spacing:.06em;padding:2px 0 6px;}
 
+/* ══════════════════════════════════════════════════════════════
+   SEGMENTED GLASS BAR — Sim tab's Core/Risk/Ticker/Psych/Overrides
+   selector (mockup-picked "Option B"). One continuous frosted
+   capsule, same family as the Starting Capital stepper's glass
+   treatment, subdivided into five equal segments — replaces the old
+   circle cluster's lopsided 3-over-2 grid with one balanced row and
+   reclaims the vertical space the circ-hint line used to take (no
+   idle-state hint needed — a segmented control reads as tappable on
+   its own). Icon originally rested at the same near-black the old
+   .circ-btn always resolved to ("invisible until picked" restraint)
+   — reverted per follow-up feedback ("black logos are hard to read")
+   to the app's own generic blue/cyan accent plus a slight drop-shadow
+   glow at rest, same --glow-rgb this app already uses for every other
+   resting-glow accent; a literal "blue theme" ask, so this is ONE
+   colour for all six strategy panes' idle icons, not each strategy's
+   own identity colour (that stays reserved for the selected fill,
+   below). Selected segment fills solid with THIS strategy's identity
+   colour (#sp0-#sp5, same accent set the tab bar above already uses)
+   and flips icon+label to dark-on-colour, the same contrast move
+   .sbtn.on already makes one screen up — already legible against the
+   bright fill, so untouched by this round's icon-colour fix — unlike
+   the old circles, the label never hides, since nothing else on
+   screen names which category's fields are open below. */
+.seg-bar{display:flex;gap:3px;border-radius:14px;padding:4px;background:rgba(18,23,33,.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 6px 18px -8px rgba(0,0,0,.5);}
+.seg-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:9px 2px;border-radius:10px;background:none;border:none;cursor:pointer;touch-action:manipulation;position:relative;transition:background .28s ease,box-shadow .28s ease;}
+.seg-ic{display:flex;color:var(--accent-solid);filter:drop-shadow(0 0 3px rgba(var(--glow-rgb),.55));}
+.seg-ic svg{width:16px;height:16px;transition:color .2s ease;}
+.seg-btn .ovr-badge{position:absolute;top:1px;right:3px;font-size:6px;padding:1px 3px;}
+.seg-lbl{font-family:'Inter',sans-serif;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#e2e6ed;transition:color .2s ease;}
+.seg-btn.sel .seg-ic{color:#0a0d13;filter:none;}
+.seg-btn.sel .seg-lbl{color:#0a0d13;font-weight:800;}
+/* "a little more reflective quality in the section body" — the panel
+   that opens below (.circ-panel-inner, holding WIN RATE/BREAKEVEN/etc
+   for Core, R:R OVERRIDE/etc for Overrides...) shares its glass recipe
+   with many other cards app-wide via the shared frost list up top
+   (.fc/.chart-panel/.diag/.vs-card/etc), so this layers extra shine on
+   TOP of that shared rule scoped to #scr-sim specifically — Journal's
+   and Stats' own opened panels (same .circ-panel-inner class) are
+   untouched. Adds a bright top-down ellipse sheen (the same "reflects
+   more light up top, fades out" recipe #gc-stepper .stp already uses
+   for its own liquid-glass surface) layered above the existing
+   diagonal gloss rather than replacing it, plus a brighter top-edge
+   specular line via box-shadow. */
+#scr-sim .circ-panel-inner{
+  background-image:
+    radial-gradient(ellipse 140% 60% at 50% 0%,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 55%,transparent 82%),
+    linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,0) 60%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 0 0 1px rgba(255,255,255,.07),0 10px 28px -10px rgba(0,0,0,.55);
+}
+
 .fc{background:#10141c;border:1px solid #232b3d;border-left-width:2px;border-radius:3px;padding:8px 10px;margin-bottom:5px;}
 .fc.off{opacity:.22;pointer-events:none;}
 .fc.off .fc-top{pointer-events:auto;opacity:1;}
 .fc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
 .fc-lbl{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:#4d5a6e;display:flex;align-items:center;gap:4px;}
-.ib{display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;border:1px solid #232b3d;font-size:8px;color:#4d5a6e;cursor:pointer;border-radius:2px;background:#10141c;font-family:'IBM Plex Mono',monospace;}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;border:1px solid #232b3d;font-size:8px;color:#4d5a6e;cursor:pointer;border-radius:2px;background:#10141c;font-family:'Inter',sans-serif;}
 .ib:active{color:var(--accent-solid);border-color:var(--accent-solid);}
 .fc-note{font-size:9px;color:#4d5a6e;margin-top:4px;line-height:1.55;}
 .tog-wrap{display:flex;align-items:center;gap:5px;cursor:pointer;}
@@ -262,10 +408,10 @@ tr.sel-day{transition:background .5s ease;}
 .tog:checked::after{transform:translateX(13px);}
 .tog-lbl{font-size:8px;color:#4d5a6e;letter-spacing:.07em;}
 .stp{display:flex;align-items:center;width:100%;background:#161b26;border:1px solid #232b3d;border-radius:3px;overflow:hidden;}
-.stp-btn{width:36px;height:32px;background:#10141c;border:none;color:#8892a4;font-family:'IBM Plex Mono',monospace;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;user-select:none;-webkit-user-select:none;touch-action:manipulation;border-right:1px solid #232b3d;}
+.stp-btn{width:36px;height:32px;background:#10141c;border:none;color:#8892a4;font-family:'Inter',sans-serif;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;user-select:none;-webkit-user-select:none;touch-action:manipulation;border-right:1px solid #232b3d;}
 .stp-btn:last-child{border-right:none;border-left:1px solid #232b3d;}
 .stp-btn:active{background:#1c2333;color:var(--accent-solid);}
-.stp-val{flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:16px !important;color:#e2e6ed;background:#161b26;border:none;outline:none;height:32px;padding:0 4px;min-width:0;}
+.stp-val{flex:1;text-align:center;font-family:'Roboto Mono',monospace;font-size:16px !important;color:#e2e6ed;background:#161b26;border:none;outline:none;height:32px;padding:0 4px;min-width:0;}
 .stp-unit{font-size:8px;color:#4d5a6e;padding-right:7px;flex-shrink:0;background:#161b26;}
 /* Sim tab only (this same .stp component is reused for the Table tab's
    interval stepper too) — bumps every hand-entered number to the same
@@ -273,7 +419,7 @@ tr.sel-day{transition:background .5s ease;}
    in and a value the app computed back read as one consistent "number"
    language throughout this tab. */
 #scr-sim .stp-val{font-weight:700;font-variant-numeric:tabular-nums;}
-.fc-sel{width:100%;background:#161b26;border:1px solid #232b3d;color:#e2e6ed;font-family:'IBM Plex Mono',monospace;font-size:11px !important;height:32px;padding:0 8px;outline:none;border-radius:3px;margin-top:4px;}
+.fc-sel{width:100%;background:#161b26;border:1px solid #232b3d;color:#e2e6ed;font-family:'Inter',sans-serif;font-size:11px !important;height:32px;padding:0 8px;outline:none;border-radius:3px;margin-top:4px;}
 .ro-pill{display:inline-flex;align-items:center;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:2px;padding:2px 8px;margin-top:4px;}
 .ro-pill span{font-size:11px;color:#f87171;}
 .dist-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
@@ -284,18 +430,33 @@ tr.sel-day{transition:background .5s ease;}
 .dist-labels{display:flex;justify-content:space-between;margin-top:5px;}
 .dist-labels span{font-size:8px;}
 .sim-row{padding:9px 16px;border-bottom:1px solid #232b3d;display:flex;gap:7px;}
-.sim-btn{flex:1;height:48px;background:#38bdf8;color:#0a0d13;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.15em;text-transform:uppercase;border:none;cursor:pointer;border-radius:3px;touch-action:manipulation;transition:opacity .1s;}
+.sim-btn{
+  --rgb:82,181,224;
+  flex:1;height:48px;
+  background:radial-gradient(ellipse 130% 150% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(var(--rgb));
+  color:#0a0d13;font-family:'Inter',sans-serif;font-weight:700;font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+  border:none;cursor:pointer;border-radius:7px;touch-action:manipulation;transition:opacity .1s;
+  box-shadow:0 4px 14px -4px rgba(var(--rgb),.5),inset 0 1px 0 rgba(255,255,255,.5);
+}
 .sim-btn:active{opacity:.82;}
-.sim-btn.sc-b{background:#fb923c;color:#0a0d13;}
-.sim-btn.sc-c{background:#a78bfa;color:#0a0d13;}
-.sim-btn.sc-d{background:#84cc16;color:#0a0d13;}
-.sim-btn.sc-e{background:#ef4444;color:#0a0d13;}
-.sim-btn.sc-f{background:#ec4899;color:#0a0d13;}
-.exp-btn{height:42px;padding:0 12px;background:transparent;border:1px solid #232b3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;touch-action:manipulation;}
+.sim-btn.sc-b{--rgb:227,148,84;}
+.sim-btn.sc-c{--rgb:173,152,236;}
+.sim-btn.sc-d{--rgb:126,180,44;}
+.sim-btn.sc-e{--rgb:217,89,89;}
+.sim-btn.sc-f{--rgb:215,91,153;}
+.exp-btn{height:42px;padding:0 12px;background:transparent;border:1px solid #232b3d;color:#4d5a6e;font-family:'Inter',sans-serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:7px;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.1);}
+.exp-btn svg{flex-shrink:0;}
 .exp-btn:active{border-color:var(--accent-solid);color:var(--accent-solid);}
-.mode-row{padding:5px 16px 7px;border-bottom:1px solid #232b3d;display:flex;align-items:center;gap:8px;background:#10141c;}
+/* Round 78: Randomise Daily is the only mode that models real day-to-day
+   trade variance (see the c.mode==='rand' branches in the sim engine) —
+   "Use Midpoints" collapses every day to the same deterministic average,
+   which is the opposite of what this app is for. So it's kept as the
+   sole functional mode (already the default, and reset-to-defaults
+   already re-selects it) but the picker itself is hidden — nothing here
+   for a user to change, on purpose. */
+.mode-row{padding:5px 16px 7px;border-bottom:1px solid #232b3d;align-items:center;gap:8px;background:#10141c;display:none;}
 .mode-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;white-space:nowrap;}
-.mode-sel{flex:1;background:#161b26;border:1px solid #232b3d;color:#8892a4;font-family:'IBM Plex Mono',monospace;font-size:11px !important;height:28px;padding:0 7px;outline:none;border-radius:3px;}
+.mode-sel{flex:1;background:#161b26;border:1px solid #232b3d;color:#8892a4;font-family:'Inter',sans-serif;font-size:11px !important;height:28px;padding:0 7px;outline:none;border-radius:3px;}
 .chart-panel{margin:8px 0;background:#10141c;border:1px solid #232b3d;border-radius:3px;overflow:hidden;}
 .chart-hd{display:flex;align-items:center;justify-content:space-between;padding:7px 12px 3px;}
 .chart-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;}
@@ -334,13 +495,13 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
    character instead, pulling the month value in close to the year value
    without also cramming the digits within each token together. */
 .rg-time{
-  font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:58px;
+  font-family:'Roboto Mono',monospace;font-weight:700;font-size:58px;
   color:rgba(226,230,237,.95);white-space:nowrap;line-height:1;
   letter-spacing:-.03em;word-spacing:-.5em;
   text-shadow:0 0 10px rgba(226,230,237,.03);
 }
 .rg-bottom{
-  font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:36px;
+  font-family:'Inter',sans-serif;font-weight:800;font-size:36px;
   line-height:.86;letter-spacing:-.01em;text-transform:uppercase;
   color:rgba(226,230,237,.95);margin-top:6px;
   text-shadow:0 0 10px rgba(226,230,237,.03);
@@ -370,7 +531,7 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
   width:55.8px;height:55.8px;border-radius:50%;box-sizing:border-box;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:1px;
-  font-family:'IBM Plex Mono',monospace;
+  font-family:'Roboto Mono',monospace;
   color:#e2e6ed;white-space:nowrap;
   background:
     radial-gradient(ellipse 100% 70% at 50% 0%, rgba(255,255,255,.28) 0%, rgba(255,255,255,.04) 55%, rgba(255,255,255,0) 85%),
@@ -435,7 +596,7 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
      it for a bubble this small. */
   padding:2.5px 6px;border-radius:5px;box-sizing:border-box;
   display:flex;align-items:center;justify-content:center;
-  font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:7px;
+  font-family:'Roboto Mono',monospace;font-weight:700;font-size:7px;
   letter-spacing:.09em;text-transform:uppercase;color:#f5f7fa;
   white-space:nowrap;
   background:
@@ -567,7 +728,7 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
   position:absolute;inset:0;
   display:flex;flex-direction:column;align-items:center;
   padding-top:var(--eptop);gap:.5px;
-  font-family:'IBM Plex Mono',monospace;
+  font-family:'Roboto Mono',monospace;
   white-space:nowrap;
 }
 /* Text sizing matches the original canvas labels exactly (LBL_SIZE 7.2px
@@ -586,8 +747,10 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
    row in .dv-ep-tri-txt's stack, since its vertical position (governed
    by the flush transition line + the tip's own 1% top padding) has
    nothing to do with that stack's flow. --eptiptop set inline per
-   instance from dvSolveEpTri's yrTop. 500 weight (an actually-loaded
-   IBM Plex Mono weight, unlike the synthetic-bold 700 above) and
+   instance from dvSolveEpTri's yrTop. 500 weight (like the 700 above,
+   an actually-loaded Roboto Mono weight — round 80's typeface swap to
+   Roboto Mono also fixed the old IBM Plex Mono 700 synthetic-bold gap,
+   since Roboto Mono's four requested weights include 700) and
    near-white rather than the old accent-tinted colour the date line
    used to have — that tint was sized for the frosted upper zone's
    lighter backdrop, not the darker solid tip fill underneath this. */
@@ -603,7 +766,7 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
      nothing about. flex sidesteps the strut entirely, so the div's
      rendered height matches .dv-ep-yr's own line-height exactly. */
   display:flex;
-  font-family:'IBM Plex Mono',monospace;
+  font-family:'Roboto Mono',monospace;
   white-space:nowrap;
 }
 .dv-ep-yr{font-size:6.4px;font-weight:500;line-height:1.2;color:rgba(255,255,255,.82);}
@@ -612,11 +775,11 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
 .cm:nth-child(even){border-right:none;}
 .cm:nth-last-child(-n+2){border-bottom:none;}
 .cml{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-/* Bumped to the same 700-weight IBM Plex Mono + tabular figures used on
+/* Bumped to the same 700-weight Roboto Mono + tabular figures used on
    the Table tab's share gauges/capital tallies, so this tab's own summary
    numbers read as the same "material" instead of a plain lighter-weight
    readout. */
-.cmv{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
+.cmv{font-family:'Roboto Mono',monospace;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
 .cms{font-size:8px;color:#4d5a6e;margin-top:2px;}
 .cmv.go{color:#34d399;}.cmv.stop{color:#f87171;}.cmv.amb{color:#fbbf24;}.cmv.steel{color:#60a5fa;}
 /* .chart-metrics scoped overrides: the shared .cm/.cml/.cmv/.cms classes above
@@ -629,7 +792,7 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
 .diag{margin:8px 0;border-radius:3px;overflow:hidden;display:none;border:1px solid #232b3d;}
 .diag.show{display:block;}
 .diag-hd{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #232b3d;}
-.diag-title{font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.diag-title{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
 .diag-badge{font-size:8px;padding:2px 8px;border-radius:2px;font-weight:600;letter-spacing:.1em;}
 /* Only the badge (the actual outcome - VIABLE/MARGINAL/FAILING) carries
    status colour. The header itself (background + "Diagnostics" title)
@@ -683,16 +846,60 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
    the one "answer" typography instead of their own lighter 600 weight.
    Still used exactly as before, just inside .diag-grp-row now instead
    of the retired flat .diag-row. */
-.dpos{color:#34d399;font-weight:700;font-variant-numeric:tabular-nums;}
-.dneg{color:#f87171;font-weight:700;font-variant-numeric:tabular-nums;}
-.dneu{color:#fbbf24;font-weight:700;font-variant-numeric:tabular-nums;}
-.dval{color:#e2e6ed;font-weight:700;font-variant-numeric:tabular-nums;}
+.dpos{font-family:'Roboto Mono',monospace;color:#34d399;font-weight:700;font-variant-numeric:tabular-nums;}
+.dneg{font-family:'Roboto Mono',monospace;color:#f87171;font-weight:700;font-variant-numeric:tabular-nums;}
+.dneu{font-family:'Roboto Mono',monospace;color:#fbbf24;font-weight:700;font-variant-numeric:tabular-nums;}
+.dval{font-family:'Roboto Mono',monospace;color:#e2e6ed;font-weight:700;font-variant-numeric:tabular-nums;}
 .dnote{font-size:9px;color:#4d5a6e;}
 .disc{margin:8px 16px 16px;}
 .disc p{font-size:9px;color:#4d5a6e;line-height:1.6;}
-.tbl-controls{display:flex;gap:8px;padding:8px 16px;border-bottom:1px solid #232b3d;align-items:center;background:#10141c;}
+.tbl-controls{display:flex;gap:6px;padding:5px 16px;border-bottom:1px solid #232b3d;align-items:center;background:#10141c;}
 .tc-lbl{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap;}
-.tc-stp{flex:1;}
+.tc-stp{flex:none;}
+/* "the header for the table will also be updated to reflect the sim
+   section" — this interval stepper already shares its underlying glass
+   recipe with every other .stp in the app (the shared rule up top:
+   translucent fill + blur + soft border), but kept the same sharp 3px
+   corners and no specular highlight as the plain settings-list steppers
+   it's styled identically to elsewhere — sitting directly under the new
+   14px-radius segmented capsule bar, that read as two different eras of
+   the app rather than one continuous surface. Rounds ONLY this stepper's
+   corners and adds the same thin top-edge specular line .seg-bar/
+   .circ-panel-inner already use, scoped to #scr-tbl so every other .stp
+   in the app (dense settings fields, meant to stay compact) is
+   untouched. */
+#scr-tbl .tc-stp .stp{border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.14);width:auto;}
+#scr-tbl .tc-stp .stp-val{width:34px;flex:none;font-size:13px !important;height:28px;}
+#scr-tbl .tc-stp .stp-btn{width:26px;height:26px;font-size:13px;}
+/* "the increment bar takes up so much space, any ideas?" — measured
+   first: the always-visible stepper's own .tc-stp{flex:1} stretched a
+   single 1-3 digit value across the ENTIRE remaining row width (320px
+   measured for one character), the single biggest wasted-space
+   offender on this screen, at 51px tall. Replaced the default view
+   with a segmented quick-pick (.tc-quick/.tc-qbtn) reusing the Sim
+   tab's seg-btn capsule language (round 69) rather than inventing a
+   new visual vocabulary - four common intervals as one-tap chips.
+   Tapping the trailing "···" chip reveals the ORIGINAL stepper
+   (#intv-wrap-{tab}, untouched JS/data path - same mkStp/clampStp/LIM
+   plumbing, same save/load persistence via SDEFS - see tcOpenCustom/
+   tcCloseCustom) instead of building a second custom-value input from
+   scratch; .tc-close collapses it back to the quick-pick. That chip
+   also mirrors back whatever custom value is actually active (e.g.
+   "17") rather than just showing "···" once the user has one dialled
+   in, so the custom state stays glanceable without opening it. .tc-stp
+   and its inner .stp/.stp-val/.stp-btn also dropped their flex:1/fixed
+   36x32 sizing for content-hugging widths (scoped under #scr-tbl since
+   .stp/.stp-btn are shared app-wide) - the rare expanded/custom state
+   is now proportioned like the rest of this redesign instead of
+   reverting to the old oversized control. Row height measured 51px
+   baseline -> 36px with the quick-pick showing (30% shorter), buying
+   back a visible extra table row (confirmed via Playwright). */
+.tc-quick{display:flex;align-items:center;gap:3px;background:rgba(12,15,22,.44);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:2px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
+.tc-qbtn{border:none;background:transparent;color:#7d8699;font-family:'Roboto Mono',monospace;font-size:9.5px;font-weight:600;padding:4px 8px;border-radius:7px;cursor:pointer;touch-action:manipulation;}
+.tc-qbtn.on{background:radial-gradient(ellipse 130% 150% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(56,189,248);color:#0a0d13;font-weight:800;box-shadow:0 2px 8px -2px rgba(56,189,248,.5),inset 0 1px 0 rgba(255,255,255,.5);}
+.tc-qbtn-custom{color:#4d5a6e;font-family:'Roboto Mono',monospace;letter-spacing:.04em;padding:4px 7px;min-width:14px;text-align:center;}
+.tc-qbtn-custom.on{background:rgba(56,189,248,.16);color:var(--accent-solid);box-shadow:none;font-weight:700;}
+.tc-close{width:22px;height:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid #232b3d;border-radius:5px;color:#4d5a6e;font-size:10px;cursor:pointer;touch-action:manipulation;}
 /* Share gauges used to be drawn on-canvas inside the race chart itself,
    docked bottom-right during a hover. With six strategies now instead of
    three, that many gauges crowded into the chart's own corner read as
@@ -719,19 +926,19 @@ canvas.eqcv{width:100%;height:100%;display:block;cursor:crosshair;touch-action:n
    in JS (see initTableAxisLock) by toggling overflow-x/y off for the
    duration of a gesture once its dominant direction is known — same
    single scroll element throughout, so sticky is never at risk. */
-.tbl-scroll{flex:1;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(56px + env(safe-area-inset-bottom,0px));}
+.tbl-scroll{flex:1;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px));}
 .tbl-scroll.lock-x{overflow-x:hidden;}
 .tbl-scroll.lock-y{overflow-y:hidden;}
 table{width:100%;border-collapse:collapse;min-width:580px;}
 thead{background:#161b26;position:sticky;top:0;z-index:5;}
-th{font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.04em;padding:6px 7px;text-align:right;border-bottom:1px solid #232b3d;white-space:nowrap;}
+th{font-family:'Roboto Mono',monospace;font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.04em;padding:6px 7px;text-align:right;border-bottom:1px solid #232b3d;white-space:nowrap;}
 th:nth-child(1),th:nth-child(2){text-align:center;}th:nth-child(4){text-align:left;}
 tbody tr{border-bottom:1px solid #161b26;}
 tr.rl{background:rgba(248,113,113,.05);}tr.rb_{background:rgba(96,165,250,.04);}
 tr.rms-w{background:rgba(52,211,153,.07);}tr.rms-w td{color:#34d399 !important;}
 tr.rms-l{background:rgba(248,113,113,.07);}tr.rms-l td{color:#f87171 !important;}
 tr.sel-day{background:rgba(var(--glow-rgb),.08) !important;}tr.sel-day td{color:var(--accent-solid) !important;}
-td{padding:5px 7px;text-align:right;font-size:10px;white-space:nowrap;color:#e2e6ed;}
+td{font-family:'Roboto Mono',monospace;padding:5px 7px;text-align:right;font-size:10px;white-space:nowrap;color:#e2e6ed;}
 td:nth-child(1),td:nth-child(2){text-align:center;color:#4d5a6e;font-size:9px;}
 td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
 /* Capital used to read as just another settings row (same 32px stepper
@@ -770,8 +977,21 @@ td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
    66 - only the surrounding UI chrome's colour changed here. */
 .global-capital{padding:14px 16px 12px;border-bottom:1px solid #232b3d;}
 .gc-hd{display:flex;align-items:center;gap:7px;padding:0 0 10px;}
-.gc-hd span{font-family:'Cabinet Grotesk',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#e2e6ed;}
+.gc-hd span{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#e2e6ed;}
 .gc-body{padding:0;}
+/* Round 78: Starting Capital reimagined as a quick-pick, same pattern
+   as the Table tab's interval control (.tc-quick/.tc-qbtn) — most users
+   land on a round number, so presets are the fast path; the original
+   stepper (#gc-stepper, untouched) is still there for a custom amount,
+   just tucked behind "···" instead of always occupying the full row. */
+.cap-quick{display:flex;align-items:center;gap:3px;background:rgba(12,15,22,.44);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:3px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
+.cap-qbtn{flex:1;border:none;background:transparent;color:#7d8699;font-family:'Roboto Mono',monospace;font-size:12px;font-weight:700;padding:10px 4px;border-radius:9px;cursor:pointer;touch-action:manipulation;}
+.cap-qbtn.on{background:radial-gradient(ellipse 130% 150% at 50% 0%,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 55%),rgb(56,189,248);color:#0a0d13;font-weight:800;box-shadow:0 2px 8px -2px rgba(56,189,248,.5),inset 0 1px 0 rgba(255,255,255,.5);}
+.cap-qbtn-custom{flex:0 0 36px;color:#4d5a6e;letter-spacing:.02em;font-size:11px;}
+.cap-qbtn-custom.on{background:rgba(56,189,248,.16);color:var(--accent-solid);box-shadow:none;font-weight:700;}
+.cap-stp-row{display:flex;align-items:center;gap:6px;}
+.cap-stp-row #gc-stepper{flex:1;}
+.cap-close{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid #232b3d;border-radius:8px;color:#4d5a6e;font-size:13px;cursor:pointer;touch-action:manipulation;}
 #gc-stepper .stp{
   height:44px;border-radius:6px;overflow:hidden;
   /* Neutral liquid, not a tinted one — same pooled-top/dark-bottom
@@ -788,30 +1008,33 @@ td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
 }
 #gc-stepper .stp-btn{width:40px;height:44px;font-size:18px;background:rgba(var(--glow-rgb),.07);color:var(--accent-solid);border-right:1px solid rgba(var(--glow-rgb),.18);}
 #gc-stepper .stp-btn:last-child{border-right:none;border-left:1px solid rgba(var(--glow-rgb),.18);}
-#gc-stepper .stp-val{font-family:'IBM Plex Mono',monospace;font-size:22px !important;font-weight:800;color:#e2e6ed;background:transparent;}
+#gc-stepper .stp-val{font-family:'Roboto Mono',monospace;font-size:22px !important;font-weight:700;color:#e2e6ed;background:transparent;}
 #gc-stepper .stp-unit{font-size:12px;font-weight:700;color:var(--accent-solid);background:transparent;padding-right:12px;}
 .tbl-empty{padding:32px;text-align:center;font-size:10px;color:#4d5a6e;}
 .log-body{padding:8px 16px;}
-.log-info{font-size:9px;color:#4d5a6e;text-align:center;margin-bottom:6px;letter-spacing:.07em;}
+/* Round 78: was boxed via the shared card-glass list (a window around
+   one line of meta-text); now just accent-colored text so it stands
+   out without needing a container. */
+.log-info{font-size:9px;font-weight:600;color:var(--accent-solid);text-align:center;margin-bottom:6px;letter-spacing:.07em;}
 .inp-grp{background:#10141c;border-radius:3px;margin:0 -16px 7px;overflow:hidden;border:1px solid #232b3d;}
 .tb-card{border:1px solid #232b3d;border-radius:3px;padding:7px 10px;margin:0 -16px 7px;}
 .inp-row{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:1px solid #1c2333;}
 .inp-row:last-child{border:none;}
 .inp-row label{font-size:10px;color:#8892a4;}
-.ni{background:#161b26;border:1px solid #232b3d;color:#e2e6ed;font-family:'IBM Plex Mono',monospace;font-size:16px !important;text-align:center;width:76px;height:28px;outline:none;padding:0 4px;border-radius:3px;}
+.ni{background:#161b26;border:1px solid #232b3d;color:#e2e6ed;font-family:'Roboto Mono',monospace;font-size:16px !important;text-align:center;width:76px;height:28px;outline:none;padding:0 4px;border-radius:3px;}
 .ni:focus{border-color:var(--accent-solid);}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:6px;}
 .sc-s{background:#10141c;padding:7px 8px;border-radius:3px;text-align:center;border:1px solid #232b3d;}
 .scl{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
 .scv{font-size:12px;font-weight:600;color:#e2e6ed;}
 .sess-btns{display:flex;gap:6px;margin-bottom:7px;}
-.sess-btn{flex:1;height:36px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:3px;border:1px solid;touch-action:manipulation;}
+.sess-btn{flex:1;height:36px;font-family:'Inter',sans-serif;font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:7px;border:1px solid;touch-action:manipulation;}
 .sess-btn.log{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3);color:var(--accent-solid);}
 .sess-btn.clr{background:transparent;border-color:#232b3d;color:#4d5a6e;}
 .grade-card{background:#10141c;border:1px solid #232b3d;border-radius:3px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;margin:0 -16px 10px;}
 .grade-info .gt{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px;}
 .grade-info .gs{font-size:10px;color:#8892a4;}
-.grade-big{font-family:'Cabinet Grotesk',sans-serif;font-size:40px;font-weight:800;line-height:1;color:#e2e6ed;}
+.grade-big{font-family:'Inter',sans-serif;font-size:40px;font-weight:800;line-height:1;color:#e2e6ed;}
 .log-divider{border-top:1px solid #232b3d;margin:4px 0 8px;}
 .jdate{font-size:9px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.14em;text-align:center;margin-bottom:7px;}
 .jsec{background:#10141c;border-radius:3px;margin-bottom:6px;overflow:hidden;border:1px solid #232b3d;}
@@ -820,13 +1043,14 @@ td:nth-child(4){text-align:left;font-size:9px;color:#4d5a6e;}
 .jrow:last-child{border:none;}
 .jrow label{font-size:10px;color:#8892a4;}
 .scale-row{display:flex;gap:3px;}
-.scale-btn{width:28px;height:24px;border-radius:2px;border:1px solid #232b3d;background:#161b26;font-size:10px;font-family:'IBM Plex Mono',monospace;color:#4d5a6e;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;}
+.scale-btn{width:28px;height:24px;border-radius:2px;border:1px solid #232b3d;background:#161b26;font-size:10px;font-family:'Inter',sans-serif;color:#4d5a6e;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;}
 .scale-btn.on{border-color:rgba(251,191,36,.4);color:#fbbf24;background:rgba(251,191,36,.07);}
-.jsel{background:#161b26;border:1px solid #232b3d;color:#e2e6ed;font-family:'IBM Plex Mono',monospace;font-size:13px !important;height:28px;padding:0 7px;outline:none;border-radius:3px;min-width:120px;}
-.jnote{width:100%;background:#161b26;border:1px solid #232b3d;color:#e2e6ed;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:7px 10px;outline:none;border-radius:3px;resize:none;min-height:56px;line-height:1.5;}
+.jsel{background:#161b26;border:1px solid #232b3d;color:#e2e6ed;font-family:'Inter',sans-serif;font-size:13px !important;height:28px;padding:0 7px;outline:none;border-radius:3px;min-width:120px;}
+.jnote{width:100%;background:#161b26;border:1px solid #232b3d;color:#e2e6ed;font-family:'Inter',sans-serif;font-size:14px;padding:7px 10px;outline:none;border-radius:3px;resize:none;min-height:56px;line-height:1.5;}
 .jnote:focus{border-color:var(--accent-solid);}
 .jnotes-wrap{padding:7px 12px;}
-.j-save-btn{width:100%;height:36px;background:transparent;border:1px solid rgba(56,189,248,.35);color:var(--accent-solid);font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;border-radius:3px;margin-bottom:8px;touch-action:manipulation;}
+.j-save-btn{width:100%;height:36px;background:transparent;border:1px solid rgba(56,189,248,.35);color:var(--accent-solid);font-family:'Inter',sans-serif;font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;border-radius:7px;margin-bottom:8px;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:6px;}
+.j-save-btn svg{flex-shrink:0;}
 .j-save-btn:active{background:rgba(56,189,248,.1);}
 .spark-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px;}
 .spark-cell{background:#10141c;padding:7px 9px;border-radius:3px;border:1px solid #232b3d;}
@@ -855,7 +1079,7 @@ canvas.spark{width:100%;height:34px;display:block;}
    padding, so full-bleed here needs the negative-margin trick instead
    of just removing margin. */
 #scr-stats .vs-card{margin:0 -16px 7px;}
-.vs-title{font-family:'Cabinet Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#8892a4;}
+.vs-title{font-family:'Inter',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#8892a4;}
 .vs-badge{font-size:8px;padding:2px 8px;border-radius:2px;font-weight:600;letter-spacing:.08em;}
 .vs-badge.on-track{background:rgba(52,211,153,.1);color:#34d399;}
 .vs-badge.behind{background:rgba(248,113,113,.1);color:#f87171;}
@@ -892,12 +1116,12 @@ canvas.spark{width:100%;height:34px;display:block;}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px;}
 .sg{background:#10141c;padding:7px 9px;border-radius:3px;border:1px solid #232b3d;}
 .sgl{font-size:7px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-.sgv{font-size:13px;font-weight:600;color:#e2e6ed;}
+.sgv{font-family:'Roboto Mono',monospace;font-size:13px;font-weight:600;color:#e2e6ed;}
 .gauge-row{background:#10141c;border:1px solid #232b3d;border-radius:3px;padding:8px 10px;margin:0 -16px 6px;}
 .wrc{background:#10141c;border:1px solid #232b3d;border-radius:3px;overflow:hidden;margin:0 -16px 5px;}
 .wrc-hd{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #232b3d;background:transparent;}
-.wrc-title{font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#e2e6ed;}
-.wrc-grade{font-family:'Cabinet Grotesk',sans-serif;font-size:24px;font-weight:800;line-height:1;}
+.wrc-title{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#e2e6ed;}
+.wrc-grade{font-family:'Inter',sans-serif;font-size:24px;font-weight:800;line-height:1;}
 .wrc-body{padding:8px 12px;}
 .wrc-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #1c2333;font-size:10px;}
 .wrc-row:last-child{border:none;}
@@ -915,13 +1139,13 @@ canvas.spark{width:100%;height:34px;display:block;}
 .modal.open,.imodal.open{display:flex;}
 .mbox,.ibox{background:#10141c;border-top:1px solid var(--accent-cyan);max-width:600px;width:100%;padding:14px 16px 32px;max-height:80vh;overflow-y:auto;border-radius:8px 8px 0 0;position:relative;}
 .mlbl{font-size:8px;color:var(--accent-solid);text-transform:uppercase;letter-spacing:.2em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #232b3d;}
-.mx{position:absolute;top:10px;right:14px;background:transparent;border:1px solid #232b3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:8px;padding:2px 8px;cursor:pointer;border-radius:2px;}
+.mx{position:absolute;top:10px;right:14px;background:transparent;border:1px solid #232b3d;color:#4d5a6e;font-family:'Inter',sans-serif;font-size:8px;padding:2px 8px;cursor:pointer;border-radius:2px;}
 .gs-sec{margin-bottom:10px;padding-left:10px;border-left:1px solid var(--accent-cyan);}
-.gs-sec h3{font-family:'Cabinet Grotesk',sans-serif;font-size:10px;font-weight:700;color:var(--accent-solid);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;}
+.gs-sec h3{font-family:'Inter',sans-serif;font-size:10px;font-weight:700;color:var(--accent-solid);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;}
 .gs-sec p,.gs-sec li{font-size:11px;color:#8892a4;line-height:1.65;margin-bottom:2px;}
 .gs-sec ul{padding-left:14px;}
 .gtag{background:rgba(56,189,248,.12);color:var(--accent-solid);font-size:9px;padding:1px 5px;border-radius:2px;}
-.ibox h2{font-family:'Cabinet Grotesk',sans-serif;font-size:10px;color:#fbbf24;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.ibox h2{font-family:'Inter',sans-serif;font-size:10px;color:#fbbf24;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
 .ibox p,.ibox li{font-size:11px;color:#8892a4;line-height:1.65;margin-bottom:3px;}
 .ibox ul{padding-left:14px;}
 .friction-breakdown{background:#161b26;border:1px solid #232b3d;border-radius:3px;padding:6px 8px;margin-top:6px;}
@@ -958,16 +1182,28 @@ canvas.spark{width:100%;height:34px;display:block;}
         <span>Starting Capital</span>
         <button class="ib" onclick="openInfo('globalcap')" style="margin-left:4px;">?</button>
       </div>
-      <div class="gc-body" id="gc-stepper"></div>
+      <div class="gc-body">
+        <div class="cap-quick" id="cap-quick">
+          <button class="cap-qbtn" data-v="10000" onclick="capQuickPick(10000)">$10K</button>
+          <button class="cap-qbtn" data-v="25000" onclick="capQuickPick(25000)">$25K</button>
+          <button class="cap-qbtn" data-v="50000" onclick="capQuickPick(50000)">$50K</button>
+          <button class="cap-qbtn" data-v="100000" onclick="capQuickPick(100000)">$100K</button>
+          <button class="cap-qbtn cap-qbtn-custom" id="cap-qcustom" onclick="capOpenCustom()">···</button>
+        </div>
+        <div class="cap-stp-row" id="cap-stp-row" style="display:none;">
+          <div id="gc-stepper"></div>
+          <button class="cap-close" id="cap-close" onclick="capCloseCustom()">✕</button>
+        </div>
+      </div>
       <div class="fc-note" style="padding:0 12px 8px;">Shared starting capital across all six strategies — makes A–F directly comparable on the same account size. Each strategy still sets its own ticker, price, and share count.</div>
     </div>
     <div class="sbar">
-      <button class="sbtn on" id="stb0" onclick="switchStrat(0)">A</button>
-      <button class="sbtn sc-b" id="stb1" onclick="switchStrat(1)">B</button>
-      <button class="sbtn sc-c" id="stb2" onclick="switchStrat(2)">C</button>
-      <button class="sbtn sc-d" id="stb3" onclick="switchStrat(3)">D</button>
-      <button class="sbtn sc-e" id="stb4" onclick="switchStrat(4)">E</button>
-      <button class="sbtn sc-f" id="stb5" onclick="switchStrat(5)">F</button>
+      <button class="sbtn on" id="stb0" onclick="switchStrat(0)"><span class="sb-top">A<i class="sb-ring" id="sbr0"></i></span><span class="sb-stat" id="sbs0">—</span></button>
+      <button class="sbtn sc-b" id="stb1" onclick="switchStrat(1)"><span class="sb-top">B<i class="sb-ring" id="sbr1"></i></span><span class="sb-stat" id="sbs1">—</span></button>
+      <button class="sbtn sc-c" id="stb2" onclick="switchStrat(2)"><span class="sb-top">C<i class="sb-ring" id="sbr2"></i></span><span class="sb-stat" id="sbs2">—</span></button>
+      <button class="sbtn sc-d" id="stb3" onclick="switchStrat(3)"><span class="sb-top">D<i class="sb-ring" id="sbr3"></i></span><span class="sb-stat" id="sbs3">—</span></button>
+      <button class="sbtn sc-e" id="stb4" onclick="switchStrat(4)"><span class="sb-top">E<i class="sb-ring" id="sbr4"></i></span><span class="sb-stat" id="sbs4">—</span></button>
+      <button class="sbtn sc-f" id="stb5" onclick="switchStrat(5)"><span class="sb-top">F<i class="sb-ring" id="sbr5"></i></span><span class="sb-stat" id="sbs5">—</span></button>
     </div>
     <div id="sp0"></div>
     <div id="sp1" style="display:none;"></div>
@@ -1000,21 +1236,29 @@ canvas.spark{width:100%;height:34px;display:block;}
     </div>
     <div class="dv-half">
       <div class="sbar">
-        <button class="sbtn on" id="tsb0" onclick="switchTblStrat(0)">A</button>
-        <button class="sbtn sc-b" id="tsb1" onclick="switchTblStrat(1)">B</button>
-        <button class="sbtn sc-c" id="tsb2" onclick="switchTblStrat(2)">C</button>
-        <button class="sbtn sc-d" id="tsb3" onclick="switchTblStrat(3)">D</button>
-        <button class="sbtn sc-e" id="tsb4" onclick="switchTblStrat(4)">E</button>
-        <button class="sbtn sc-f" id="tsb5" onclick="switchTblStrat(5)">F</button>
+        <button class="sbtn on" id="tsb0" onclick="switchTblStrat(0)"><span class="sb-top">A<i class="sb-ring" id="tbr0"></i></span><span class="sb-stat" id="tbs0">—</span></button>
+        <button class="sbtn sc-b" id="tsb1" onclick="switchTblStrat(1)"><span class="sb-top">B<i class="sb-ring" id="tbr1"></i></span><span class="sb-stat" id="tbs1">—</span></button>
+        <button class="sbtn sc-c" id="tsb2" onclick="switchTblStrat(2)"><span class="sb-top">C<i class="sb-ring" id="tbr2"></i></span><span class="sb-stat" id="tbs2">—</span></button>
+        <button class="sbtn sc-d" id="tsb3" onclick="switchTblStrat(3)"><span class="sb-top">D<i class="sb-ring" id="tbr3"></i></span><span class="sb-stat" id="tbs3">—</span></button>
+        <button class="sbtn sc-e" id="tsb4" onclick="switchTblStrat(4)"><span class="sb-top">E<i class="sb-ring" id="tbr4"></i></span><span class="sb-stat" id="tbs4">—</span></button>
+        <button class="sbtn sc-f" id="tsb5" onclick="switchTblStrat(5)"><span class="sb-top">F<i class="sb-ring" id="tbr5"></i></span><span class="sb-stat" id="tbs5">—</span></button>
       </div>
       <div class="tbl-controls">
         <span class="tc-lbl">Every</span>
-        <div class="tc-stp" id="intv-wrap-0"></div>
+        <div class="tc-quick" id="tc-quick">
+          <button class="tc-qbtn" data-v="1" onclick="tcQuickPick(1)">1</button>
+          <button class="tc-qbtn" data-v="5" onclick="tcQuickPick(5)">5</button>
+          <button class="tc-qbtn" data-v="10" onclick="tcQuickPick(10)">10</button>
+          <button class="tc-qbtn" data-v="20" onclick="tcQuickPick(20)">20</button>
+          <button class="tc-qbtn tc-qbtn-custom" id="tc-qcustom" onclick="tcOpenCustom()">···</button>
+        </div>
+        <div class="tc-stp" id="intv-wrap-0" style="display:none;"></div>
         <div class="tc-stp" id="intv-wrap-1" style="display:none;"></div>
         <div class="tc-stp" id="intv-wrap-2" style="display:none;"></div>
         <div class="tc-stp" id="intv-wrap-3" style="display:none;"></div>
         <div class="tc-stp" id="intv-wrap-4" style="display:none;"></div>
         <div class="tc-stp" id="intv-wrap-5" style="display:none;"></div>
+        <button class="tc-close" id="tc-close" onclick="tcCloseCustom()" style="display:none;">✕</button>
         <span class="tc-lbl">days</span>
       </div>
       <div class="tbl-scroll" id="tbl-scroll">
@@ -1045,9 +1289,9 @@ canvas.spark{width:100%;height:34px;display:block;}
 
       <div class="log-info" id="log-info">0 days logged</div>
       <div class="inp-grp">
-        <div class="inp-row"><label>Wins</label><input class="ni" id="dWins" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
-        <div class="inp-row"><label>Losses</label><input class="ni" id="dLoss" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
-        <div class="inp-row"><label>Breakevens</label><input class="ni" id="dBE" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
+        <div class="inp-row"><label style="color:#34d399;">Wins</label><input class="ni" id="dWins" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
+        <div class="inp-row"><label style="color:#f87171;">Losses</label><input class="ni" id="dLoss" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
+        <div class="inp-row"><label style="color:#60a5fa;">Breakevens</label><input class="ni" id="dBE" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
         <div class="inp-row"><label>Avg Win ticks</label><input class="ni" id="dTickW" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
         <div class="inp-row"><label>Avg Loss ticks</label><input class="ni" id="dTickL" type="number" min="0" placeholder="0" oninput="onDaily()"></div>
         <div class="inp-row"><label>Net P&amp;L $</label><input class="ni" id="dPnl" type="number" step="0.01" placeholder="0.00" oninput="onDaily()" style="width:86px;"></div>
@@ -1068,7 +1312,7 @@ canvas.spark{width:100%;height:34px;display:block;}
       <div class="g3">
         <div class="sc-s"><div class="scl">vs Baseline</div><div class="scv" id="dd-pb">—</div></div>
         <div class="sc-s"><div class="scl">On Goal</div><div class="scv" id="dd-og">—</div></div>
-        <div class="sc-s"><div class="scl">Grade</div><div class="scv" id="dd-gr" style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:800;">—</div></div>
+        <div class="sc-s"><div class="scl">Grade</div><div class="scv" id="dd-gr" style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;">—</div></div>
       </div>
       <div class="sess-btns">
         <button class="sess-btn log" onclick="logDay()">+ Log Day</button>
@@ -1079,7 +1323,7 @@ canvas.spark{width:100%;height:34px;display:block;}
         <div class="grade-big" id="sd-grade">—</div>
       </div>
 
-      <button class="j-save-btn" onclick="exportLogCSV()" style="border-color:#60a5fa;color:#60a5fa;">Export Log + Journal CSV</button>
+      <button class="j-save-btn" onclick="exportLogCSV()" style="border-color:#60a5fa;color:#60a5fa;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Export Log + Journal CSV</span></button>
       <div class="spark-grid" id="spark-grid" style="display:none;"></div>
       <div class="jhist" id="jhist"><div class="jhist-hd">History</div><div class="jentry" style="color:#4d5a6e;font-size:10px;text-align:center;padding:14px;">No entries yet.</div></div>
     </div>
@@ -1122,27 +1366,27 @@ canvas.spark{width:100%;height:34px;display:block;}
       <div class="stats-grid">
         <div class="sg"><div class="sgl">YTD Return</div><div class="sgv" id="rYTD">—</div></div>
       </div>
-      <button class="j-save-btn" onclick="exportLogCSV()" style="border-color:#60a5fa;color:#60a5fa;margin-top:4px;">Export Log + Journal CSV</button>
+      <button class="j-save-btn" onclick="exportLogCSV()" style="border-color:#60a5fa;color:#60a5fa;margin-top:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Export Log + Journal CSV</span></button>
     </div>
   </div>
 
 </div>
 
 <nav class="bnav">
-  <button class="nb on" id="nb-sim" onclick="switchScreen('sim')">
+  <button class="nb on" id="nb-sim" onclick="switchScreen('sim')" aria-label="Sim">
     <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
     <span>Sim</span>
   </button>
-  <button class="nb" id="nb-tbl" onclick="switchScreen('tbl')">
+  <button class="nb" id="nb-tbl" onclick="switchScreen('tbl')" aria-label="Table">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
     <span>Table</span>
     <span class="nb-pip" id="tbl-pip"></span>
   </button>
-  <button class="nb" id="nb-log" onclick="switchScreen('log')">
+  <button class="nb" id="nb-log" onclick="switchScreen('log')" aria-label="Log">
     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <span>Log</span>
   </button>
-  <button class="nb" id="nb-stats" onclick="switchScreen('stats')">
+  <button class="nb" id="nb-stats" onclick="switchScreen('stats')" aria-label="Stats">
     <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     <span>Stats</span>
   </button>
@@ -1265,7 +1509,7 @@ function switchScreen(n){
   SCREENS.forEach(s=>{const sc=$('scr-'+s),nb=$('nb-'+s);if(sc)sc.classList.toggle('active',s===n);if(nb)nb.classList.toggle('on',s===n);});
   activeScreen=n;
   if(n==='log'){$('jdate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});renderJournal();}
-  if(n==='tbl')renderTable(activeTblStrat);
+  if(n==='tbl'){renderTable(activeTblStrat);tcSyncQuickUI(activeTblStrat);}
   if(n==='stats')onReal();
 }
 
@@ -1280,7 +1524,74 @@ function switchStrat(n){
   });
   updateDist(n);
 }
-function switchTblStrat(n){activeTblStrat=n;[0,1,2,3,4,5].forEach(i=>{$('tsb'+i).classList.toggle('on',i===n);const iw=$('intv-wrap-'+i);if(iw)iw.style.display=i===n?'flex':'none';});renderTable(n);dvSyncTblScroll();}
+// Keeps a strategy tab's ring (has this been simulated?) and mini-stat
+// (final capital, K-abbreviated via fmtK — same convention the endpoint
+// triangle uses) in sync with simResults[tab] — for BOTH the Sim tab's own
+// switcher (stb/sbr/sbs) and the Table tab's parallel one (tsb/tbr/tbs),
+// since the redesign now spans both and they're driven by the identical
+// underlying data, there's no reason to compute hasRun/statTxt twice or
+// risk the two bars drifting apart. Called after a simulation completes
+// and after Clear Strategy resets one back to empty; the "on" (active)
+// visual state is handled separately by switchStrat/switchTblStrat via
+// the same .on class this has always used, so this only ever touches the
+// hasrun/stat side of a tab, never which one looks active.
+function updateStratTab(tab){
+  const r=simResults[tab];
+  const hasRun=!!(r&&r.rows&&r.rows.length);
+  const statTxt=hasRun?'$'+fmtK(r.acct0+r.rows[r.rows.length-1].cumPnl):'—';
+  [['sbr','sbs','stb'],['tbr','tbs','tsb']].forEach(([ringP,statP,btnP])=>{
+    const ring=$(ringP+tab),stat=$(statP+tab),btn=$(btnP+tab);
+    if(!ring||!stat||!btn)return;
+    btn.classList.toggle('hasrun',hasRun);
+    stat.textContent=statTxt;
+  });
+}
+/* Table tab's interval control: default view is a segmented quick-pick
+   (.tc-quick, "1/5/10/20/···"), not the raw stepper - see the CSS
+   comment above #scr-tbl .tc-stp .stp for the full rationale. The
+   underlying per-tab steppers (#intv-wrap-0..5) still exist exactly as
+   built by wirePanes()/mkStp - tcOpenCustom/tcCloseCustom just toggle
+   which one is visible, same as switchTblStrat always did; tcCustomOpen
+   tracks whether the user currently has that raw stepper open so a tab
+   switch while it's open follows them to the new tab's own stepper
+   instead of snapping back to the quick-pick. */
+let tcCustomOpen=false;
+const TC_PRESETS=[1,5,10,20];
+function tcSyncQuickUI(tab){
+  const fid='intv'+(tab===0?'':'_'+tab);
+  const v=parseFloat($(fid)?.value)||1;
+  const isPreset=TC_PRESETS.includes(v);
+  document.querySelectorAll('#tc-quick .tc-qbtn:not(.tc-qbtn-custom)').forEach(b=>{
+    b.classList.toggle('on',+b.dataset.v===v);
+  });
+  const cb=$('tc-qcustom');
+  if(cb){cb.classList.toggle('on',!isPreset);cb.textContent=isPreset?'···':String(v);}
+}
+function tcQuickPick(v){
+  const tab=activeTblStrat;
+  const fid='intv'+(tab===0?'':'_'+tab);
+  const inp=$(fid);if(!inp)return;
+  inp.value=v;
+  clampStp(fid,tab);
+  tcSyncQuickUI(tab);
+  renderTable(tab);
+}
+function tcOpenCustom(){
+  tcCustomOpen=true;
+  const q=$('tc-quick'),cl=$('tc-close'),iw=$('intv-wrap-'+activeTblStrat);
+  if(q)q.style.display='none';
+  if(cl)cl.style.display='flex';
+  if(iw)iw.style.display='flex';
+}
+function tcCloseCustom(){
+  tcCustomOpen=false;
+  const q=$('tc-quick'),cl=$('tc-close'),iw=$('intv-wrap-'+activeTblStrat);
+  if(q)q.style.display='flex';
+  if(cl)cl.style.display='none';
+  if(iw)iw.style.display='none';
+  tcSyncQuickUI(activeTblStrat);
+}
+function switchTblStrat(n){activeTblStrat=n;[0,1,2,3,4,5].forEach(i=>{$('tsb'+i).classList.toggle('on',i===n);const iw=$('intv-wrap-'+i);if(iw)iw.style.display=(tcCustomOpen&&i===n)?'flex':'none';});tcSyncQuickUI(n);renderTable(n);dvSyncTblScroll();}
 /* Keep the table scrolled to the same day across A/B/C switches, so
    flipping tabs compares the same point in time instead of landing
    wherever that strategy's own scrollTop last happened to be — each
@@ -1327,20 +1638,13 @@ function onTog(cb,ctrl,tab){
 const isOn=id=>{const e=$(id);return!e||e.checked;};
 function circSelect(tab,catKey){
   const s=tab===0?'':'_'+tab;
-  const cluster=$('circ-cluster'+s);
+  const cluster=$('seg-bar'+s);
   const panelWrap=$('circ-panel-wrap'+s);
   const currentSel=cluster?.dataset.sel;
   const deselecting=currentSel===catKey;
-  cluster.querySelectorAll('.circ-btn').forEach(btn=>{
-    const isThis=btn.dataset.cat===catKey;
-    btn.classList.toggle('sel',isThis&&!deselecting);
-    btn.classList.toggle('dim',!isThis&&!deselecting);
-    const lbl=btn.parentElement.querySelector('.circ-label');
-    // Labels show by default (idle state); any selection hides all of them,
-    // including the tapped circle's own — reappearing once deselected.
-    if(lbl)lbl.classList.toggle('dim-out',!deselecting);
+  cluster.querySelectorAll('.seg-btn').forEach(btn=>{
+    btn.classList.toggle('sel',btn.dataset.cat===catKey&&!deselecting);
   });
-  cluster.classList.toggle('has-sel',!deselecting);
   cluster.dataset.sel=deselecting?'':catKey;
   document.querySelectorAll('.circ-panel'+s).forEach(p=>{
     p.style.display=(!deselecting&&p.dataset.cat===catKey)?'block':'none';
@@ -1608,6 +1912,7 @@ function _sim(tab){
   $('tbl-pip').classList.add('on');
   renderTable(tab,rows,acct0,c,msp,capped);
   renderStratComparison();
+  updateStratTab(tab);
   save();
 }
 
@@ -1730,10 +2035,10 @@ function dvGlassGauge(ctx,cx,cyBase,r,frac,rgb,shareVal){
   const capSize=Math.max(6,Math.min(15,r*.27));
   ctx.textAlign='center';
   ctx.fillStyle='rgba(226,230,237,.78)';
-  ctx.font=`700 ${numSize}px IBM Plex Mono`;
+  ctx.font=`700 ${numSize}px Roboto Mono`;
   ctx.fillText(Math.round(shareVal).toLocaleString(),cx,cyBase-r*.36);
   ctx.fillStyle='rgba(163,173,190,.5)';
-  ctx.font=`${capSize}px IBM Plex Mono`;
+  ctx.font=`${capSize}px Roboto Mono`;
   ctx.textBaseline='alphabetic';
   ctx.fillText('SHARES',cx,cyBase-r*.045);
 
@@ -2027,7 +2332,7 @@ function drawCombinedChart(cv,legendEl){
   const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
   /* canvas left transparent — the panel behind it is frosted glass */
   if(!active.length){
-    ctx.fillStyle='#4d5a6e';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';
+    ctx.fillStyle='#4d5a6e';ctx.font='11px Roboto Mono';ctx.textAlign='center';
     ctx.fillText('Run a simulation on any strategy to see it here',W/2,H/2);
     if(legendEl)legendEl.innerHTML='';
     return;
@@ -2584,7 +2889,7 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
   const realPts=sortedLog.length?sortedLog.map((e,i)=>{realCum+=e.pnl;return{idx:i,date:e.date,cap:realCapS+realCum};}):[];
   const hasReal=realPts.length>1&&realCapS>0;
   if(!active.length&&!hasReal){
-    ctx.fillStyle='#4d5a6e';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';
+    ctx.fillStyle='#4d5a6e';ctx.font='11px Roboto Mono';ctx.textAlign='center';
     ctx.fillText('Run a simulation to see the race to goal',W/2,H/2);
     if(legendEl)legendEl.innerHTML='';
     const bubblesElEmpty=$('dv-ep-bubbles');
@@ -2636,7 +2941,7 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
   // drops below its line instead of above so it isn't clipped by the
   // canvas edge.
   const gridN=4;
-  ctx.font='8px IBM Plex Mono';ctx.textAlign='left';
+  ctx.font='8px Roboto Mono';ctx.textAlign='left';
   for(let i=0;i<=gridN;i++){
     const cap=minCap+(capRng*i/gridN);
     const gy=yS(cap);
@@ -2715,7 +3020,14 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
     // the same glowing leader + tinted-glass label the Sim tab's own
     // "RAPID GROWTH POINT" marker uses — strong enough to stay legible
     // crossing up to six competing curves, not just the marker itself.
-    dvPositionGrowthCallout($('rg-line-tbl'),$('rg-bubble-tbl'),mx,my,RG_MK_R,hexToRgb(rapid.color),'FASTEST PATH',pd.l,pd.l+pw);
+    // Round 83: the label itself is now conditional on `active.length`
+    // (computed above from simResults) rather than hardcoded — with
+    // only one strategy simulated there's nothing to compare, so calling
+    // it "FASTEST PATH" implied a race that isn't happening; it reads as
+    // "RAPID GROWTH POINT" (same wording Sim's own single-curve chart
+    // always uses) until a second strategy actually has results too.
+    const rgLabel=active.length>=2?'FASTEST PATH':'RAPID GROWTH POINT';
+    dvPositionGrowthCallout($('rg-line-tbl'),$('rg-bubble-tbl'),mx,my,RG_MK_R,hexToRgb(rapid.color),rgLabel,pd.l,pd.l+pw);
   }else{
     dvPositionGrowthCallout($('rg-line-tbl'),$('rg-bubble-tbl'),null);
   }
@@ -2834,11 +3146,11 @@ function dvDrawRaceChart(cv,legendEl,hoverDay){
     // Measure each line with the exact font/weight/size the CSS uses so
     // the triangle can be sized snugly around THIS endpoint's own text
     // instead of a one-size-fits-all guess.
-    ctx.font='700 7.2px "IBM Plex Mono", monospace';
+    ctx.font='700 7.2px "Roboto Mono", monospace';
     const moW=ctx.measureText(moTxt).width;
-    ctx.font='400 7.2px "IBM Plex Mono", monospace';
+    ctx.font='400 7.2px "Roboto Mono", monospace';
     const capW=ctx.measureText(capTxt).width;
-    ctx.font='500 6.4px "IBM Plex Mono", monospace';
+    ctx.font='500 6.4px "Roboto Mono", monospace';
     const yrW=ctx.measureText(yrTxt).width;
     const {triW,H,topPad,innerTop,yrTop}=dvSolveEpTri(moW,capW,yrW);
     // Horizontal-only clamp so a triangle near either edge of the plot
@@ -2967,7 +3279,7 @@ function dvDrawGaugeRow(cv,hoverDay){
   const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
   ctx.clearRect(0,0,W,H);
   if(!active.length){
-    ctx.fillStyle='#4d5a6e';ctx.font='9px IBM Plex Mono';ctx.textAlign='center';
+    ctx.fillStyle='#4d5a6e';ctx.font='9px Roboto Mono';ctx.textAlign='center';
     ctx.fillText('Share gauges appear once a strategy is simulated',W/2,H/2);
     return;
   }
@@ -3017,7 +3329,7 @@ function dvDrawGaugeRow(cv,hoverDay){
     const [r,g,b]=hexToRgb(hp.color);
     dvGlassGauge(ctx,gX[i],gY,gR,hp.sh/shRange,[r,g,b],hp.sh);
     const txt=hp.label+'  $'+fmt(hp.cap,0);
-    ctx.font='700 7.2px IBM Plex Mono';
+    ctx.font='700 7.2px Roboto Mono';
     ctx.fillStyle=`rgba(${r},${g},${b},.9)`;
     ctx.fillText(txt,gX[i],gY+11);
     if(hp.cap>=leaderCap){
@@ -3273,19 +3585,35 @@ const JCATS=[
     <div class="jrow"><label>Losses</label><input class="ni" id="j-${b.key}-l" type="number" min="0" placeholder="0" style="width:60px;"></div>`).join('')}`},
 ];
 
+/* Journal's 6-category picker used to be the OLD pre-round-68 circle
+   grid (.circ-btn, 3-over-3, black icons, labels below) - the same
+   component the Sim tab's Core/Risk/Ticker/Psych/Overrides selector
+   used to be before round 69's segmented-glass-bar redesign. "Full
+   visual pass" on the Log tab means bringing this one up to that same
+   .seg-btn language too, rather than leaving Journal on the one visual
+   era Sim/Table have already moved past. Kept the 2-row grouping
+   (two .seg-bar strips instead of one 6-wide bar) since 6 items reads
+   tight in a single row at this width and the 3-and-3 grouping already
+   matched Soul/Mind/Body vs Grade/Market/Outcome's natural pairing -
+   "same layout/order, just dressed up" per how this round was scoped,
+   not a restructure. No per-category identity colour here (unlike
+   Sim's per-strategy #sp{n} scoping) since Journal isn't per-strategy -
+   the selected segment just gets the app's one generic accent fill,
+   see #jcirc-mount .seg-btn.sel below. Dropped the old "Tap a circle to
+   open its section" hint text too - Sim's segmented bar never needed
+   one, a row of tappable chips is self-evident the same way tabs are. */
 function buildJournalCircles(){
   const mount=$('jcirc-mount');if(!mount)return;
-  const circBtn=cat=>`<div style="display:flex;flex-direction:column;align-items:center;">
-    <button class="circ-btn" data-cat="${cat.key}" onclick="circSelectJ('${cat.key}')">${JICONS[cat.key]||''}</button>
-    <span class="circ-label">${cat.title}</span>
-  </div>`;
+  const circBtn=cat=>`<button class="seg-btn" data-cat="${cat.key}" onclick="circSelectJ('${cat.key}')">
+    <span class="seg-ic">${JICONS[cat.key]||''}</span>
+    <span class="seg-lbl">${cat.title}</span>
+  </button>`;
   mount.innerHTML=`
     <div class="circ-nav">
-      <div class="circ-cluster" id="jcirc-cluster" data-sel="">
-        <div class="circ-row">${circBtn(JCATS[0])}${circBtn(JCATS[1])}${circBtn(JCATS[2])}</div>
-        <div class="circ-row">${circBtn(JCATS[3])}${circBtn(JCATS[4])}${circBtn(JCATS[5])}</div>
+      <div id="jcirc-cluster" data-sel="" style="display:flex;flex-direction:column;gap:6px;margin-bottom:4px;">
+        <div class="seg-bar">${circBtn(JCATS[0])}${circBtn(JCATS[1])}${circBtn(JCATS[2])}</div>
+        <div class="seg-bar">${circBtn(JCATS[3])}${circBtn(JCATS[4])}${circBtn(JCATS[5])}</div>
       </div>
-      <div class="circ-hint">Tap a circle to open its section</div>
       <div class="circ-panel-wrap" id="jcirc-panel-wrap">
         <div class="circ-panel-inner">
           ${JCATS.map(cat=>`<div class="jcirc-panel" data-cat="${cat.key}" style="display:none;"><div class="jsec-hd" style="margin:-10px -16px 8px;">${cat.title}</div>${cat.body()}</div>`).join('')}
@@ -3305,14 +3633,9 @@ function circSelectJ(catKey){
   if(!cluster)return;
   const currentSel=cluster.dataset.sel;
   const deselecting=currentSel===catKey;
-  cluster.querySelectorAll('.circ-btn').forEach(btn=>{
-    const isThis=btn.dataset.cat===catKey;
-    btn.classList.toggle('sel',isThis&&!deselecting);
-    btn.classList.toggle('dim',!isThis&&!deselecting);
-    const lbl=btn.parentElement.querySelector('.circ-label');
-    if(lbl)lbl.classList.toggle('dim-out',!deselecting);
+  cluster.querySelectorAll('.seg-btn').forEach(btn=>{
+    btn.classList.toggle('sel',btn.dataset.cat===catKey&&!deselecting);
   });
-  cluster.classList.toggle('has-sel',!deselecting);
   cluster.dataset.sel=deselecting?'':catKey;
   document.querySelectorAll('.jcirc-panel').forEach(p=>{
     p.style.display=(!deselecting&&p.dataset.cat===catKey)?'block':'none';
@@ -3321,30 +3644,34 @@ function circSelectJ(catKey){
 }
 
 /* ══════════════════════════════════════════════════════════════
-   STATS TAB CIRCLE — single circle for manual broker data entry,
-   same interaction pattern as the Sim and Log tab clusters, just
-   sized to one. Everything auto-computed (Weekly Report, Gauges,
-   Real Equity charts, Real vs Sim) stays visible outside it — this
-   circle is only for the fields a person types in by hand.
+   STATS TAB TRIGGER — single action button for manual broker data
+   entry. Used to be a lone circle (same .circ-btn language as Sim's
+   old category selector and Journal's old picker, both since
+   redesigned to .seg-btn segmented bars) but a segmented-bar treatment
+   doesn't fit a single item - there's nothing to segment against, it
+   just floats as an odd narrow pill with dead space on both sides
+   (checked via a real mockup before committing, presented alongside 2
+   other options). A full-width glass button with a rotating chevron
+   reads as one self-contained action instead, and the chevron gives
+   the expand/collapse affordance a clearer signal than the bare circle
+   ever had. Everything auto-computed (Weekly Report, Gauges, Real
+   Equity charts, Real vs Sim) stays visible outside it - this trigger
+   is only for the fields a person types in by hand.
    ══════════════════════════════════════════════════════════════ */
 function buildStatsCircle(){
   const mount=$('scirc-mount');if(!mount)return;
-  const icon=`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>`;
+  const icon=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>`;
+  const chev=`<svg class="stat-actbtn-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
   mount.innerHTML=`
     <div class="circ-nav">
-      <div class="circ-cluster" id="scirc-cluster" data-sel="">
-        <div class="circ-row">
-          <div style="display:flex;flex-direction:column;align-items:center;">
-            <button class="circ-btn" data-cat="broker" onclick="circSelectS('broker')">${icon}</button>
-            <span class="circ-label">Enter your broker trading data</span>
-          </div>
-        </div>
-      </div>
+      <button class="stat-actbtn" id="scirc-trigger" onclick="circSelectS('broker')">
+        ${icon}<span>Enter Broker Trading Data</span>${chev}
+      </button>
       <div class="circ-panel-wrap" id="scirc-panel-wrap">
         <div class="circ-panel-inner">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
             <span style="font-size:8px;color:#4d5a6e;text-transform:uppercase;letter-spacing:.12em;">Real Trading Data</span>
-            <button onclick="resetRealStats()" style="background:transparent;border:1px solid #232b3d;color:#4d5a6e;font-family:'IBM Plex Mono',monospace;font-size:8px;padding:2px 8px;border-radius:2px;cursor:pointer;letter-spacing:.08em;">↺ Auto-fill from Log</button>
+            <button onclick="resetRealStats()" style="background:transparent;border:1px solid #232b3d;color:#4d5a6e;font-family:'Inter',sans-serif;font-size:8px;padding:2px 8px;border-radius:2px;cursor:pointer;letter-spacing:.08em;">↺ Auto-fill from Log</button>
           </div>
           <div class="stats-inp">
             <div class="si"><label>Total Trades</label><input class="ni" id="rTrades" type="number" placeholder="—" oninput="onReal()" style="width:78px;"></div>
@@ -3371,18 +3698,11 @@ function buildStatsCircle(){
 }
 
 function circSelectS(catKey){
-  const cluster=$('scirc-cluster');
+  const btn=$('scirc-trigger');
   const panelWrap=$('scirc-panel-wrap');
-  if(!cluster)return;
-  const currentSel=cluster.dataset.sel;
-  const deselecting=currentSel===catKey;
-  cluster.querySelectorAll('.circ-btn').forEach(btn=>{
-    const isThis=btn.dataset.cat===catKey;
-    btn.classList.toggle('sel',isThis&&!deselecting);
-    const lbl=btn.parentElement.querySelector('.circ-label');
-    if(lbl)lbl.classList.toggle('dim-out',!deselecting);
-  });
-  cluster.dataset.sel=deselecting?'':catKey;
+  if(!btn)return;
+  const deselecting=btn.classList.contains('sel');
+  btn.classList.toggle('sel',!deselecting);
   if(panelWrap)panelWrap.classList.toggle('open',!deselecting);
 }
 
@@ -3469,7 +3789,8 @@ function renderJournal(){
   hist.innerHTML='<div class="jhist-hd">History — '+journalLog.length+' entries</div>'+
     journalLog.slice(0,10).map(e=>{
       const blockSummary=e.blocks?.length?e.blocks.reduce((a,b)=>a+b.w,0)+'W-'+e.blocks.reduce((a,b)=>a+b.l,0)+'L across blocks':'';
-      return `<div class="jentry"><div class="jentry-date">${e.date}${e.daygrade?` · Grade ${e.daygrade}`:''}</div><div class="jentry-grid">
+      const dgc=e.daygrade==='A'?'#34d399':(e.daygrade==='B'||e.daygrade==='C')?'#fbbf24':'#f87171';
+      return `<div class="jentry"><div class="jentry-date">${e.date}${e.daygrade?` · <span style="color:${dgc}">Grade ${e.daygrade}</span>`:''}</div><div class="jentry-grid">
       ${e.sleep?`<div class="jentry-cell"><span class="jk">Sleep</span>${e.sleep}h${e.timeSlept!==''&&e.timeWoke!==''?` (${HOUR_LABELS[e.timeSlept]}–${HOUR_LABELS[e.timeWoke]})`:''} · Q${e.sleepQ||'—'}</div>`:''}
       ${e.preSleepEmo?`<div class="jentry-cell"><span class="jk">Pre-Sleep</span>${e.preSleepEmo}</div>`:''}
       ${e.social&&e.social!=='None — normal night'?`<div class="jentry-cell"><span class="jk">Social</span>${e.social}</div>`:''}
@@ -4052,6 +4373,16 @@ const INFO={
 
 const SDEFS=[['minP',15,'t'],['maxP',30,'t'],['minL',5,'t'],['maxL',15,'t'],['minWR',55,'%'],['maxWR',65,'%'],['minBE',10,'%'],['maxBE',20,'%'],['minT',2,''],['maxT',5,''],['sh',100,''],['goal',500,''],['minPr',43,''],['maxPr',47,''],['spread',1,'t'],['slip',1,'t'],['buf',1,''],['cap',0,'t'],['disc',85,'%'],['bf',3,'%'],['bs',2,'%'],['gf',3,'%'],['gs_',2,'%'],['minPB',3,'t'],['maxPB',8,'t'],['minEO',1,'t'],['maxEO',4,'t'],['minSw',15,'t'],['maxSw',40,'t'],['rrSlider',0,''],['tickSz',1,'¢'],['minDp',-2,'%'],['maxDp',3,'%'],['bias',50,'%'],['intv',5,''],['volCeil',0,'sh'],['vwFH_min',60000,'/m'],['vwFH_max',120000,'/m'],['vwMD_min',15000,'/m'],['vwMD_max',40000,'/m'],['vwLH_min',30000,'/m'],['vwLH_max',70000,'/m'],['partRate',10,'%']];
 
+// Round 78: CSV/Restart got icons so their action reads at a glance
+// instead of relying on the label alone. Round 83: renamed from "Clear"
+// to "Restart" when clearStrategy() was narrowed down to
+// restartStrategy() (see its own comment below), which only clears
+// results, not settings. Round 84: relabeled again to "Reset" per
+// explicit request; function/icon renamed to resetStrategy()/RESET_ICON
+// to match. Note the button still only clears results, never settings —
+// that hasn't changed, only the word on it.
+const DOWNLOAD_ICON=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+const RESET_ICON=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>`;
 function buildPanes(){
   [0,1,2,3,4,5].forEach(n=>{
     const pane=$('sp'+n);if(!pane)return;
@@ -4117,11 +4448,25 @@ function buildPanes(){
       // Gear wheel — now Overrides (was Core's icon)
       ovr:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
     };
-    // Circle nav: same five categories, contained as a 3-over-2 circle
-    // cluster instead of an accordion. Selecting a circle emphasizes it
-    // (scale up, others dim) and reveals its panel below the cluster —
-    // the panel's transform-origin anchors to the cluster itself so the
-    // scale-emerge motion stays visually tied to "this circle opened."
+    // Category selector: mockup-picked "Option B" — one continuous
+    // segmented glass capsule (same frosted-pill family as the Starting
+    // Capital stepper) instead of the old 3-over-2 circle cluster, whose
+    // lopsided last row (3 then 2) was the one real problem with it.
+    // Icon+label are nested INSIDE each segment now rather than a
+    // separate sibling label under a free-floating circle — Journal's
+    // circSelectJ() and Stats' circSelectS() still build the ORIGINAL
+    // .circ-btn/.circ-cluster/.circ-row/.circ-label markup untouched
+    // (still circular, same shared classes, confirmed via grep before
+    // touching anything), so this uses new .seg-* class names rather
+    // than repurposing those — same shared-class caution as the
+    // strategy tab bar redesign. The open panel below (circ-panel-wrap/
+    // -inner/circ-panel${s}) is completely unchanged, only the chooser
+    // row above it is new. Unlike the old design — which hid EVERY
+    // label, including the tapped circle's own, the instant anything
+    // was selected — the segmented bar keeps all five labels visible
+    // always; the active one just goes bold/dark-on-colour, which
+    // actually improves on the old behaviour since nothing else on
+    // screen names which category's fields are showing below.
     const CATS=[
       {key:'core',title:'Core',body:core,eid:''},
       {key:'risk',title:'Risk',body:risk,eid:''},
@@ -4131,20 +4476,16 @@ function buildPanes(){
     ];
     function circBtn(cat){
       const badgeHtml=cat.eid?`<span class="ovr-badge" id="${cat.eid}">!</span>`:'';
-      return`<div style="display:flex;flex-direction:column;align-items:center;">
-        <button class="circ-btn" data-cat="${cat.key}" onclick="circSelect(${n},'${cat.key}')">
-          ${ICONS[cat.key]||''}${badgeHtml}
-        </button>
-        <span class="circ-label">${cat.title}</span>
-      </div>`;
+      return`<button class="seg-btn" data-cat="${cat.key}" onclick="circSelect(${n},'${cat.key}')">
+        <span class="seg-ic">${ICONS[cat.key]||''}${badgeHtml}</span>
+        <span class="seg-lbl">${cat.title}</span>
+      </button>`;
     }
     const circHtml=`
       <div class="circ-nav">
-        <div class="circ-cluster" id="circ-cluster${s}" data-sel="">
-          <div class="circ-row">${circBtn(CATS[0])}${circBtn(CATS[1])}${circBtn(CATS[2])}</div>
-          <div class="circ-row">${circBtn(CATS[3])}${circBtn(CATS[4])}</div>
+        <div class="seg-bar" id="seg-bar${s}" data-sel="">
+          ${circBtn(CATS[0])}${circBtn(CATS[1])}${circBtn(CATS[2])}${circBtn(CATS[3])}${circBtn(CATS[4])}
         </div>
-        <div class="circ-hint">Tap a circle to open its settings</div>
         <div class="circ-panel-wrap" id="circ-panel-wrap${s}">
           <div class="circ-panel-inner">
             ${CATS.map(cat=>`<div class="circ-panel${s}" data-cat="${cat.key}" style="display:none;">${cat.body}</div>`).join('')}
@@ -4156,8 +4497,8 @@ function buildPanes(){
       ${circHtml}
       <div class="sim-row">
         <button class="sim-btn ${SCLS}" onclick="simulate(${n})">Simulate</button>
-        <button class="exp-btn" onclick="exportData(${n})">CSV</button>
-        <button class="exp-btn" onclick="clearStrategy(${n})" title="Reset Strategy ${L} to defaults">Clear</button>
+        <button class="exp-btn" onclick="exportData(${n})">${DOWNLOAD_ICON}<span>CSV</span></button>
+        <button class="exp-btn" onclick="resetStrategy(${n})" title="Remove Strategy ${L} from calculations">${RESET_ICON}<span>Reset</span></button>
       </div>
       <div class="mode-row">
         <span class="mode-lbl">Sim Mode</span>
@@ -4194,25 +4535,21 @@ function buildPanes(){
   });
 }
 
-// Resets one strategy tab back to its shipped defaults: every stepper in
-// SDEFS, every override toggle (routed through onTog so the off-state
-// styling/label/badge all follow, same as a real click), the two
-// selects, and any simulation results/derived displays for that tab.
-// Does not touch the other two strategies or the shared Capital field.
-const TOG_DEFAULTS=[['dist',false],['dp',false],['fees',true],['rr',false],['swing',true],['volceil',false],['vw',false]];
-function clearStrategy(tab){
+// Resets one strategy tab's CALCULATION, not its configuration: clears
+// that tab's last simulation run (results, chart, Diagnostics, chart-
+// metrics tiles, rapid-growth callout) so it drops out of Strategy
+// Comparison and the Table race chart exactly as if it had never been
+// simulated. Deliberately does NOT touch anything in SDEFS, override
+// toggles, the curve/mode selects, ticker, or capital — those are
+// manually configured (often by hand, one field at a time), and this
+// used to reset all of it back to shipped defaults alongside the
+// results, which is real, frustrating data loss for something the user
+// just wanted to re-run. Now it only clears what a fresh Simulate click
+// would regenerate anyway; settings survive untouched.
+function resetStrategy(tab){
   const L=STRAT_LABELS[tab];
-  if(!confirm('Clear Strategy '+L+' back to defaults? This wipes its settings and any simulation results.'))return;
+  if(!confirm('Remove Strategy '+L+' from the comparison? Its results will be cleared — your settings stay as they are, and you can re-simulate anytime.'))return;
   const s=tab===0?'':'_'+tab;
-  SDEFS.forEach(([id,defV])=>setV(id,tab,defV));
-  TOG_DEFAULTS.forEach(([id,def])=>{
-    const cb=$('tog-'+id+s);if(!cb)return;
-    cb.checked=def;
-    onTog(cb,'fc-'+id+s,tab);
-  });
-  const curveEl=$('curve'+s);if(curveEl)curveEl.value='slow';
-  const modeEl=$('mode'+s);if(modeEl)modeEl.value='rand';
-  onSlider(tab);
   simResults[tab]=null;
   const cv=$('cv'+s);if(cv){const ctx=cv.getContext('2d');if(ctx)ctx.clearRect(0,0,cv.width,cv.height);}
   const ttEl=$('ct'+s);if(ttEl)ttEl.textContent='';
@@ -4231,6 +4568,7 @@ function clearStrategy(tab){
   if(diagDetail){diagDetail.style.display='none';diagDetail.open=false;}
   if(diagEl)diagEl.className='diag';
   renderStratComparison();
+  updateStratTab(tab);
   if(activeTblStrat===tab)renderTable(tab);
   dvRedrawChart();
   save();
@@ -4248,11 +4586,12 @@ function wirePanes(){
   [0,1,2,3,4,5].forEach(tab=>{
     const iw=$('intv-wrap-'+tab);if(!iw)return;
     const el=mkStp('intv',tab,'');iw.replaceWith(el);el.id='intv-wrap-'+tab;
-    if(tab!==0)el.style.display='none';
+    el.style.display='none';
     const inp=el.querySelector('.stp-val');
-    if(inp){inp.addEventListener('change',()=>renderTable(activeTblStrat));inp.addEventListener('blur',()=>renderTable(activeTblStrat));}
-    el.querySelectorAll('.stp-btn').forEach(b=>b.addEventListener('pointerup',()=>setTimeout(()=>renderTable(activeTblStrat),60)));
+    if(inp){inp.addEventListener('change',()=>{renderTable(activeTblStrat);tcSyncQuickUI(activeTblStrat);});inp.addEventListener('blur',()=>{renderTable(activeTblStrat);tcSyncQuickUI(activeTblStrat);});}
+    el.querySelectorAll('.stp-btn').forEach(b=>b.addEventListener('pointerup',()=>setTimeout(()=>{renderTable(activeTblStrat);tcSyncQuickUI(activeTblStrat);},60)));
   });
+  tcSyncQuickUI(0);
   dvWireTableScroll();
   initTableAxisLock();
   const gcEl=$('gc-stepper');
@@ -4261,14 +4600,55 @@ function wirePanes(){
     const inp=el.querySelector('.stp-val');
     inp.value=0;
     // Global capital affects every strategy's cfg() — refresh all three, not just tab 0.
-    const refreshAll=()=>{[0,1,2,3,4,5].forEach(t=>{updateDist(t);updateFrictionBreakdown(t);updateDerivedShares(t);});save();};
+    const refreshAll=()=>{[0,1,2,3,4,5].forEach(t=>{updateDist(t);updateFrictionBreakdown(t);updateDerivedShares(t);});capSyncQuickUI();save();};
     inp.removeEventListener?.('change',null);
     // mkStp already wired change/blur/click to call onSlider(0); override with a
-    // handler that also updates B and C, since this field is shared.
+    // handler that also updates B and C, since this field is shared. Also keeps
+    // the quick-pick row's highlight in sync while the custom stepper is open.
     el.querySelectorAll('.stp-btn').forEach(btn=>btn.addEventListener('click',()=>setTimeout(refreshAll,10)));
     inp.addEventListener('change',refreshAll);
     inp.addEventListener('blur',refreshAll);
+    capSyncQuickUI();
   }
+}
+// Round 78: quick-pick for Starting Capital, same shape as the Table tab's
+// interval control (TC_PRESETS/tcQuickPick/tcOpenCustom/tcCloseCustom) —
+// the underlying #gc-stepper (mkStp('gcStartCap',...)) is untouched, this
+// just decides whether the preset row or the raw stepper is visible.
+const CAP_PRESETS=[10000,25000,50000,100000];
+function fmtCapK(v){
+  if(v>=1000000)return'$'+(v/1000000).toFixed(v%1000000===0?0:1)+'M';
+  if(v>=1000)return'$'+(v/1000).toFixed(v%1000===0?0:1)+'K';
+  return'$'+v;
+}
+function capSyncQuickUI(){
+  const inp=$('gcStartCap');
+  const v=parseFloat(inp?.value)||0;
+  const isPreset=CAP_PRESETS.includes(v);
+  document.querySelectorAll('#cap-quick .cap-qbtn:not(.cap-qbtn-custom)').forEach(b=>{
+    b.classList.toggle('on',+b.dataset.v===v);
+  });
+  const cb=$('cap-qcustom');
+  if(cb){cb.classList.toggle('on',!isPreset);cb.textContent=isPreset?'···':fmtCapK(v);}
+}
+function capQuickPick(v){
+  const inp=$('gcStartCap');if(!inp)return;
+  inp.value=v;
+  clampStp('gcStartCap',0);
+  [0,1,2,3,4,5].forEach(t=>{updateDist(t);updateFrictionBreakdown(t);updateDerivedShares(t);});
+  capSyncQuickUI();
+  save();
+}
+function capOpenCustom(){
+  const q=$('cap-quick'),row=$('cap-stp-row');
+  if(q)q.style.display='none';
+  if(row)row.style.display='flex';
+}
+function capCloseCustom(){
+  const q=$('cap-quick'),row=$('cap-stp-row');
+  if(q)q.style.display='flex';
+  if(row)row.style.display='none';
+  capSyncQuickUI();
 }
 
 const SK='ahm-v39';
@@ -4314,7 +4694,7 @@ async function load(){
    at page-load or gets created later by buildPanes/buildJournalCircles/
    buildStatsCircle — no per-element wiring needed. */
 function initPressBloom(){
-  const SEL='.sim-btn,.j-save-btn,.sess-btn,.exp-btn,.guide-btn,.ib,.stp-btn,.nb,.sbtn,.scale-btn,.circ-btn,.dv-tbtn';
+  const SEL='.sim-btn,.j-save-btn,.sess-btn,.exp-btn,.guide-btn,.ib,.stp-btn,.nb,.sbtn,.scale-btn,.circ-btn,.seg-btn,.dv-tbtn,.tc-qbtn,.tc-close,.stat-actbtn,.cap-qbtn,.cap-close';
   const press=e=>{const t=e.target.closest(SEL);if(t)t.classList.add('pressed');};
   const release=e=>{const t=e.target.closest(SEL);if(t)setTimeout(()=>t.classList.remove('pressed'),120);};
   document.addEventListener('pointerdown',press,{passive:true});
@@ -4327,6 +4707,7 @@ async function init(){
   buildJournalCircles();
   buildStatsCircle();
   const loaded=await load();
+  capSyncQuickUI();
   [0,1,2,3,4,5].forEach(n=>{updateDist(n);updateFrictionBreakdown(n);updateVolWindowSummary(n);updateDerivedShares(n);});
   const allCv=$('real-cv-all'),allTt=$('real-ct-all');if(allCv&&allTt)wireChart(allCv,allTt);
   const wkCv=$('real-cv-week'),wkTt=$('real-ct-week');if(wkCv&&wkTt)wireChart(wkCv,wkTt);
