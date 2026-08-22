@@ -1248,6 +1248,17 @@ canvas.spark{width:100%;height:34px;display:block;}
    Continue off the bottom of a real phone viewport with no way to
    reach it before this fix. */
 .scr-inner{width:100%;max-width:300px;margin:auto 0;display:flex;flex-direction:column;align-items:center;}
+/* .scr-inner.grow overrides the vertical auto-margin above for the one
+   screen that grows its own content over time (the paced reveal,
+   renderReadiness) - with margin:auto 0, every newly-appended sentence
+   changes the block's height, and flexbox re-centers the WHOLE block
+   after every single append, so already-read lines visibly slide up
+   the screen each time a new one arrives ("loads wonky", caught from
+   the user's own description, not a screenshot - the jump is only
+   visible in motion). Anchoring to the top instead means only the
+   BOTTOM edge grows as sentences append; nothing already on screen
+   ever moves. */
+.scr-inner.grow{margin-top:0;margin-bottom:0;}
 .intro-skip{position:fixed;z-index:2002;top:calc(14px + env(safe-area-inset-top,0px));right:16px;font-size:10px;color:#6b7484;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:8px;touch-action:manipulation;}
 @keyframes scrFadeUp{from{opacity:0;transform:translateY(9px);}to{opacity:1;transform:translateY(0);}}
 .scr-progress{position:fixed;z-index:1;top:calc(16px + env(safe-area-inset-top,0px));left:24px;right:60px;display:flex;gap:5px;}
@@ -5550,8 +5561,49 @@ function stopFlakeField(){
 // inside .scr-inner, which centers short content and degrades to a
 // scrollable top-aligned block for anything taller than the viewport
 // (see the .scr-inner CSS comment above for why that split matters).
-function setFg(topHtml,innerHtml){
-  introFg.innerHTML=(topHtml||'')+'<div class="scr-inner">'+innerHtml+'</div>';
+// extraCls is optional - renderReadiness passes 'grow' (see the CSS
+// comment on .scr-inner.grow) since it's the one screen whose content
+// keeps growing after it's first shown.
+function setFg(topHtml,innerHtml,extraCls){
+  introFg.innerHTML=(topHtml||'')+'<div class="scr-inner'+(extraCls?' '+extraCls:'')+'">'+innerHtml+'</div>';
+}
+
+// Minimum on-screen time for a piece of text, scaled to its own length
+// - the direct fix for "the text moves too fast for readability": the
+// old flat timeouts (3.4-4.6s per beat, 3.8s per reaction, 950ms per
+// reveal paragraph) were tuned by feel, not by how much there actually
+// was to read, and the longest strings in this sequence ran well past
+// 400 words/minute once actually measured - closer to speed-reading
+// than the deliberate, weighty pace this sequence is going for. ~200
+// words/minute (300ms/word) is a comfortable, unhurried silent-reading
+// pace; the 2200ms floor keeps even a one-word line ("Good.") from
+// flashing past.
+function readMs(text){
+  var words=(text||'').trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(2200,500+words*300);
+}
+
+// A second, deliberately smaller pacing function for ONE specific spot:
+// the gap between sentences as they stage into renderReadiness's reveal.
+// readMs() above is right for a screen shown in isolation (a beat, a
+// reaction) - the full 300ms/word plus a 2200ms floor gives each of
+// those its own fair read. But once "distill it to one sentence per
+// paragraph" turned the reveal's handful of multi-sentence paragraphs
+// into a dozen-plus short standalone sentences, reusing readMs() per
+// sentence meant that same 2200ms floor got paid AGAIN for every one of
+// them - and they stack, since every earlier sentence is still sitting
+// on screen when the next one lands, so the reader isn't starting cold
+// each time the way they are for a fresh beat. Measured against the
+// actual low-readiness copy (worst case, ~14 sentences): readMs() per
+// sentence summed to roughly 65+ seconds for this one screen alone,
+// which reads as sluggish rather than weighty. revealStepMs() paces the
+// STAGGER instead of the READ - a shorter floor (1100ms), a lower
+// per-word rate (130ms), and a cap (3000ms) so one unusually long
+// sentence can't stretch the rhythm out on its own - bringing that same
+// worst case down to roughly 33 seconds.
+function revealStepMs(text){
+  var words=(text||'').trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1100,Math.min(3000,650+words*130));
 }
 
 // Advances on tap OR after `ms` of nobody tapping, whichever comes
@@ -5586,7 +5638,7 @@ function runBeats(onDone){
       '<div class="scr-title">'+b.title+'</div>'+
       (b.body?'<div class="scr-body">'+b.body+'</div>':'')+
       (isLast?'<div class="scr-nav center"><button type="button" class="scr-next" id="beat-next">'+b.btn+'</button></div>':''));
-    autoAdvance(isLast?'beat-next':null,isLast?60000:(b.body?4600:3400),function(){i++;step();});
+    autoAdvance(isLast?'beat-next':null,isLast?60000:readMs((b.title||'')+' '+(b.body||'')),function(){i++;step();});
   }
   step();
 }
@@ -5632,7 +5684,7 @@ function renderReaction(text,dots,onDone){
     '<div class="scr-progress">'+dots+'</div>',
     '<div class="scr-body">'+text+'</div>'+
     '<div class="scr-nav center"><button type="button" class="scr-next" id="reaction-next">Continue</button></div>');
-  autoAdvance('reaction-next',3800,function(){
+  autoAdvance('reaction-next',readMs(text),function(){
     if(quizIdx<QUIZ_QUESTIONS.length-1){quizIdx++;renderQuizStep(onDone);}
     else{onDone();}
   });
@@ -5661,47 +5713,77 @@ function runGutCheck(onDone){
   });
 }
 
+// Naive but sufficient sentence splitter for renderReadiness's one-
+// sentence-per-paragraph rule below: every string this app ever feeds
+// it is plain prose with no abbreviations/decimals/ellipses, so a
+// split on ". "/"! "/"? " is safe here - this is NOT a general-purpose
+// sentence splitter, don't reuse it on arbitrary text without checking
+// that assumption still holds.
+function splitSentences(text){
+  var m=(text||'').match(/[^.!?]+[.!?]+(?:\s+|$)/g);
+  if(!m)return text?[text.trim()]:[];
+  return m.map(function(s){return s.trim();}).filter(Boolean);
+}
+
 // The payoff, paced like a considered verdict rather than a wall of
-// text: eyebrow+title alone first (a held beat of quiet), then each
-// body paragraph fades in on its own, roughly a second apart, then the
-// gut-check line, then Continue - all inside .scr-inner, which centers
-// short content and gracefully becomes a scrollable top-aligned block
-// once it's too tall (see the .scr-inner CSS comment), so even the
-// longest "Start Here" verdict never traps its own Continue button
-// off-screen. Scoring/tiers unchanged from round 97; what's new is the
-// pacing and the appended gut-check line.
+// text: eyebrow+title alone first (a held beat of quiet), then ONE
+// SENTENCE at a time fades in - not one paragraph at a time - each
+// held on screen for revealStepMs() of its own length (see that
+// function's comment for why it's not just readMs() reused), then the gut-check
+// line, then Continue. Two things changed here after the user flagged
+// both a readability problem and a visual one in the same message:
+// (1) "distill it to one sentence per paragraph for the big text
+// block" - each gap/closing/gut-check string, which used to render as
+// one multi-sentence paragraph, is now run through splitSentences()
+// and each sentence gets its own line; shorter chunks read faster AND
+// land closer to what was actually asked for than just slowing the
+// old multi-sentence paragraphs down would have. (2) "the last big
+// text block loads wonky" - traced to .scr-inner's vertical auto-
+// centering: every new paragraph changed the block's height, so
+// flexbox re-centered the WHOLE block and every already-read line
+// visibly slid up the screen. Fixed by passing the 'grow' modifier to
+// setFg() here specifically (see the .scr-inner.grow CSS comment) so
+// this screen anchors to the top and only grows downward - nothing
+// already on screen moves once it's there. .scr-inner still degrades
+// to a scrollable block once content overflows the viewport (that
+// part of round 97's fix is untouched), so even the longest "Start
+// Here" verdict - now potentially a dozen-plus short sentences - never
+// traps its own Continue button off-screen. Scoring/tiers themselves
+// are unchanged from round 97.
 function renderReadiness(onDone){
   var total=quizAnswers.reduce(function(a,x){return a+(x?x.s:0);},0);
   var gaps=quizAnswers.filter(function(x){return x&&x.s<=1;}).map(function(x){return QUIZ_QUESTIONS[x.qi].gap;});
-  var eyebrow,title,bodies;
+  var eyebrow,title,paras;
   if(total>=6){
     eyebrow='You’re Ready';
     title='You’ve already done the part most people skip.';
-    bodies=['This tool won’t predict the market for you. What it will do is tell you the truth about your own process — usually the part traders spend the most energy avoiding.'];
-    if(gaps.length)bodies.push(gaps[0]);
+    paras=['This tool won’t predict the market for you. What it will do is tell you the truth about your own process — usually the part traders spend the most energy avoiding.'];
+    if(gaps.length)paras.push(gaps[0]);
   }else if(total>=3){
     eyebrow='Getting There';
     title='Real gaps, worth carrying into what comes next.';
-    bodies=gaps.slice(0,3);
-    bodies.push('None of that locks you out. It just means the next stretch in here should be treated as practice, not proof.');
+    paras=gaps.slice(0,3);
+    paras.push('None of that locks you out. It just means the next stretch in here should be treated as practice, not proof.');
   }else{
     eyebrow='Start Here, Not There';
     title='Day trading is unforgiving of accounts that skip the groundwork.';
-    bodies=gaps.slice(0,4);
-    bodies.push('That’s not a reason to stop. It’s exactly what Simulate mode is for — build the history first, and let the app show you the truth instead of you having to guess at it.');
+    paras=gaps.slice(0,4);
+    paras.push('That’s not a reason to stop. It’s exactly what Simulate mode is for — build the history first, and let the app show you the truth instead of you having to guess at it.');
   }
-  if(gutLine)bodies.push(gutLine);
+  if(gutLine)paras.push(gutLine);
+  var sentences=[];
+  paras.forEach(function(p){sentences=sentences.concat(splitSentences(p));});
 
-  setFg('','<div class="scr-eyebrow">'+eyebrow+'</div><div class="scr-title">'+title+'</div><div class="scr-bodies" id="rd-bodies"></div>');
+  setFg('','<div class="scr-eyebrow">'+eyebrow+'</div><div class="scr-title">'+title+'</div><div class="scr-bodies" id="rd-bodies"></div>','grow');
   var bodiesEl=document.getElementById('rd-bodies');
   var i=0;
   function next(){
-    if(i<bodies.length){
+    if(i<sentences.length){
       var p=document.createElement('div');
-      p.className='scr-body';p.textContent=bodies[i];
+      p.className='scr-body';p.textContent=sentences[i];
       bodiesEl.appendChild(p);
       i++;
-      setTimeout(next,950);
+      setTimeout(next,revealStepMs(sentences[i-1]));
     }else{
       var nav=document.createElement('div');
       nav.className='scr-nav center';
@@ -5711,7 +5793,7 @@ function renderReadiness(onDone){
       if(goBtn)goBtn.addEventListener('click',onDone);
     }
   }
-  setTimeout(next,1600);
+  setTimeout(next,1900);
 }
 
 function startIntroSequence(){
