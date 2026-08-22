@@ -5470,6 +5470,56 @@ var GUT_CHECK={
   ]
 };
 
+// Round 99's three "thinking exercise" beats - user asked for ideas beyond
+// the questionnaire itself ("short thinking exercises to prune better
+// thinking about day trading and capital growth"), then picked all three
+// pitched back: a psychology beat, a math beat, and a real-statistic beat.
+// All three share ONE mechanic (runInsight below) rather than three custom
+// screens - same shape as GUT_CHECK (pick any option, nothing is scored,
+// everything leads to the same underlying substance), just with a per-
+// option acknowledgment line so picking still feels answered rather than
+// ignored. EV_INSIGHT's math is verified arithmetic, not a guess: 40%*200
+// - 60%*100 = +20/trade, *100 trades = +2000 - checked with a throwaway
+// Node script before writing it into copy, since getting trading math
+// wrong in an app whose entire premise is "cold, correct numbers" would
+// undercut the one thing it can't afford to get wrong. STAT_INSIGHT's
+// figure is sourced, not invented: the ~97% figure is the widely-cited
+// headline result of Chague/De-Losso/Giovannetti's "Day Trading for a
+// Living?" (Brazilian futures day traders who persisted 300+ days) -
+// corroborated across many independent secondary sources during round 99,
+// but a direct primary-source fetch was blocked by a tool-level session
+// limit that round, so only the headline figure is used here, not any
+// secondary number (sample size, exact earnings threshold, etc.) that
+// wasn't independently confirmed. Worth a follow-up primary-source check
+// before ever citing this stat somewhere more formal than this app.
+var LOSS_INSIGHT={
+  q:'Quick one. Which hits harder — losing $200 you already had, or missing out on a trade that would’ve made you $200?',
+  opts:[
+    {t:'Losing the $200',line:'That instinct is well documented.'},
+    {t:'About the same, honestly',line:'Worth watching for — most people don’t actually feel it that way.'},
+    {t:'Missing the gain hits harder',line:'That’s the less common answer.'}
+  ],
+  fact:'Most people rate a loss as roughly twice as painful as an equal-sized gain feels good — a bias called loss aversion. It’s why traders hold losing trades hoping they’ll turn around, and cut winning trades short just to lock in the relief. The math doesn’t care how a trade feels. Your discipline has to cover for what your instincts won’t.'
+};
+var EV_INSIGHT={
+  q:'Quick math. Risk $100 a trade, win 40% of the time, winners pay 2x the risk, losers cost 1x the risk. Over 100 trades — profitable, or not?',
+  opts:[
+    {t:'Clearly profitable',line:'Good instinct.'},
+    {t:'Roughly breakeven',line:'Close, but not quite.'},
+    {t:'Losing money',line:'The 40% made it feel that way — a fair guess.'}
+  ],
+  fact:'Run it: 40% × $200 minus 60% × $100 comes out to +$20 of expected value per trade. Over 100 trades, that’s +$2,000 — profitable, on a strategy that loses more often than it wins. Win rate alone never tells the whole story; reward-to-risk is doing just as much work. This is the exact math Sim mode runs for you, on your own numbers instead of a hypothetical.'
+};
+var STAT_INSIGHT={
+  q:'One more, before the diagnosis. Guess: among people who day trade persistently — not a week, a sustained stretch — what share end up losing money?',
+  opts:[
+    {t:'Less than half',line:'Optimistic — and not what the data shows.'},
+    {t:'Roughly half to three-quarters',line:'Closer, but still short.'},
+    {t:'The large majority',line:'That’s the right instinct.'}
+  ],
+  fact:'A widely cited academic study tracking Brazilian futures day traders found that among those who kept trading for more than 300 days, about 97% still lost money. Persistence alone didn’t save them. It rarely does — process does, or it doesn’t.'
+};
+
 var introOverlay,introCanvas,introFg,introSkipBtn;
 var quizIdx=0,quizAnswers=[],gutLine='';
 var flakeRafId=null,flakeParticles=null,flakeCtx=null,flakeW=0,flakeH=0;
@@ -5713,6 +5763,38 @@ function runGutCheck(onDone){
   });
 }
 
+// The shared mechanic behind LOSS_INSIGHT/EV_INSIGHT/STAT_INSIGHT (see
+// the header comment above those) - structurally the same as
+// runGutCheck just above (pick any option, nothing scored) crossed with
+// renderReaction's auto-advancing reveal, but with no dots (these
+// aren't part of the 4-question progress count) and no Back (matching
+// gut-check/beats: Skip is the only way out of a screen once it's up).
+// Each option's own `line` is a short, tailored acknowledgment; `fact`
+// underneath it is the one substantive payoff, identical regardless of
+// which option got picked, since these are revealing an objective
+// answer, not reacting to a subjective one the way the questionnaire's
+// reactions do.
+function renderInsightReveal(text,onDone){
+  setFg('',
+    '<div class="scr-body">'+text+'</div>'+
+    '<div class="scr-nav center"><button type="button" class="scr-next" id="insight-next">Continue</button></div>');
+  autoAdvance('insight-next',readMs(text),onDone);
+}
+function runInsight(insight,onDone){
+  setFg('',
+    '<div class="scr-title">'+insight.q+'</div>'+
+    '<div class="scr-opts">'+insight.opts.map(function(o,oi){return '<button type="button" class="scr-opt" data-i="'+oi+'">'+o.t+'</button>';}).join('')+'</div>');
+  introFg.querySelectorAll('.scr-opt').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      introFg.querySelectorAll('.scr-opt').forEach(function(b){b.classList.remove('sel');});
+      btn.classList.add('sel');
+      var oi=+btn.getAttribute('data-i');
+      var revealText=insight.opts[oi].line+' '+insight.fact;
+      setTimeout(function(){renderInsightReveal(revealText,onDone);},300);
+    });
+  });
+}
+
 // Naive but sufficient sentence splitter for renderReadiness's one-
 // sentence-per-paragraph rule below: every string this app ever feeds
 // it is plain prose with no abbreviations/decimals/ellipses, so a
@@ -5801,14 +5883,25 @@ function startIntroSequence(){
   introOverlay.style.display='block';introOverlay.style.opacity='1';
   introSkipBtn.style.display='';
   startFlakeField();
+  // LOSS_INSIGHT opens right after the atmosphere beats - a light
+  // psychology hook before the questionnaire gets personal. EV_INSIGHT
+  // and STAT_INSIGHT land back to back after the questionnaire, building
+  // from concrete math into the heaviest "cold truth" beat, right before
+  // the gut-check's direct question about wanting to see that truth.
   runBeats(function(){
-    runQuestionnaire(function(){
-      runGutCheck(function(){
-        renderReadiness(function(){
-          stopFlakeField();
-          introOverlay.style.display='none';
-          introSkipBtn.style.display='none';
-          startTour();
+    runInsight(LOSS_INSIGHT,function(){
+      runQuestionnaire(function(){
+        runInsight(EV_INSIGHT,function(){
+          runInsight(STAT_INSIGHT,function(){
+            runGutCheck(function(){
+              renderReadiness(function(){
+                stopFlakeField();
+                introOverlay.style.display='none';
+                introSkipBtn.style.display='none';
+                startTour();
+              });
+            });
+          });
         });
       });
     });
