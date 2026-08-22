@@ -4983,10 +4983,269 @@ function onResize(){
   positionFor(TOUR_STOPS[state.idx]);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   DEMO MODE — round 95. The tour above walks a fresh install where
+   every screen shows real, honest emptiness (no sim run yet, no log/
+   journal entries) — which meant the very stops explaining share
+   gauges, equity curves, variable gauges, and report cards had
+   nothing to point at. This block temporarily substitutes plausible
+   synthetic data for the tour's duration only, then puts everything
+   back exactly as it was. sessionLog/journalLog/simResults are real
+   user DATA (not settings, which this tour has never touched), so
+   the bar for "back exactly as it was" is zero drift, not "close
+   enough":
+   - window.save is replaced with a no-op for the entire demo window,
+     restored only once every real value is back in place. save() is
+     the ONLY writer of the app's localStorage save key anywhere in
+     this file (grep-verified — see load()/save() above), so this
+     alone is a complete guarantee nothing synthetic ever reaches
+     disk, independent of whatever render/compute path happens to
+     run while it's live.
+   - sessionLog/journalLog are swapped for synthetic arrays and
+     swapped back by reference, verbatim.
+   - simResults[0..5] are snapshotted by reference (each slot's value,
+     null or not — _sim() always REPLACES a slot rather than mutating
+     it in place, so the original object, if any, sits untouched in
+     the snapshot the whole time) then restored by reference.
+   - Every visual these feed (equity canvases, diagnostics, the race
+     chart + gauges, the data table, weekly report card, variable
+     gauges, real equity charts, the Log tab's live day-grade preview)
+     is repainted from the restored data via the app's own render
+     functions — restoring the DATA alone would leave stale demo
+     pixels on any canvas/innerHTML nothing repaints on its own.
+   ══════════════════════════════════════════════════════════════ */
+var DEMO_LOG_FIELD_IDS=['dWins','dLoss','dBE','dTickW','dTickL','dPnl','dShares','dTotW','dCapW','dTotBE','dCapBE','dTotL','dCapL'];
+var DEMO_PREVIEW_IDS=['dd-wr','dd-ev','dd-mo','dd-pb','dd-og','dd-gr'];
+var demo={active:false};
+
+function pickGbg(){var r=Math.random();return r<0.15?'Bad':r<0.55?'Good':'Great';}
+var DEMO_EXERCISE=['None','Light walk','Moderate','Intense'];
+var DEMO_PREP=['None','Brief','Thorough'];
+
+// ~18 days of synthetic sessionLog + same-date journalLog entries, newest
+// first (matches saveJournal's own unshift order). Sleep hours are
+// DELIBERATELY made to drive that day's P&L (with noise on top) so the
+// Variable Gauges panel — which only ever shows a gauge once a variable
+// clears a real statistical bar (GAUGE_MIN_WEIGHTED_N/GAUGE_MIN_ABS_R,
+// see above) — reliably has at least one real-looking gauge to show
+// instead of gambling on random noise clearing that bar by chance.
+// Every other tracked variable is left to pure noise, same as it would
+// be for the pattern-searching this feature is actually built for.
+function genDemoData(){
+  var N=18,sessionLog=[],journalLog=[];
+  for(var i=0;i<N;i++){
+    var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);
+    var date=d.toISOString().slice(0,10);
+    var sleep=+(5+Math.random()*4).toFixed(1);
+    var pnlBase=(sleep-7)*185+(Math.random()-0.5)*230;
+    var numTr=4+Math.floor(Math.random()*4);
+    var wrProb=Math.max(0.25,Math.min(0.8,0.5+pnlBase/900));
+    var w=Math.round(numTr*wrProb);
+    var b=Math.random()<0.3?1:0;
+    var l=Math.max(0,numTr-w-b);
+    var tw=+(6+Math.random()*6).toFixed(1),tl=+(4+Math.random()*5).toFixed(1);
+    var sh=100+Math.floor(Math.random()*4)*50;
+    var pnl=+pnlBase.toFixed(2);
+    sessionLog.push({date:date,w:w,l:l,b:b,pnl:pnl,tw:tw,tl:tl,sh:sh,
+      totW:w,capW:+(55+Math.random()*35).toFixed(1),
+      totBE:b,capBE:+(40+Math.random()*20).toFixed(1),
+      totL:l,capL:+(50+Math.random()*30).toFixed(1)});
+    var stress=Math.max(1,Math.min(5,Math.round(3-(sleep-7)*0.6+(Math.random()-0.5)*2)));
+    var fatigue=Math.max(1,Math.min(5,Math.round(3-(sleep-7)*0.7+(Math.random()-0.5)*2)));
+    var conf=Math.max(1,Math.min(5,Math.round(3+(sleep-7)*0.4+(Math.random()-0.5)*2)));
+    var sleepQ=Math.max(1,Math.min(5,Math.round(3+(sleep-7)*0.5+(Math.random()-0.5)*2)));
+    var diet=1+Math.floor(Math.random()*5);
+    var hydration=1+Math.floor(Math.random()*5);
+    var rulesN=Math.random()<0.55?0:(Math.random()<0.7?1:(Math.random()<0.85?2:3));
+    var remW=w,remL=l;
+    var blocks=TIME_BLOCKS.map(function(b2,bi){
+      var isLast=bi===TIME_BLOCKS.length-1;
+      var bw=isLast?remW:Math.round(Math.random()*remW);
+      var bl=isLast?remL:Math.round(Math.random()*remL);
+      remW-=bw;remL-=bl;
+      return{key:b2.key,disc:pickGbg(),tr:bw+bl,w:bw,l:bl};
+    });
+    journalLog.push({
+      date:date,ts:d.getTime(),
+      timeSlept:'',timeWoke:'',sleep:sleep,preSleepEmo:'',
+      sleepQ:sleepQ,social:'None — normal night',
+      stress:stress,fatigue:fatigue,conf:conf,
+      rules:rulesN,diet:diet,hydration:hydration,
+      phys:'Normal',sick:'No',temp:'Comfortable',
+      emo:'Steady',conflict:'None',news:'Neither',
+      exercise:DEMO_EXERCISE[Math.floor(Math.random()*DEMO_EXERCISE.length)],
+      prep:DEMO_PREP[Math.floor(Math.random()*DEMO_PREP.length)],
+      note:'',
+      worship:pickGbg(),faith:pickGbg(),prayer:pickGbg(),
+      balance:'',control:'',behavior:'',newsday:'',
+      location:'',
+      daygrade:pnl>=150?'A':pnl>=0?'B':pnl>=-150?'C':'D',
+      marketfav:'',focus:'',bestop:'',
+      blocks:blocks
+    });
+  }
+  return{sessionLog:sessionLog,journalLog:journalLog};
+}
+
+function snapshotEl(id){
+  var e=document.getElementById(id);
+  if(!e)return null;
+  return{text:e.textContent,color:e.style.color};
+}
+function restoreEl(id,snap){
+  var e=document.getElementById(id);
+  if(!e||!snap)return;
+  e.textContent=snap.text;e.style.color=snap.color;
+}
+
+// Mirrors resetStrategy()'s DOM-clearing half exactly (see that function,
+// in the main script above) — deliberately not called directly since
+// resetStrategy also confirm()s, mutates simResults, and save()s, none
+// of which belong here.
+function blankStrategyVisuals(tab){
+  var s=tab===0?'':'_'+tab;
+  var cv=document.getElementById('cv'+s);
+  if(cv){var ctx=cv.getContext('2d');if(ctx)ctx.clearRect(0,0,cv.width,cv.height);}
+  var ttEl=document.getElementById('ct'+s);if(ttEl)ttEl.textContent='';
+  var rgLineEl=document.getElementById('rg-line'+s),rgBubbleEl=document.getElementById('rg-bubble'+s);
+  if(rgLineEl)rgLineEl.classList.remove('show');
+  if(rgBubbleEl)rgBubbleEl.classList.remove('show');
+  var CM_DEFAULT_CLS={'cm-ttg':'cmv steel','cm-cap':'cmv amb','cm-ret':'cmv','cm-ann':'cmv'};
+  Object.keys(CM_DEFAULT_CLS).forEach(function(id){var e=document.getElementById(id+s);if(e){e.textContent='—';e.className=CM_DEFAULT_CLS[id];}});
+  ['cm-ttgs','cm-caps','cm-rets'].forEach(function(id){var e=document.getElementById(id+s);if(e)e.textContent='—';});
+  var diagT=document.getElementById('diag-t'+s),diagB=document.getElementById('diag-b'+s),diagTiles=document.getElementById('diag-tiles'+s),diagVerdict=document.getElementById('diag-verdict'+s),diagDetail=document.getElementById('diag-detail'+s),diagL=document.getElementById('diag-l'+s),diagEl=document.getElementById('diag'+s);
+  if(diagT)diagT.textContent='Diagnostics';
+  if(diagB)diagB.textContent='—';
+  if(diagTiles)diagTiles.innerHTML='';
+  if(diagVerdict)diagVerdict.innerHTML='';
+  if(diagL)diagL.innerHTML='';
+  if(diagDetail){diagDetail.style.display='none';diagDetail.open=false;}
+  if(diagEl)diagEl.className='diag';
+}
+
+// Repaints one strategy tab's Sim-tab visuals (equity chart, cm-* summary
+// fields, Diagnostics, its Table-tab row data) straight from
+// simResults[tab] with NO recomputation — unlike simulate()/_sim(), which
+// always runs a fresh (random) simulation. Used only to restore a tab
+// after demo mode, where re-simulating would silently hand a returning
+// user a DIFFERENT result than the one they actually had. Mirrors
+// _sim()'s own tail (see the main script above), reading stored values
+// instead of live locals.
+function repaintStrategy(tab){
+  var r=simResults[tab];
+  var s=tab===0?'':'_'+tab;
+  if(!r||!r.rows||!r.rows.length){
+    blankStrategyVisuals(tab);
+    try{updateStratTab(tab);}catch(e){}
+    try{renderTable(tab);}catch(e){}
+    return;
+  }
+  var rows=r.rows,equity=r.equity,acct0=r.acct0,c=r.c,msp=r.msp;
+  var day=rows.length,calMoT=(day/252)*12;
+  var cumPnl=rows[rows.length-1].cumPnl;
+  var retPct=(cumPnl/acct0)*100,annPct=day>0?(retPct/day)*252:0;
+  var pnlArr=rows.map(function(x){return x.dayPnl;});
+  var sp=sharpe(pnlArr,acct0);
+  var capped=day>=10000;
+  var peak=0,simMDD=0;
+  equity.forEach(function(pt){if(pt.cumPnl>peak)peak=pt.cumPnl;var dd=peak-pt.cumPnl;if(dd>simMDD)simMDD=dd;});
+  var simMDDpct=acct0>0?(simMDD/acct0)*100:0;
+  try{drawChart(equity,acct0,tab);}catch(e){}
+  function setEl(id,v,cls){var e=document.getElementById(id+s);if(!e)return;e.textContent=v;if(cls)e.className='cmv '+cls;}
+  setEl('cm-ttg',cal(calMoT),'steel');setEl('cm-ttgs',day.toLocaleString()+' market days','');
+  setEl('cm-cap','$'+fmt(acct0+cumPnl),'amb');setEl('cm-caps',pct(retPct)+' total','');
+  setEl('cm-ret',pct(retPct),retPct>=0?'go':'stop');setEl('cm-rets',pct(annPct)+' ann.','');
+  setEl('cm-ann',pct(annPct)+' p.a.',annPct>=0?'go':'stop');
+  try{buildDiag(c,cumPnl,day,acct0,capped,retPct,annPct,sp,simMDD,simMDDpct,tab);}catch(e){}
+  try{renderTable(tab,rows,acct0,c,msp,capped);}catch(e){}
+  try{updateStratTab(tab);}catch(e){}
+}
+
+function startDemoMode(){
+  if(demo.active)return;
+  try{
+    demo.active=true;
+    demo.realSave=window.save;
+    window.save=function(){};
+    demo.origSessionLog=sessionLog;
+    demo.origJournalLog=journalLog;
+    demo.origSimResults=simResults.slice();
+    demo.origActiveStrat=activeStrat;
+    demo.origActiveTblStrat=activeTblStrat;
+    var logInfoEl0=document.getElementById('log-info');
+    demo.origLogInfo=logInfoEl0?logInfoEl0.textContent:null;
+    var pipEl0=document.getElementById('tbl-pip');
+    demo.origTblPipOn=!!(pipEl0&&pipEl0.classList.contains('on'));
+    demo.origLogFields={};
+    DEMO_LOG_FIELD_IDS.forEach(function(id){var e=document.getElementById(id);demo.origLogFields[id]=e?e.value:'';});
+    demo.origPreview={};
+    DEMO_PREVIEW_IDS.forEach(function(id){demo.origPreview[id]=snapshotEl(id);});
+    demo.origSdGrade=snapshotEl('sd-grade');
+    var sdStatusEl0=document.getElementById('sd-status');
+    demo.origSdStatus=sdStatusEl0?sdStatusEl0.textContent:null;
+    demo.origRealFields={};
+    REAL_IDS.forEach(function(id){var e=document.getElementById(id);demo.origRealFields[id]=e?e.value:'';});
+
+    var gen=genDemoData();
+    sessionLog=gen.sessionLog;
+    journalLog=gen.journalLog;
+
+    [0,1,2,3,4,5].forEach(function(t){try{simulate(t);}catch(e){}});
+    try{resetRealStats();}catch(e){}
+
+    var todayEntry=sessionLog[0];
+    if(todayEntry){
+      var setV=function(id,v){var e=document.getElementById(id);if(e)e.value=v;};
+      setV('dWins',todayEntry.w);setV('dLoss',todayEntry.l);setV('dBE',todayEntry.b);
+      setV('dTickW',todayEntry.tw);setV('dTickL',todayEntry.tl);
+      setV('dPnl',todayEntry.pnl);setV('dShares',todayEntry.sh);
+      setV('dTotW',todayEntry.totW);setV('dCapW',todayEntry.capW);
+      setV('dTotBE',todayEntry.totBE);setV('dCapBE',todayEntry.capBE);
+      setV('dTotL',todayEntry.totL);setV('dCapL',todayEntry.capL);
+      try{onDaily();}catch(e){}
+    }
+    if(logInfoEl0)logInfoEl0.textContent=sessionLog.length+' days logged';
+    try{renderJournal();}catch(e){}
+  }catch(e){/* demo setup must never break the tour itself */}
+}
+
+function endDemoMode(){
+  if(!demo.active)return;
+  try{
+    sessionLog=demo.origSessionLog;
+    journalLog=demo.origJournalLog;
+    for(var i=0;i<6;i++)simResults[i]=demo.origSimResults[i];
+    [0,1,2,3,4,5].forEach(function(t){try{switchStrat(t);repaintStrategy(t);}catch(e){}});
+    try{switchStrat(demo.origActiveStrat);}catch(e){}
+
+    DEMO_LOG_FIELD_IDS.forEach(function(id){var e=document.getElementById(id);if(e)e.value=demo.origLogFields[id]||'';});
+    DEMO_PREVIEW_IDS.forEach(function(id){restoreEl(id,demo.origPreview[id]);});
+    restoreEl('sd-grade',demo.origSdGrade);
+    var sdStatusEl1=document.getElementById('sd-status');
+    if(sdStatusEl1&&demo.origSdStatus!=null)sdStatusEl1.textContent=demo.origSdStatus;
+    REAL_IDS.forEach(function(id){var e=document.getElementById(id);if(e)e.value=demo.origRealFields[id]||'';});
+
+    try{onReal();}catch(e){}
+
+    var logInfoEl1=document.getElementById('log-info');
+    if(logInfoEl1&&demo.origLogInfo!=null)logInfoEl1.textContent=demo.origLogInfo;
+    try{renderJournal();}catch(e){}
+
+    var pipEl1=document.getElementById('tbl-pip');
+    if(pipEl1)pipEl1.classList.toggle('on',demo.origTblPipOn);
+    try{switchTblStrat(demo.origActiveTblStrat);}catch(e){}
+  }catch(e){}
+  finally{
+    window.save=demo.realSave||window.save;
+    demo.active=false;
+  }
+}
+
 function startTour(){
   ensureDom();
   state.active=true;state.idx=0;
   try{switchScreen('sim');switchStrat(0);}catch(e){}
+  startDemoMode();
   blocker.style.display='';spotlight.style.display='';card.style.display='';
   var skipBtn=document.getElementById('tour-skip-btn');if(skipBtn)skipBtn.style.display='';
   renderStop(0);
@@ -4994,6 +5253,7 @@ function startTour(){
 }
 function finish(){
   state.active=false;
+  endDemoMode();
   markSeen();
   if(blocker)blocker.style.display='none';
   if(spotlight)spotlight.style.display='none';
