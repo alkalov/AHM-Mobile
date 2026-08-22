@@ -1212,6 +1212,35 @@ canvas.spark{width:100%;height:34px;display:block;}
 .tour-back:disabled{opacity:.35;pointer-events:none;}
 .tour-next{background:var(--accent-solid);border:none;color:#04060a;font-weight:700;}
 .tour-skip{position:fixed;z-index:2002;top:calc(14px + env(safe-area-inset-top,0px));right:16px;font-size:10px;color:#8892a4;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:6px;touch-action:manipulation;background:rgba(4,6,10,.5);border-radius:4px;}
+
+/* PRE-TOUR SEQUENCE (round 96) — motion intro + screening
+   questionnaire, first-time visitors only, ahead of the tour above.
+   .intro-overlay's z-index (1990) sits BELOW .tour-skip/.tour-card's
+   (2002, shared classes reused for the questionnaire's own skip button
+   and card) on purpose — it's a full-viewport backdrop those two need
+   to render (and receive taps) ON TOP OF, same relationship
+   .tour-blocker (2000) has with .tour-card/.tour-skip (2002) in the
+   tour above; getting this backwards once during the build (a higher
+   z-index "to be safe") silently made every control underneath
+   unclickable — caught only by an actual Playwright click timing out,
+   not by anything visual, so don't re-guess this number without a
+   click test. The motion intro is pure canvas (.intro-cv) - no
+   separate per-element CSS animation needed, everything (line draw-in,
+   colour join, flake burst) is drawn frame-by-frame in JS reusing the
+   Race to Goal chart's own dvBuildCurvePath/dvStrokeGlassCurve "glass
+   tube" material, so the intro's coloured-lines phase is materially
+   identical to the real chart it's foreshadowing. The questionnaire
+   card reuses .tour-card/.tour-progress/.tour-title/.tour-btn as-is
+   (same look, zero duplicated chrome) via the extra .quiz-card class
+   below just for its taller scrollable content. */
+.intro-overlay{position:fixed;inset:0;z-index:1990;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse 60% 50% at 50% 42%,rgba(56,189,248,.07),transparent 65%),#04060a;transition:opacity .35s ease;}
+.intro-cv{width:min(90vw,380px);height:200px;display:block;}
+.quiz-card{max-height:80vh;overflow-y:auto;}
+.quiz-opts{margin-bottom:10px;}
+.quiz-opt{display:block;width:100%;text-align:left;padding:11px 14px;margin-bottom:8px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid #232b3d;color:#e2e6ed;font-family:'Inter',sans-serif;font-size:11px;line-height:1.4;cursor:pointer;touch-action:manipulation;}
+.quiz-opt.pressed{border-color:var(--accent-solid);}
+.quiz-opt.sel{background:rgba(56,189,248,.14);border-color:var(--accent-solid);color:var(--accent-solid);}
+.quiz-nav{display:flex;gap:8px;}
 </style>
 
 </head>
@@ -4761,7 +4790,7 @@ async function load(){
    at page-load or gets created later by buildPanes/buildJournalCircles/
    buildStatsCircle — no per-element wiring needed. */
 function initPressBloom(){
-  const SEL='.sim-btn,.j-save-btn,.sess-btn,.exp-btn,.guide-btn,.ib,.stp-btn,.nb,.sbtn,.scale-btn,.circ-btn,.seg-btn,.dv-tbtn,.tc-qbtn,.tc-close,.stat-actbtn,.cap-qbtn,.cap-close';
+  const SEL='.sim-btn,.j-save-btn,.sess-btn,.exp-btn,.guide-btn,.ib,.stp-btn,.nb,.sbtn,.scale-btn,.circ-btn,.seg-btn,.dv-tbtn,.tc-qbtn,.tc-close,.stat-actbtn,.cap-qbtn,.cap-close,.quiz-opt';
   const press=e=>{const t=e.target.closest(SEL);if(t)t.classList.add('pressed');};
   const release=e=>{const t=e.target.closest(SEL);if(t)setTimeout(()=>t.classList.remove('pressed'),120);};
   document.addEventListener('pointerdown',press,{passive:true});
@@ -5278,9 +5307,234 @@ function shouldAutoShow(){
 }
 function markSeen(){try{localStorage.setItem(TK,'1');}catch(e){}}
 
-window.startTour=startTour;
+/* ══════════════════════════════════════════════════════════════
+   PRE-TOUR SEQUENCE — round 96. First-time visitors now see a short
+   motion intro (one line, then six, in the app's own "glass tube"
+   curve material) followed by a brief screening questionnaire,
+   BEFORE the coachmark tour above begins. Both are first-run only:
+   the SAME ahm-tour-v1-seen flag gates the whole sequence exactly as
+   it gated the tour alone before this round - Guide keeps jumping
+   straight into the tour, unchanged, since re-asking "have you
+   backtested 50 trades" on every manual Guide click would get old
+   fast (confirmed directly with the user rather than assumed). Skip
+   - one control, shown throughout both the motion and the
+   questionnaire - abandons the ENTIRE remaining sequence, tour
+   included: the same "get me out, I'll explore myself" meaning the
+   tour's own Skip has always had, not a second, narrower meaning of
+   "skip just this animation." The questionnaire never writes
+   anything - no app field, no localStorage - it's a reflective
+   screening step only, same "pure explainer" principle as the tour
+   itself; answers are never even held past the next tap.
+   ══════════════════════════════════════════════════════════════ */
+var QUIZ_QUESTIONS=[
+  {q:'Have you traded before?',opts:['Not yet','Demo or paper trading','Live, under 1 year','Live, 1+ years']},
+  {q:'Have you backtested a strategy over at least 50 trades?',opts:['No','Working on it','Yes, informally','Yes, rigorously']},
+  {q:'Do you have real trading data ready to log — broker statements, a trade journal?',opts:['Not yet','Some of it','Yes, ready now']},
+  {q:'What brings you here?',opts:['Test a strategy idea before risking money','Compare a few strategy variations','Track my psychology alongside real trades','Just exploring']}
+];
 
-if(shouldAutoShow())setTimeout(startTour,500);
+var introOverlay,introCanvas,quizCard,introSkipBtn;
+var introRafId=null;
+var quizIdx=0;
+
+function ensureIntroDom(){
+  if(introOverlay)return;
+  introOverlay=document.createElement('div');introOverlay.className='intro-overlay';
+  introCanvas=document.createElement('canvas');introCanvas.className='intro-cv';
+  introOverlay.appendChild(introCanvas);
+  document.body.appendChild(introOverlay);
+  quizCard=document.createElement('div');quizCard.className='tour-card centered quiz-card';
+  document.body.appendChild(quizCard);
+  introSkipBtn=document.createElement('div');introSkipBtn.className='tour-skip';introSkipBtn.id='intro-skip-btn';introSkipBtn.textContent='Skip';
+  introSkipBtn.addEventListener('click',abandonOnboarding);
+  document.body.appendChild(introSkipBtn);
+}
+
+// Bails out of the WHOLE pre-tour sequence (motion + questionnaire) AND
+// the tour that would have followed it - see the header comment above
+// for why this is one meaning, not two. Never touches demo mode: at
+// this point in the sequence the tour hasn't started yet, so there is
+// nothing demo-related to restore (that only happens once startTour()
+// itself runs, and its own finish()/endDemoMode() handle it if the user
+// instead skips out of the tour proper, later).
+function abandonOnboarding(){
+  if(introRafId)cancelAnimationFrame(introRafId);
+  introRafId=null;
+  if(introOverlay)introOverlay.style.display='none';
+  if(quizCard){quizCard.style.display='none';}
+  if(introSkipBtn)introSkipBtn.style.display='none';
+  markSeen();
+}
+
+// Motion intro: canvas-only, "one line, then six, then it scatters."
+// Reuses dvBuildCurvePath/dvStrokeGlassCurve (the Race to Goal chart's
+// own glass-tube material, see the main script above) so this literally
+// previews the real chart's look rather than inventing a separate one.
+// Progressive draw-in is done by feeding a growing point COUNT into
+// dvBuildCurvePath each frame (not stroke-dasharray, which would need
+// exact path lengths per curve) - simplest correct way to "grow" a
+// Path2D that's rebuilt fresh every frame anyway.
+function runMotionIntro(onDone){
+  introOverlay.style.display='flex';introOverlay.style.opacity='1';
+  quizCard.style.display='none';
+  introSkipBtn.style.display='';
+  var dpr=window.devicePixelRatio||1;
+  var W=introCanvas.offsetWidth,H=introCanvas.offsetHeight;
+  if(!W||!H){onDone();return;}
+  introCanvas.width=W*dpr;introCanvas.height=H*dpr;
+  var ctx=introCanvas.getContext('2d');ctx.scale(dpr,dpr);
+
+  var N=42;
+  var startX=W*0.08,startY=H*0.80,endX=W*0.92;
+  var endYs=[H*0.16,H*0.32,H*0.44,H*0.56,H*0.68,H*0.80];
+  var colors=STRAT_COLORS.map(hexToRgb);
+  function genLine(seed,endY){
+    var xs=[],ys=[];
+    var freq=1.6+seed*0.35,phase=seed*1.7,amp=H*0.045;
+    for(var i=0;i<N;i++){
+      var t=i/(N-1);
+      var ease=t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+      var x=startX+(endX-startX)*t;
+      var baseY=startY+(endY-startY)*ease;
+      var noise=Math.sin(t*Math.PI*freq+phase)*amp*(1-t*0.55);
+      xs.push(x);ys.push(baseY+noise);
+    }
+    return{xs:xs,ys:ys};
+  }
+  var lines=endYs.map(function(ey,i){return genLine(i,ey);});
+
+  var flakes=[],flakesSpawned=false;
+  function spawnFlakes(){
+    if(flakesSpawned)return;flakesSpawned=true;
+    for(var i=0;i<26;i++){
+      var li=Math.floor(Math.random()*6);
+      flakes.push({
+        x:endX+(Math.random()-0.5)*10,
+        y:lines[li].ys[N-1]+(Math.random()-0.5)*16,
+        vx:(Math.random()-0.5)*0.55,
+        vy:-0.35-Math.random()*0.55,
+        r:1.3+Math.random()*2.2,
+        born:performance.now(),
+        life:1000+Math.random()*900
+      });
+    }
+  }
+
+  var start=null;
+  var PH1=1100,PH2_STAGGER=95,PH2_DUR=950,HOLD=350,FADE=650;
+  var ph2Start=PH1;
+  var lastLineFullAt=ph2Start+5*PH2_STAGGER+PH2_DUR;
+  var fadeStart=lastLineFullAt+HOLD;
+  var fadeEnd=fadeStart+FADE;
+  var flakeEnd=fadeEnd+1800;
+
+  function frame(ts){
+    if(!start)start=ts;
+    var t=ts-start;
+    ctx.clearRect(0,0,W,H);
+
+    var fadeAlpha=1;
+    if(t>fadeStart)fadeAlpha=Math.max(0,1-(t-fadeStart)/FADE);
+
+    ctx.save();ctx.globalAlpha=fadeAlpha;
+    var revealFrac=[Math.min(1,t/PH1)];
+    for(var i=0;i<5;i++){
+      var s=ph2Start+i*PH2_STAGGER;
+      revealFrac.push(Math.max(0,Math.min(1,(t-s)/PH2_DUR)));
+    }
+    for(var li=0;li<6;li++){
+      var frac=revealFrac[li];
+      if(frac<=0)continue;
+      var k=Math.max(2,Math.round(frac*N));
+      var ln=lines[li];
+      var path=dvBuildCurvePath(function(idx){return ln.xs[idx];},function(idx){return ln.ys[idx];},k);
+      dvStrokeGlassCurve(ctx,path,colors[li],H*0.05,H*0.95);
+    }
+    ctx.restore();
+
+    if(t>fadeStart-150)spawnFlakes();
+    if(flakesSpawned){
+      ctx.save();
+      flakes.forEach(function(f){
+        var age=ts-f.born;
+        if(age<0||age>f.life)return;
+        var a=1-age/f.life;
+        var px=f.x+f.vx*age*0.06,py=f.y+f.vy*age*0.06;
+        ctx.beginPath();
+        ctx.fillStyle='rgba(125,211,252,'+(a*0.9).toFixed(3)+')';
+        ctx.shadowColor='rgba(56,189,248,'+(a*0.8).toFixed(3)+')';ctx.shadowBlur=6;
+        ctx.arc(px,py,f.r,0,Math.PI*2);ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    if(t<flakeEnd){
+      introRafId=requestAnimationFrame(frame);
+    }else{
+      ctx.clearRect(0,0,W,H);
+      introRafId=null;
+      onDone();
+    }
+  }
+  introRafId=requestAnimationFrame(frame);
+}
+
+// Screening questionnaire: tap-to-advance chip questions, same feel as
+// the (fully removed) round 86-88 wizard's chip pages, but — unlike
+// that wizard — purely reflective. Nothing here is stored (not even in
+// memory past the next tap) or applied to any app field/setting.
+function renderQuizStep(onDone){
+  var item=QUIZ_QUESTIONS[quizIdx];
+  quizCard.innerHTML=
+    '<div class="tour-progress">'+(quizIdx+1)+' / '+QUIZ_QUESTIONS.length+'</div>'+
+    '<div class="tour-title">'+item.q+'</div>'+
+    '<div class="quiz-opts">'+item.opts.map(function(o,oi){return '<button type="button" class="quiz-opt" data-i="'+oi+'">'+o+'</button>';}).join('')+'</div>'+
+    '<div class="quiz-nav"><button class="tour-btn tour-back" id="quiz-back"'+(quizIdx===0?' disabled':'')+'>Back</button></div>';
+  var backBtn=document.getElementById('quiz-back');
+  if(backBtn)backBtn.addEventListener('click',function(){
+    if(quizIdx>0){quizIdx--;renderQuizStep(onDone);}
+  });
+  quizCard.querySelectorAll('.quiz-opt').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      quizCard.querySelectorAll('.quiz-opt').forEach(function(b){b.classList.remove('sel');});
+      btn.classList.add('sel');
+      setTimeout(function(){
+        if(quizIdx<QUIZ_QUESTIONS.length-1){quizIdx++;renderQuizStep(onDone);}
+        else{onDone();}
+      },220);
+    });
+  });
+}
+// introOverlay is left fully visible/opaque here on purpose - it's the
+// questionnaire's own backdrop too (a full-viewport blocker, same as
+// the tour's own .tour-blocker), not just the motion canvas's. Hiding
+// it at this point (an earlier bug, caught via screenshot review) left
+// the quiz card floating over the fully-visible, fully-tappable real
+// app underneath - wrong both visually (looked broken, not layered on
+// purpose) and functionally (nothing was stopping a tap from reaching
+// the real app mid-questionnaire).
+function runQuestionnaire(onDone){
+  quizCard.style.display='';
+  quizIdx=0;
+  renderQuizStep(onDone);
+}
+
+function startIntroSequence(){
+  ensureIntroDom();
+  runMotionIntro(function(){
+    runQuestionnaire(function(){
+      if(introOverlay)introOverlay.style.display='none';
+      if(quizCard)quizCard.style.display='none';
+      if(introSkipBtn)introSkipBtn.style.display='none';
+      startTour();
+    });
+  });
+}
+
+window.startTour=startTour;
+window.startIntroSequence=startIntroSequence;
+
+if(shouldAutoShow())setTimeout(startIntroSequence,500);
 })();
 </script>
 
